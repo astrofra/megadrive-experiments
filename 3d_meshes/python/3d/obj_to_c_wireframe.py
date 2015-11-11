@@ -12,13 +12,13 @@ from vector3 import Vector3
 folder_in = "meshes"
 scale_factor = 10.0
 
-def parse_obj_vector(_string):
+def parse_obj_vector(_string, _scale_factor):
 	_args = _string.split(' ')
 	_vector = Vector3(float(_args[1]), float(_args[2]), float(_args[3]))
-	_vector *= scale_factor
-	_vector.x = float(int(_vector.x))
-	_vector.y = float(int(_vector.y))
-	_vector.z = float(int(_vector.z))
+	_vector *= _scale_factor
+	_vector.x = float(_vector.x)
+	_vector.y = float(_vector.y)
+	_vector.z = float(_vector.z)
 	return _vector
 
 def parse_obj_face(_string):
@@ -56,9 +56,10 @@ def main():
 
 	filename_out = '../../src/meshs.c'
 	fc = codecs.open(filename_out, 'w')
+	fc.write('#include "genesis.h"\n\n')
 
 	for filename_in in os.listdir(folder_in):
-		if filename_in.find("cube.obj") > -1:
+		if filename_in.find(".obj") > -1:
 			face_list = []
 			vertex_list = []
 			vertex_normal_list = []
@@ -74,11 +75,11 @@ def main():
 					line = line.strip()
 					if line.startswith('v '):
 						# print('found a vertex')
-						vertex_list.append(parse_obj_vector(line))
+						vertex_list.append(parse_obj_vector(line, scale_factor))
 
 					if line.startswith('vn '):
 						# print('found a vertex normal')
-						vertex_normal_list.append(parse_obj_vector(line))
+						vertex_normal_list.append(parse_obj_vector(line, 1.0))
 
 					if line.startswith('f '):
 						# print('found a face')
@@ -109,16 +110,16 @@ def main():
 			obj_name = obj_name.replace('-', '_')
 			obj_name = obj_name.lower()
 
-			##  Creates the H file that lists the vertices
-			##############################################
+			##  Creates the H file that lists the arrays
+			############################################
 
 			fh.write('const Vect3D_f16 ' + obj_name + '_coord[' + str(len(vertex_list) * 3) + '];\n')
 			fh.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '];\n')
-			fh.write('const u16  ' + obj_name + '_line_ind[' + str(len(edge_list) * 2) + '];\n\n')
+			fh.write('const u16  ' + obj_name + '_line_ind[' + str(len(edge_list) * 2) + '];\n')
+			fh.write('const Vect3D_f16  ' + obj_name + '_face_norm[' + str(len(face_list)) + '];\n\n')
 
-			##  Creates the C file that lists the vertices
-			##############################################
-			fc.write('#include "genesis.h"\n\n')
+			##  Creates the C file that lists the meshes
+			############################################
 			fc.write('/* ' + filename_in + ' */' + '\n')
 			fc.write('/* List of vertices */' + '\n')
 			fc.write('const Vect3D_f16 ' + obj_name + '_coord[' + str(len(vertex_list) * 3) + '] =\n')
@@ -126,7 +127,7 @@ def main():
 
 			##  Iterate on vertices
 			for _vertex in vertex_list:
-				_str_out = '{FIX16(' + str(int(_vertex.x)) + '),\t' + 'FIX16(' + str(int(_vertex.z)) + '),\t' + 'FIX16(' + str(int(_vertex.y * -1.0)) + ')},'
+				_str_out = '{FIX16(' + str(_vertex.x) + '),\t' + 'FIX16(' + str(_vertex.z) + '),\t' + 'FIX16(' + str(_vertex.y * -1.0) + ')},'
 				fc.write('\t' + _str_out + '\n')
 
 			_str_out = '};'
@@ -168,6 +169,23 @@ def main():
 			_str_out = '};'
 			fc.write(_str_out + '\n')
 			fc.write('\n')
+
+			##  Iterate on face normals
+			fc.write('/* List of face normals */' + '\n')
+
+			fc.write('const Vect3D_f16  ' + obj_name + '_face_norm[' + str(len(face_list)) + '] =\n')
+			fc.write('{\n')
+
+			for _face in face_list:
+				_str_out = '\t'
+				_vertex = vertex_normal_list[_face[0]['normal']]
+				_str_out = '{FIX16(' + str(_vertex.x) + '),\t' + 'FIX16(' + str(_vertex.z) + '),\t' + 'FIX16(' + str(_vertex.y * -1.0) + ')},'
+				fc.write('\t' + _str_out + '\n')
+
+			_str_out = '};'
+			fc.write(_str_out + '\n')
+			fc.write('\n')
+
 
 	fh.close()
 	fc.close()

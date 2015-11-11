@@ -1,111 +1,51 @@
 #include "genesis.h"
 
-
-//    CUBE
-//
-//    6----7
-//   /|   /|
-//  2-+--4 |
-//  | |  | |
-//  | 3--+-5
-//  |/   |/
-//  0----1
-
-const Vect3D_f16 cube_coord[8] =
+/* cube.obj */
+/* List of vertices */
+const Vect3D_f16 cube_coord[24] =
 {
-    {FIX16(-5), FIX16(-5), FIX16(-5)},
-    {FIX16(5), FIX16(-5), FIX16(-5)},
-    {FIX16(-5), FIX16(5), FIX16(-5)},
-    {FIX16(-5), FIX16(-5), FIX16(5)},
-    {FIX16(5), FIX16(5), FIX16(-5)},
-    {FIX16(5), FIX16(-5), FIX16(5)},
-    {FIX16(-5), FIX16(5), FIX16(5)},
-    {FIX16(5), FIX16(5), FIX16(5)}
+	{FIX16(-4.99999970198),	FIX16(-4.99999940395),	FIX16(5.00000119209)},
+	{FIX16(4.99999970198),	FIX16(-4.99999940395),	FIX16(5.00000119209)},
+	{FIX16(-4.99999970198),	FIX16(-4.99999940395),	FIX16(-4.99999761581)},
+	{FIX16(4.99999970198),	FIX16(-4.99999940395),	FIX16(-4.99999761581)},
+	{FIX16(-4.99999970198),	FIX16(4.99999940395),	FIX16(5.00000119209)},
+	{FIX16(4.99999970198),	FIX16(4.99999940395),	FIX16(5.00000119209)},
+	{FIX16(-4.99999970198),	FIX16(4.99999940395),	FIX16(-4.99999761581)},
+	{FIX16(4.99999970198),	FIX16(4.99999940395),	FIX16(-4.99999761581)},
 };
 
-const u16 cube_poly_ind[6 * 4] =
+/* List of faces */
+const u16  cube_poly_ind[24] =
 {
-    6, 3, 5, 7,
-    0, 2, 4, 1,
-    2, 6, 7, 4,
-    3, 0, 1, 5,
-    1, 4, 7, 5,
-    3, 6, 2, 0
+	3,1,0,2,
+	7,6,4,5,
+	5,4,0,1,
+	7,5,1,3,
+	6,7,3,2,
+	4,6,2,0,
 };
 
-const u16 cube_line_ind[12 * 2] =
+/* List of edges */
+const u16  cube_line_ind[16] =
 {
-    0, 1,
-    1, 4,
-    4, 2,
-    2, 0,
-    3, 5,
-    5, 7,
-    7, 6,
-    6, 3,
-    0, 3,
-    1, 5,
-    4, 7,
-    2, 6
+	1, 3, 
+	0, 2, 
+	6, 7, 
+	4, 5, 
+	0, 1, 
+	5, 7, 
+	2, 3, 
+	4, 6, 
 };
 
-const Vect3D_f16 cube_face_norm[6] =
+/* List of face normals */
+const Vect3D_f16  cube_face_norm[6] =
 {
-    {FIX16(0), FIX16(0), FIX16(1)},
-    {FIX16(0), FIX16(0), FIX16(-1)},
-    {FIX16(0), FIX16(1), FIX16(0)},
-    {FIX16(0), FIX16(-1), FIX16(0)},
-    {FIX16(1), FIX16(0), FIX16(0)},
-    {FIX16(-1), FIX16(0), FIX16(0)}
+	{FIX16(0.0),	FIX16(-1.0),	FIX16(-0.0)},
+	{FIX16(0.0),	FIX16(1.0),	FIX16(-0.0)},
+	{FIX16(0.0),	FIX16(0.0),	FIX16(1.0)},
+	{FIX16(1.0),	FIX16(0.0),	FIX16(-0.0)},
+	{FIX16(0.0),	FIX16(0.0),	FIX16(-1.0)},
+	{FIX16(-1.0),	FIX16(0.0),	FIX16(-0.0)},
 };
 
-//    ALTERNATE CUBE
-
-#define EDGE_SIZE 3
-const Vect3D_f16 alt_cube_coord[8] =
-{
-    {FIX16(-EDGE_SIZE), FIX16(-EDGE_SIZE), FIX16(-EDGE_SIZE)},
-    {FIX16(EDGE_SIZE), FIX16(-EDGE_SIZE), FIX16(-EDGE_SIZE)},
-    {FIX16(-EDGE_SIZE), FIX16(EDGE_SIZE), FIX16(-EDGE_SIZE)},
-    {FIX16(-EDGE_SIZE), FIX16(-EDGE_SIZE), FIX16(EDGE_SIZE)},
-    {FIX16(EDGE_SIZE), FIX16(EDGE_SIZE), FIX16(-EDGE_SIZE)},
-    {FIX16(EDGE_SIZE), FIX16(-EDGE_SIZE), FIX16(EDGE_SIZE)},
-    {FIX16(-EDGE_SIZE), FIX16(EDGE_SIZE), FIX16(EDGE_SIZE)},
-    {FIX16(EDGE_SIZE), FIX16(EDGE_SIZE), FIX16(EDGE_SIZE)}
-};
-
-const u16 alt_cube_poly_ind[6 * 4] =
-{
-    6, 3, 5, 7,
-    0, 2, 4, 1,
-    2, 6, 7, 4,
-    3, 0, 1, 5,
-    1, 4, 7, 5,
-    3, 6, 2, 0
-};
-
-const u16 alt_cube_line_ind[12 * 2] =
-{
-    0, 1,
-    1, 4,
-    4, 2,
-    2, 0,
-    3, 5,
-    5, 7,
-    7, 6,
-    6, 3,
-    0, 3,
-    1, 5,
-    4, 7,
-    2, 6
-};
-
-const Vect3D_f16 alt_cube_face_norm[6] =
-{
-    {FIX16(0), FIX16(0), FIX16(1)},
-    {FIX16(0), FIX16(0), FIX16(-1)},
-    {FIX16(0), FIX16(1), FIX16(0)},
-    {FIX16(0), FIX16(-1), FIX16(0)},
-    {FIX16(1), FIX16(0), FIX16(0)},
-    {FIX16(-1), FIX16(0), FIX16(0)}
-};

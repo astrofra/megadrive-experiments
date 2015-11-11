@@ -41,8 +41,6 @@ void handleJoyEvent(u16 joy, u16 changed, u16 state);
 int main()
 {
     char str[16];
-    u16 change_mesh_counter = 0;
-
 
     VDP_setScreenWidth256();
     VDP_setHInterrupt(0);
@@ -83,26 +81,6 @@ int main()
         doActionJoy(JOY_1, JOY_readJoypad(JOY_1));
 
         M3D_setCamDistance(camdist);
-
-        change_mesh_counter++;
-        if (change_mesh_counter > 16)
-        {
-            change_mesh_counter = 0;
-            if (mesh_coord == cube_coord)
-            {
-                mesh_coord = alt_cube_coord;
-                mesh_poly_ind = alt_cube_poly_ind;
-                mesh_line_ind = alt_cube_line_ind;
-                mesh_face_norm = alt_cube_face_norm;
-            }
-            else
-            {
-                mesh_coord = cube_coord;
-                mesh_poly_ind = cube_poly_ind;
-                mesh_line_ind = cube_line_ind;
-                mesh_face_norm = cube_face_norm;
-            }
-        }
 
         // do work here
         rotation.x += rotstep.x;
