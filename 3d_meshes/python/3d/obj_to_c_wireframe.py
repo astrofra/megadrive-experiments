@@ -61,7 +61,8 @@ def main():
 		if filename_in.find("cube.obj") > -1:
 			face_list = []
 			vertex_list = []
-			normal_list = []
+			vertex_normal_list = []
+			edge_list = []
 
 			f = codecs.open(os.path.join(folder_in, filename_in), 'r')
 			for line in f:
@@ -77,14 +78,31 @@ def main():
 
 					if line.startswith('vn '):
 						# print('found a vertex normal')
-						normal_list.append(parse_obj_vector(line))
+						vertex_normal_list.append(parse_obj_vector(line))
 
 					if line.startswith('f '):
 						# print('found a face')
 						face_list.append(parse_obj_face(line))
 
+			new_edge = []
+			for _face in face_list:
+				for _corner in _face:
+					new_edge.append(_corner['vertex'])
+					if len(new_edge) == 2:
+						if new_edge[0] > new_edge[1]:
+							tmp = new_edge[1]
+							new_edge[1] = new_edge[0]
+							new_edge[0] = tmp
+						already_in_list = False
+						for _edge in edge_list:
+							if _edge == new_edge:
+								already_in_list = True
+						if not already_in_list:
+							edge_list.append(new_edge)
+						new_edge = []
 
-			print('OBJ Parser : "' + filename_in + '", ' + str(len(vertex_list)) + ' vertices, ' + str(len(normal_list)) + ' normals, ' + str(len(face_list)) + ' faces, ')
+
+			print('OBJ Parser : "' + filename_in + '", ' + str(len(vertex_list)) + ' vertices, ' + str(len(vertex_normal_list)) + ' normals, ' + str(len(face_list)) + ' faces, ')
 
 			obj_name = filename_in.replace('.obj', '')
 			obj_name = obj_name.replace(' ', '')
@@ -95,7 +113,8 @@ def main():
 			##############################################
 
 			fh.write('const Vect3D_f16 ' + obj_name + '_coord[' + str(len(vertex_list) * 3) + '];\n')
-			fh.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '];\n\n')
+			fh.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '];\n')
+			fh.write('const u16  ' + obj_name + '_line_ind[' + str(len(edge_list) * 2) + '];\n\n')
 
 			##  Creates the C file that lists the vertices
 			##############################################
@@ -113,8 +132,6 @@ def main():
 			_str_out = '};'
 			fc.write(_str_out + '\n')
 
-			##  Creates the C file that lists the faces
-
 			##  Iterate on faces
 			fc.write('\n')
 			fc.write('/* List of faces */' + '\n')
@@ -131,6 +148,21 @@ def main():
 					corner_idx += 1
 					_str_out += ','
 
+				fc.write(_str_out + '\n')
+
+			_str_out = '};'
+			fc.write(_str_out + '\n')
+			fc.write('\n')
+
+			##  Iterate on edges
+			fc.write('/* List of edges */' + '\n')
+
+			fc.write('const u16  ' + obj_name + '_line_ind[' + str(len(edge_list) * 2) + '] =\n')
+			fc.write('{\n')
+
+			for _edge in edge_list:
+				_str_out = '\t'
+				_str_out += str(_edge[0]) + ', ' + str(_edge[1]) + ', '
 				fc.write(_str_out + '\n')
 
 			_str_out = '};'
