@@ -26,6 +26,11 @@ fix16 camdist;
 
 u16 flatDrawing;
 
+const Vect3D_f16 *mesh_coord;
+const u16 *mesh_poly_ind;
+const u16 *mesh_line_ind;
+const Vect3D_f16 *mesh_face_norm;
+
 
 void updatePointsPos();
 void drawPoints(u8 col);
@@ -36,6 +41,8 @@ void handleJoyEvent(u16 joy, u16 changed, u16 state);
 int main()
 {
     char str[16];
+    u16 change_mesh_counter = 0;
+
 
     VDP_setScreenWidth256();
     VDP_setHInterrupt(0);
@@ -61,13 +68,41 @@ int main()
     M3D_setTranslation(&transformation, FIX16(0), FIX16(0), FIX16(20));
     M3D_setRotation(&transformation, FIX16(0), FIX16(0), FIX16(0));
 
-    flatDrawing = 0;
+    flatDrawing = 1;
+    rotstep.x = FIX16(0.05);
+    rotstep.y = FIX16(0.05);
+
+    // set the current mesh
+    mesh_coord = cube_coord;
+    mesh_poly_ind = cube_poly_ind;
+    mesh_line_ind = cube_line_ind;
+    mesh_face_norm = cube_face_norm;
 
     while (1)
     {
         doActionJoy(JOY_1, JOY_readJoypad(JOY_1));
 
         M3D_setCamDistance(camdist);
+
+        change_mesh_counter++;
+        if (change_mesh_counter > 16)
+        {
+            change_mesh_counter = 0;
+            if (mesh_coord == cube_coord)
+            {
+                mesh_coord = alt_cube_coord;
+                mesh_poly_ind = alt_cube_poly_ind;
+                mesh_line_ind = alt_cube_line_ind;
+                mesh_face_norm = alt_cube_face_norm;
+            }
+            else
+            {
+                mesh_coord = cube_coord;
+                mesh_poly_ind = cube_poly_ind;
+                mesh_line_ind = cube_line_ind;
+                mesh_face_norm = cube_face_norm;
+            }
+        }
 
         // do work here
         rotation.x += rotstep.x;
@@ -99,66 +134,66 @@ int main()
 void updatePointsPos()
 {
     // transform 3D point
-    M3D_transform(&transformation, cube_coord, pts_3D, 8);
+    M3D_transform(&transformation, mesh_coord, pts_3D, 8);
     // project 3D point (f16) to 2D point (s16)
     M3D_project_s16(pts_3D, pts_2D, 8);
 }
 
 void drawPoints(u8 col)
 {
-    if (flatDrawing)
+    // if (flatDrawing)
+    // {
+    Vect2D_s16 v[4];
+    const Vect3D_f16 *norm;
+    const u16 *poly_ind;
+    u16 i;
+
+    norm = mesh_face_norm;
+    poly_ind = mesh_poly_ind;
+
+    i = 6;
+
+    while (i--)
     {
-        Vect2D_s16 v[4];
-        const Vect3D_f16 *norm;
-        const u16 *poly_ind;
-        u16 i;
+        Vect2D_s16 *pt_dst = v;
+        fix16 dp;
+        u8 col = 2;
 
-        norm = cube_face_norm;
-        poly_ind = cube_poly_ind;
+        *pt_dst++ = pts_2D[*poly_ind++];
+        *pt_dst++ = pts_2D[*poly_ind++];
+        *pt_dst++ = pts_2D[*poly_ind++];
+        *pt_dst = pts_2D[*poly_ind++];
 
-        i = 6;
+        dp = fix16Mul(transformation.lightInv.x, norm->x) +
+             fix16Mul(transformation.lightInv.y, norm->y) +
+             fix16Mul(transformation.lightInv.z, norm->z);
+        norm++;
 
-        while (i--)
-        {
-            Vect2D_s16 *pt_dst = v;
-            fix16 dp;
-            u8 col = 2;
+        if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
 
-            *pt_dst++ = pts_2D[*poly_ind++];
-            *pt_dst++ = pts_2D[*poly_ind++];
-            *pt_dst++ = pts_2D[*poly_ind++];
-            *pt_dst = pts_2D[*poly_ind++];
-
-            dp = fix16Mul(transformation.lightInv.x, norm->x) +
-                 fix16Mul(transformation.lightInv.y, norm->y) +
-                 fix16Mul(transformation.lightInv.z, norm->z);
-            norm++;
-
-            if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
-
-            if (!BMP_isPolygonCulled(v, 4))
-                BMP_drawPolygon(v, 4, col | (col << 4));
-        }
+        if (!BMP_isPolygonCulled(v, 4))
+            BMP_drawPolygon(v, 4, col | (col << 4));
     }
-    else
-    {
-        Line l;
-        const u16 *line_ind;
-        u16 i;
+    // }
+    // else
+    // {
+    //     Line l;
+    //     const u16 *line_ind;
+    //     u16 i;
 
-        l.col = col;
-        line_ind = cube_line_ind;
+    //     l.col = col;
+    //     line_ind = mesh_line_ind;
 
-        i = 12;
+    //     i = 12;
 
-        while (i--)
-        {
-            l.pt1 = pts_2D[*line_ind++];
-            l.pt2 = pts_2D[*line_ind++];
+    //     while (i--)
+    //     {
+    //         l.pt1 = pts_2D[*line_ind++];
+    //         l.pt2 = pts_2D[*line_ind++];
 
-            BMP_drawLine(&l);
-        }
-    }
+    //         BMP_drawLine(&l);
+    //     }
+    // }
 }
 
 
