@@ -1,0 +1,145 @@
+import os
+import string
+import codecs
+import ast
+from vector3 import Vector3
+
+# filename_list = [	"fish.obj", "bamboo.obj", "bomb.obj", "brain.obj", "communism.obj", 
+# 					"embryo.obj", "fly.obj", "golem.obj", "gothic.obj", "knife.obj",
+# 					"station.obj", "toxic_waste.obj", "cube.obj", "couch.obj", "anotherworld.obj",
+# 					"pyramid.obj", "dvix.obj", "underpant.obj", "cat_litter.obj"
+# 				]
+folder_in = "meshes"
+scale_factor = 10.0
+
+def parse_obj_vector(_string):
+	_args = _string.split(' ')
+	_vector = Vector3(float(_args[1]), float(_args[2]), float(_args[3]))
+	_vector *= scale_factor
+	_vector.x = float(int(_vector.x))
+	_vector.y = float(int(_vector.y))
+	_vector.z = float(int(_vector.z))
+	return _vector
+
+def parse_obj_face(_string):
+	## f 13//1 15//2 4//3 2//4
+	_args = _string.split(' ')
+	_args.pop(0)
+	_face = []
+	_vertex_index = -1
+	_uv_index = -1
+	_normal_index = -1
+	for _arg in _args:
+		_corner = _arg.split('/')
+		_vertex_index = -1
+		_uv_index = -1
+		_normal_index = -1
+		if len(_corner) > 0:
+			if _corner[0] != '':
+				_vertex_index = int(_corner[0]) - 1
+			if _corner[1] != '':
+				_uv_index = int(_corner[1]) - 1
+			if _corner[2] != '':
+				_normal_index = int(_corner[2]) - 1
+
+		_face.append({'vertex':_vertex_index, 'uv':_uv_index, 'normal':_normal_index})
+
+	# _face = _face[::-1]
+	# _face.append(_face.pop(0))
+	# _face.append(_face[0])
+
+	return _face
+
+def main():
+	filename_out = '../../src/meshs.h'
+	fh = codecs.open(filename_out, 'w')
+
+	filename_out = '../../src/meshs.c'
+	fc = codecs.open(filename_out, 'w')
+
+	for filename_in in os.listdir(folder_in):
+		if filename_in.find("cube.obj") > -1:
+			face_list = []
+			vertex_list = []
+			normal_list = []
+
+			f = codecs.open(os.path.join(folder_in, filename_in), 'r')
+			for line in f:
+				# print(repr(line))
+				if len(line) > 0:
+					line = line.replace('\t', ' ')
+					line = line.replace('  ', ' ')
+					line = line.replace('  ', ' ')
+					line = line.strip()
+					if line.startswith('v '):
+						# print('found a vertex')
+						vertex_list.append(parse_obj_vector(line))
+
+					if line.startswith('vn '):
+						# print('found a vertex normal')
+						normal_list.append(parse_obj_vector(line))
+
+					if line.startswith('f '):
+						# print('found a face')
+						face_list.append(parse_obj_face(line))
+
+
+			print('OBJ Parser : "' + filename_in + '", ' + str(len(vertex_list)) + ' vertices, ' + str(len(normal_list)) + ' normals, ' + str(len(face_list)) + ' faces, ')
+
+			obj_name = filename_in.replace('.obj', '')
+			obj_name = obj_name.replace(' ', '')
+			obj_name = obj_name.replace('-', '_')
+			obj_name = obj_name.lower()
+
+			##  Creates the H file that lists the vertices
+			##############################################
+
+			fh.write('const Vect3D_f16 ' + obj_name + '_coord[' + str(len(vertex_list) * 3) + '];\n')
+			fh.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '];\n\n')
+
+			##  Creates the C file that lists the vertices
+			##############################################
+			fc.write('#include "genesis.h"\n\n')
+			fc.write('/* ' + filename_in + ' */' + '\n')
+			fc.write('/* List of vertices */' + '\n')
+			fc.write('const Vect3D_f16 ' + obj_name + '_coord[' + str(len(vertex_list) * 3) + '] =\n')
+			fc.write('{\n')
+
+			##  Iterate on vertices
+			for _vertex in vertex_list:
+				_str_out = '{FIX16(' + str(int(_vertex.x)) + '),\t' + 'FIX16(' + str(int(_vertex.z)) + '),\t' + 'FIX16(' + str(int(_vertex.y * -1.0)) + ')},'
+				fc.write('\t' + _str_out + '\n')
+
+			_str_out = '};'
+			fc.write(_str_out + '\n')
+
+			##  Creates the C file that lists the faces
+
+			##  Iterate on faces
+			fc.write('\n')
+			fc.write('/* List of faces */' + '\n')
+
+			fc.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '] =\n')
+			fc.write('{\n')
+
+			for _face in face_list:
+				_str_out = '\t'
+
+				corner_idx = 0
+				for _corners in _face:
+					_str_out += str(_corners['vertex'])
+					corner_idx += 1
+					_str_out += ','
+
+				fc.write(_str_out + '\n')
+
+			_str_out = '};'
+			fc.write(_str_out + '\n')
+			fc.write('\n')
+
+	fh.close()
+	fc.close()
+	f.close()
+
+
+main()
