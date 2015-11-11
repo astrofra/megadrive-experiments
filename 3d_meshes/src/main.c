@@ -71,10 +71,10 @@ int main()
     rotstep.y = FIX16(0.05);
 
     // set the current mesh
-    mesh_coord = cube_coord;
-    mesh_poly_ind = cube_poly_ind;
-    mesh_line_ind = cube_line_ind;
-    mesh_face_norm = cube_face_norm;
+    mesh_coord = cylinder_coord;
+    mesh_poly_ind = cylinder_poly_ind;
+    mesh_line_ind = cylinder_line_ind;
+    mesh_face_norm = cylinder_face_norm;
 
     while (1)
     {
@@ -112,9 +112,9 @@ int main()
 void updatePointsPos()
 {
     // transform 3D point
-    M3D_transform(&transformation, mesh_coord, pts_3D, 8);
+    M3D_transform(&transformation, mesh_coord, pts_3D, 18);
     // project 3D point (f16) to 2D point (s16)
-    M3D_project_s16(pts_3D, pts_2D, 8);
+    M3D_project_s16(pts_3D, pts_2D, 18);
 }
 
 void drawPoints(u8 col)
@@ -129,7 +129,7 @@ void drawPoints(u8 col)
     norm = mesh_face_norm;
     poly_ind = mesh_poly_ind;
 
-    i = 6;
+    i = 18;
 
     while (i--)
     {
