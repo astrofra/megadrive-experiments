@@ -112,9 +112,9 @@ int main()
 void updatePointsPos()
 {
     // transform 3D point
-    M3D_transform(&transformation, mesh_coord, pts_3D, 18);
+    M3D_transform(&transformation, mesh_coord, pts_3D, 54);
     // project 3D point (f16) to 2D point (s16)
-    M3D_project_s16(pts_3D, pts_2D, 18);
+    M3D_project_s16(pts_3D, pts_2D, 54);
 }
 
 void drawPoints(u8 col)
@@ -129,7 +129,7 @@ void drawPoints(u8 col)
     norm = mesh_face_norm;
     poly_ind = mesh_poly_ind;
 
-    i = 18;
+    i = 16;
 
     while (i--)
     {
