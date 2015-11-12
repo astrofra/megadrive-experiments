@@ -113,10 +113,13 @@ def main():
 			##  Creates the H file that lists the arrays
 			############################################
 
+			fh.write('#define ' + obj_name.upper() + '_VTX_COUNT ' + str(len(vertex_list) * 3) + '\n')
+			fh.write('#define ' + obj_name.upper() + '_FACE_COUNT ' + str(len(face_list)) + '\n')
 			fh.write('const Vect3D_f16 ' + obj_name + '_coord[' + str(len(vertex_list) * 3) + '];\n')
 			fh.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '];\n')
 			fh.write('const u16  ' + obj_name + '_line_ind[' + str(len(edge_list) * 2) + '];\n')
 			fh.write('const Vect3D_f16  ' + obj_name + '_face_norm[' + str(len(face_list)) + '];\n\n')
+
 
 			##  Creates the C file that lists the meshes
 			############################################
