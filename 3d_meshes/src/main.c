@@ -31,6 +31,52 @@ const u16 *mesh_poly_ind;
 const u16 *mesh_line_ind;
 const Vect3D_f16 *mesh_face_norm;
 
+struct  QSORT_ENTRY poly_zsort[CYLINDER_SUBD_FACE_COUNT];
+
+// Sorting generic structure
+struct  QSORT_ENTRY
+{
+    fix16   value;
+    u16    index;
+};
+
+//------------------------------------------------------
+void    inline QSwap (struct QSORT_ENTRY *a,struct QSORT_ENTRY *b)
+//------------------------------------------------------
+{   
+    struct QSORT_ENTRY t = *a;
+    *a = *b;
+    *b = t;
+}
+
+//----------------------------------------------------
+void    inline RecQuickSort (struct QSORT_ENTRY *se, u16 l, u16 r)
+//----------------------------------------------------
+{
+    u16 cr, ls;
+
+    if  ( l >= r )
+        return;
+
+    QSwap ( &se[l], &se[(l+r)>>1] );
+    ls = l;
+
+    for ( cr = l+1; cr <= r; cr++ )
+        if  ( se[cr].value < se[l].value )
+            QSwap ( &se[cr], &se[++ls] );
+
+    QSwap ( &se[l], &se[ls] );
+    RecQuickSort ( se, l, ls - 1 );
+    RecQuickSort ( se, ls + 1, r );
+}
+
+//----------------------------------------
+void    QuickSort (u16 n,struct QSORT_ENTRY *se)
+//----------------------------------------
+{
+    RecQuickSort (se, 0, n-1);
+}
+
 
 void updatePointsPos();
 void drawPoints(u8 col);
@@ -124,18 +170,31 @@ void drawPoints(u8 col)
     Vect2D_s16 v[4];
     const Vect3D_f16 *norm;
     const u16 *poly_ind;
-    u16 i;
+    u16 i, j;
 
     norm = mesh_face_norm;
     poly_ind = mesh_poly_ind;
 
+    //  Depth sort the polygons
+    for(i = 0; i < CYLINDER_SUBD_FACE_COUNT; i++)
+    {
+        j = i << 2;
+        poly_zsort[i].index = i;
+        poly_zsort[i].value = fix16Add(fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z), fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z));
+    }
+
+    QuickSort(CYLINDER_SUBD_FACE_COUNT, &poly_zsort);
+
+    //  Draws the polygons
     i = CYLINDER_SUBD_FACE_COUNT;
 
-    while (i--)
+    while(i--)
     {
         Vect2D_s16 *pt_dst = v;
         fix16 dp;
         u8 col = 2;
+
+        poly_ind = &mesh_poly_ind[poly_zsort[i].index << 2]; // poly_zsort[i].index];
 
         *pt_dst++ = pts_2D[*poly_ind++];
         *pt_dst++ = pts_2D[*poly_ind++];
@@ -152,26 +211,6 @@ void drawPoints(u8 col)
         if (!BMP_isPolygonCulled(v, 4))
             BMP_drawPolygon(v, 4, col | (col << 4));
     }
-    // }
-    // else
-    // {
-    //     Line l;
-    //     const u16 *line_ind;
-    //     u16 i;
-
-    //     l.col = col;
-    //     line_ind = mesh_line_ind;
-
-    //     i = 12;
-
-    //     while (i--)
-    //     {
-    //         l.pt1 = pts_2D[*line_ind++];
-    //         l.pt2 = pts_2D[*line_ind++];
-
-    //         BMP_drawLine(&l);
-    //     }
-    // }
 }
 
 
