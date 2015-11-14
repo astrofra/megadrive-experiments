@@ -171,6 +171,8 @@ void drawPoints(u8 col)
     const Vect3D_f16 *norm;
     const u16 *poly_ind;
     u16 i, j;
+    fix16 z_sum, z_min = 0, z_max = 0;
+    char str[16];
 
     norm = mesh_face_norm;
     poly_ind = mesh_poly_ind;
@@ -180,7 +182,16 @@ void drawPoints(u8 col)
     {
         j = i << 2;
         poly_zsort[i].index = i;
-        poly_zsort[i].value = fix16Add(fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z), fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z));
+
+        z_sum = fix16Add(fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z), fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z));
+
+        if (z_sum > z_max)
+            z_max = z_sum;
+        else
+        if (z_sum < z_min)
+            z_min = z_sum;
+
+        poly_zsort[i].value = z_sum;
     }
 
     QuickSort(CYLINDER_SUBD_FACE_COUNT, &poly_zsort);
@@ -201,16 +212,26 @@ void drawPoints(u8 col)
         *pt_dst++ = pts_2D[*poly_ind++];
         *pt_dst = pts_2D[*poly_ind++];
 
+        norm = &mesh_face_norm[poly_zsort[i].index];
+
         dp = fix16Mul(transformation.lightInv.x, norm->x) +
              fix16Mul(transformation.lightInv.y, norm->y) +
              fix16Mul(transformation.lightInv.z, norm->z);
-        norm++;
+        // norm++;
 
         if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
 
         if (!BMP_isPolygonCulled(v, 4))
             BMP_drawPolygon(v, 4, col | (col << 4));
     }
+
+    BMP_drawText("z_min=", 0, 5);
+    fix16ToStr(z_min, str, 8);
+    BMP_drawText(str, 6, 5);
+    BMP_drawText("z_max=", 0, 6);
+    fix16ToStr(z_max, str, 8);
+    BMP_drawText(str, 6, 6);
+
 }
 
 
