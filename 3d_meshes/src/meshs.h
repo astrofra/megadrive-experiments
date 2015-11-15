@@ -26,3 +26,10 @@ const u16  cylinder_subd_2_poly_ind[1536];
 const u16  cylinder_subd_2_line_ind[848];
 const Vect3D_f16  cylinder_subd_2_face_norm[384];
 
+#define METACUBE_VTX_COUNT 114
+#define METACUBE_FACE_COUNT 34
+const Vect3D_f16 metacube_coord[114];
+const u16  metacube_poly_ind[136];
+const u16  metacube_line_ind[96];
+const Vect3D_f16  metacube_face_norm[34];
+

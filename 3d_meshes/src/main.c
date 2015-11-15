@@ -3,6 +3,7 @@
 #include "meshs.h"
 
 #define MAX_POINTS  512
+#define ASSERT_VALUE 253
 
 
 Vect3D_f16 pts_3D[MAX_POINTS];
@@ -24,14 +25,10 @@ Vect3D_f16 rotstep;
 
 fix16 camdist;
 
-u16 flatDrawing;
-
 const Vect3D_f16 *mesh_coord;
 const u16 *mesh_poly_ind;
 const u16 *mesh_line_ind;
 const Vect3D_f16 *mesh_face_norm;
-
-struct  QSORT_ENTRY poly_zsort[CYLINDER_SUBD_FACE_COUNT];
 
 // Sorting generic structure
 struct  QSORT_ENTRY
@@ -40,8 +37,10 @@ struct  QSORT_ENTRY
     u16    index;
 };
 
+struct  QSORT_ENTRY poly_zsort[METACUBE_FACE_COUNT];
+
 //------------------------------------------------------
-void    inline QSwap (struct QSORT_ENTRY *a,struct QSORT_ENTRY *b)
+void    inline QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
 //------------------------------------------------------
 {   
     struct QSORT_ENTRY t = *a;
@@ -49,32 +48,27 @@ void    inline QSwap (struct QSORT_ENTRY *a,struct QSORT_ENTRY *b)
     *b = t;
 }
 
-//----------------------------------------------------
-void    inline RecQuickSort (struct QSORT_ENTRY *se, u16 l, u16 r)
-//----------------------------------------------------
+//----------------------------------------
+// http://rosettacode.org/wiki/Sorting_algorithms/Quicksort#C
+void    QuickSort (u16 n, struct QSORT_ENTRY *a)
+//----------------------------------------
 {
-    u16 cr, ls;
-
-    if  ( l >= r )
+    int i, j, p, t;
+    if (n < 2)
         return;
+    p = a[n / 2].value;
+    for (i = 0, j = n - 1;; i++, j--) {
+        while (a[i].value < p)
+            i++;
+        while (p < a[j].value)
+            j--;
+        if (i >= j)
+            break;
 
-    QSwap ( &se[l], &se[(l+r)>>1] );
-    ls = l;
-
-    for ( cr = l+1; cr <= r; cr++ )
-        if  ( se[cr].value < se[l].value )
-            QSwap ( &se[cr], &se[++ls] );
-
-    QSwap ( &se[l], &se[ls] );
-    RecQuickSort ( se, l, ls - 1 );
-    RecQuickSort ( se, ls + 1, r );
-}
-
-//----------------------------------------
-void    QuickSort (u16 n,struct QSORT_ENTRY *se)
-//----------------------------------------
-{
-    RecQuickSort (se, 0, n-1);
+        QSwap(&a[i], &a[j]);
+    }
+    QuickSort(i, a);
+    QuickSort(n - i, a + i);
 }
 
 
@@ -110,17 +104,16 @@ int main()
     // allocate translation and rotation structure
     M3D_setTransform(&transformation, &translation, &rotation);
     M3D_setTranslation(&transformation, FIX16(0), FIX16(0), FIX16(20));
-    M3D_setRotation(&transformation, FIX16(0), FIX16(0), FIX16(0));
+    M3D_setRotation(&transformation, FIX16(0.0), FIX16(0.0), FIX16(0.0));
 
-    flatDrawing = 1;
     rotstep.x = FIX16(0.05);
     rotstep.y = FIX16(0.05);
 
     // set the current mesh
-    mesh_coord = cylinder_subd_coord;
-    mesh_poly_ind = cylinder_subd_poly_ind;
-    mesh_line_ind = cylinder_subd_line_ind;
-    mesh_face_norm = cylinder_subd_face_norm;
+    mesh_coord = metacube_coord;
+    mesh_poly_ind = metacube_poly_ind;
+    mesh_line_ind = metacube_line_ind;
+    mesh_face_norm = metacube_face_norm;
 
     while (1)
     {
@@ -158,46 +151,53 @@ int main()
 void updatePointsPos()
 {
     // transform 3D point
-    M3D_transform(&transformation, mesh_coord, pts_3D, CYLINDER_SUBD_VTX_COUNT);
+    M3D_transform(&transformation, mesh_coord, pts_3D, METACUBE_VTX_COUNT);
     // project 3D point (f16) to 2D point (s16)
-    M3D_project_s16(pts_3D, pts_2D, CYLINDER_SUBD_VTX_COUNT);
+    M3D_project_s16(pts_3D, pts_2D, METACUBE_VTX_COUNT);
 }
 
 void drawPoints(u8 col)
 {
-    // if (flatDrawing)
-    // {
     Vect2D_s16 v[4];
     const Vect3D_f16 *norm;
     const u16 *poly_ind;
     u16 i, j;
-    fix16 z_sum, z_min = 0, z_max = 0;
+    fix16 z_sum;
     char str[16];
 
     norm = mesh_face_norm;
     poly_ind = mesh_poly_ind;
 
     //  Depth sort the polygons
-    for(i = 0; i < CYLINDER_SUBD_FACE_COUNT; i++)
+    for(i = 0; i < METACUBE_FACE_COUNT; i++)
     {
         j = i << 2;
         poly_zsort[i].index = i;
 
-        z_sum = fix16Add(fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z), fix16Add(mesh_coord[poly_ind[j++]].z, mesh_coord[poly_ind[j++]].z));
-
-        if (z_sum > z_max)
-            z_max = z_sum;
-        else
-        if (z_sum < z_min)
-            z_min = z_sum;
-
+        z_sum = fix16Add(fix16Add(pts_3D[poly_ind[j]].z, pts_3D[poly_ind[j+1]].z), fix16Add(pts_3D[poly_ind[j+2]].z, pts_3D[poly_ind[j+3]].z));
         poly_zsort[i].value = z_sum;
     }
 
-    QuickSort(CYLINDER_SUBD_FACE_COUNT, &poly_zsort);
+#ifdef FRA_DEBUG
+     for(i = 0; i < 20; i++)
+    {                
+        intToStr(poly_zsort[i].value, str, 4);
+        BMP_drawText(str, 0, i);
+    }
+#endif
+
+    QuickSort(METACUBE_FACE_COUNT, poly_zsort);
+
+#ifdef FRA_DEBUG
+    for(i = 0; i < 20; i++)
+    {                
+        intToStr(poly_zsort[i].value, str, 4);
+        BMP_drawText(str, 8, i);
+    }
+#endif
 
     //  Draws the polygons
-    i = CYLINDER_SUBD_FACE_COUNT;
+    i = METACUBE_FACE_COUNT;
 
     while(i--)
     {
@@ -205,7 +205,7 @@ void drawPoints(u8 col)
         fix16 dp;
         u8 col = 2;
 
-        poly_ind = &mesh_poly_ind[poly_zsort[i].index << 2]; // poly_zsort[i].index];
+        poly_ind = &mesh_poly_ind[poly_zsort[i].index << 2];
 
         *pt_dst++ = pts_2D[*poly_ind++];
         *pt_dst++ = pts_2D[*poly_ind++];
@@ -214,24 +214,16 @@ void drawPoints(u8 col)
 
         norm = &mesh_face_norm[poly_zsort[i].index];
 
-        dp = fix16Mul(transformation.lightInv.x, norm->x) +
+        if (!BMP_isPolygonCulled(v, 4))
+        {
+            dp = fix16Mul(transformation.lightInv.x, norm->x) +
              fix16Mul(transformation.lightInv.y, norm->y) +
              fix16Mul(transformation.lightInv.z, norm->z);
-        // norm++;
 
         if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
-
-        if (!BMP_isPolygonCulled(v, 4))
             BMP_drawPolygon(v, 4, col | (col << 4));
+        }
     }
-
-    BMP_drawText("z_min=", 0, 5);
-    fix16ToStr(z_min, str, 8);
-    BMP_drawText(str, 6, 5);
-    BMP_drawText("z_max=", 0, 6);
-    fix16ToStr(z_max, str, 8);
-    BMP_drawText(str, 6, 6);
-
 }
 
 
@@ -301,7 +293,7 @@ void handleJoyEvent(u16 joy, u16 changed, u16 state)
     {
         if (changed & ~state & BUTTON_START)
         {
-            flatDrawing = 1 - flatDrawing;
+            // flatDrawing = 1 - flatDrawing;
         }
     }
 }
