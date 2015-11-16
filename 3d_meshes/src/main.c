@@ -1,5 +1,10 @@
-#include "genesis.h"
+//-----------------------------------------------
+// 3D flat shaded routine with depth sort
+// Based on SGDK's 3D samples
+// Fra^Resistance
+//-----------------------------------------------
 
+#include "genesis.h"
 #include "meshs.h"
 
 #define MAX_POINTS  512
@@ -24,6 +29,8 @@ Transformation3D transformation;
 Vect3D_f16 rotstep;
 
 fix16 camdist;
+
+u16 zsort_switch;
 
 const Vect3D_f16 *mesh_coord;
 const u16 *mesh_poly_ind;
@@ -53,7 +60,7 @@ void    inline QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
 void    QuickSort (u16 n, struct QSORT_ENTRY *a)
 //----------------------------------------
 {
-    int i, j, p, t;
+    int i, j, p;
     if (n < 2)
         return;
     p = a[n / 2].value;
@@ -76,7 +83,6 @@ void updatePointsPos();
 void drawPoints(u8 col);
 void doActionJoy(u8 numjoy, u16 value);
 void handleJoyEvent(u16 joy, u16 changed, u16 state);
-
 
 int main()
 {
@@ -114,6 +120,8 @@ int main()
     mesh_poly_ind = metacube_poly_ind;
     mesh_line_ind = metacube_line_ind;
     mesh_face_norm = metacube_face_norm;
+
+    zsort_switch = 0;
 
     while (1)
     {
@@ -163,38 +171,31 @@ void drawPoints(u8 col)
     const u16 *poly_ind;
     u16 i, j;
     fix16 z_sum;
-    char str[16];
 
     norm = mesh_face_norm;
     poly_ind = mesh_poly_ind;
 
-    //  Depth sort the polygons
-    for(i = 0; i < METACUBE_FACE_COUNT; i++)
-    {
-        j = i << 2;
-        poly_zsort[i].index = i;
+	//  Depth sort the polygons
+	if (zsort_switch == 0)
+	{
+		//	Feed an index table with the sum of the Z coordinate
+		//	of each polygon in the current mesh
+	    for(i = 0; i < METACUBE_FACE_COUNT; i++)
+	    {
+	        j = i << 2;
+	        poly_zsort[i].index = i;
 
-        z_sum = fix16Add(fix16Add(pts_3D[poly_ind[j]].z, pts_3D[poly_ind[j+1]].z), fix16Add(pts_3D[poly_ind[j+2]].z, pts_3D[poly_ind[j+3]].z));
-        poly_zsort[i].value = z_sum;
-    }
+	        z_sum = fix16Add(fix16Add(pts_3D[poly_ind[j]].z, pts_3D[poly_ind[j+1]].z), fix16Add(pts_3D[poly_ind[j+2]].z, pts_3D[poly_ind[j+3]].z));
+	        poly_zsort[i].value = z_sum;
+	    }
 
-#ifdef FRA_DEBUG
-     for(i = 0; i < 20; i++)
-    {                
-        intToStr(poly_zsort[i].value, str, 4);
-        BMP_drawText(str, 0, i);
-    }
-#endif
+	    //	Quicksort the table and order the polygons by depth
+	    QuickSort(METACUBE_FACE_COUNT, poly_zsort);
+	}
 
-    QuickSort(METACUBE_FACE_COUNT, poly_zsort);
-
-#ifdef FRA_DEBUG
-    for(i = 0; i < 20; i++)
-    {                
-        intToStr(poly_zsort[i].value, str, 4);
-        BMP_drawText(str, 8, i);
-    }
-#endif
+    //	Count 16 frames until the next depth sort
+	zsort_switch++;
+	zsort_switch &= 0xF;
 
     //  Draws the polygons
     i = METACUBE_FACE_COUNT;
@@ -212,16 +213,17 @@ void drawPoints(u8 col)
         *pt_dst++ = pts_2D[*poly_ind++];
         *pt_dst = pts_2D[*poly_ind++];
 
-        norm = &mesh_face_norm[poly_zsort[i].index];
-
+        //	If the polygon is facing the camera
         if (!BMP_isPolygonCulled(v, 4))
         {
+        	//	Compute the lighting of the polygon
+	        norm = &mesh_face_norm[poly_zsort[i].index];
             dp = fix16Mul(transformation.lightInv.x, norm->x) +
-             fix16Mul(transformation.lightInv.y, norm->y) +
-             fix16Mul(transformation.lightInv.z, norm->z);
+				fix16Mul(transformation.lightInv.y, norm->y) +
+				fix16Mul(transformation.lightInv.z, norm->z);
 
-        if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
-            BMP_drawPolygon(v, 4, col | (col << 4));
+	        if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
+	            BMP_drawPolygon(v, 4, col | (col << 4));
         }
     }
 }
