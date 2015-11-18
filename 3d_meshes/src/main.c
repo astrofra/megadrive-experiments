@@ -17,9 +17,6 @@ extern Mat3D_f16 Mat;
 Vect3D_f16 pts_3D[MAX_POINTS];
 Vect2D_s16 pts_2D[MAX_POINTS];
 
-Vect3D_f16 vtab_3D[MAX_POINTS];
-Vect2D_s16 vtab_2D[MAX_POINTS];
-
 Rotation3D rotation;
 Translation3D translation;
 Transformation3D transformation;
@@ -39,7 +36,6 @@ struct  QSORT_ENTRY poly_zsort[metacube_FACE_COUNT];
 
 void updatePointsPos();
 void drawPoints(u8 col);
-void doActionJoy(u8 numjoy, u16 value);
 void handleJoyEvent(u16 joy, u16 changed, u16 state);
 
 #define PART_3D_LOAD_MESH(mesh_name) \
@@ -90,8 +86,6 @@ int main()
 
     while (1)
     {
-        doActionJoy(JOY_1, JOY_readJoypad(JOY_1));
-
         M3D_setCamDistance(camdist);
 
         // do work here
@@ -189,67 +183,6 @@ void drawPoints(u8 col)
 
 	        if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
 	            BMP_drawPolygon(v, 4, col | (col << 4));
-        }
-    }
-}
-
-
-void doActionJoy(u8 numjoy, u16 value)
-{
-    if (numjoy == JOY_1)
-    {
-        if (value & BUTTON_UP)
-        {
-            if (value & BUTTON_A) translation.y += FIX16(0.2);
-            else rotstep.x += FIX16(0.05);
-        }
-
-        if (value & BUTTON_DOWN)
-        {
-            if (value & BUTTON_A) translation.y -= FIX16(0.2);
-            else rotstep.x -= FIX16(0.05);
-        }
-
-        if (value & BUTTON_LEFT)
-        {
-            if (value & BUTTON_A) translation.x -= FIX16(0.2);
-            else rotstep.y += FIX16(0.05);
-        }
-
-        if (value & BUTTON_RIGHT)
-        {
-            if (value & BUTTON_A) translation.x += FIX16(0.2);
-            else rotstep.y -= FIX16(0.05);
-        }
-
-        if (value & BUTTON_Y)
-        {
-            if (value & BUTTON_X) camdist += FIX16(1.0);
-            else camdist += FIX16(0.1);
-        }
-
-        if (value & BUTTON_Z)
-        {
-            if (value & BUTTON_X) camdist -= FIX16(1.0);
-            else camdist -= FIX16(0.1);
-        }
-
-        if (value & BUTTON_B)
-        {
-            if (value & BUTTON_A) translation.z += FIX16(1);
-            else translation.z += FIX16(0.1);
-        }
-
-        if (value & BUTTON_C)
-        {
-            if (value & BUTTON_A) translation.z -= FIX16(1);
-            else translation.z -= FIX16(0.1);
-        }
-
-        if (value & BUTTON_START)
-        {
-            rotstep.x = FIX16(0.0);
-            rotstep.y = FIX16(0.0);
         }
     }
 }
