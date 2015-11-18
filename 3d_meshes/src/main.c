@@ -37,7 +37,7 @@ struct  QSORT_ENTRY poly_zsort[metacube_FACE_COUNT];
 void updatePointsPos();
 void drawPoints(u8 col);
 void handleJoyEvent(u16 joy, u16 changed, u16 state);
-void RSE_startingScreen(void);
+void RSE_3DFlatShadedScreen(void);
 
 #define PART_3D_LOAD_MESH(mesh_name) \
     mesh_coord = mesh_name ## _coord; \
@@ -59,10 +59,10 @@ int main()
 
     BMP_init(TRUE, PAL0, FALSE);
 
-	RSE_startingScreen();
+	RSE_3DFlatShadedScreen();
 }
 
-void RSE_startingScreen(void)
+void RSE_3DFlatShadedScreen(void)
 {
     char str[16];
 
