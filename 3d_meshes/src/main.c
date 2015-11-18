@@ -6,18 +6,16 @@
 
 #include "genesis.h"
 #include "meshs.h"
+#include "quicksort.h"
 
 #define MAX_POINTS  512
 #define ASSERT_VALUE 253
 
-
-Vect3D_f16 pts_3D[MAX_POINTS];
-Vect2D_s16 pts_2D[MAX_POINTS];
-
-
 extern Mat3D_f16 MatInv;
 extern Mat3D_f16 Mat;
 
+Vect3D_f16 pts_3D[MAX_POINTS];
+Vect2D_s16 pts_2D[MAX_POINTS];
 
 Vect3D_f16 vtab_3D[MAX_POINTS];
 Vect2D_s16 vtab_2D[MAX_POINTS];
@@ -37,52 +35,18 @@ const u16 *mesh_poly_ind;
 const u16 *mesh_line_ind;
 const Vect3D_f16 *mesh_face_norm;
 
-// Sorting generic structure
-struct  QSORT_ENTRY
-{
-    fix16   value;
-    u16    index;
-};
-
-struct  QSORT_ENTRY poly_zsort[METACUBE_FACE_COUNT];
-
-//------------------------------------------------------
-void    inline QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
-//------------------------------------------------------
-{   
-    struct QSORT_ENTRY t = *a;
-    *a = *b;
-    *b = t;
-}
-
-//----------------------------------------
-// http://rosettacode.org/wiki/Sorting_algorithms/Quicksort#C
-void    QuickSort (u16 n, struct QSORT_ENTRY *a)
-//----------------------------------------
-{
-    int i, j, p;
-    if (n < 2)
-        return;
-    p = a[n / 2].value;
-    for (i = 0, j = n - 1;; i++, j--) {
-        while (a[i].value < p)
-            i++;
-        while (p < a[j].value)
-            j--;
-        if (i >= j)
-            break;
-
-        QSwap(&a[i], &a[j]);
-    }
-    QuickSort(i, a);
-    QuickSort(n - i, a + i);
-}
-
+struct  QSORT_ENTRY poly_zsort[metacube_FACE_COUNT];
 
 void updatePointsPos();
 void drawPoints(u8 col);
 void doActionJoy(u8 numjoy, u16 value);
 void handleJoyEvent(u16 joy, u16 changed, u16 state);
+
+#define PART_3D_LOAD_MESH(mesh_name) \
+    mesh_coord = mesh_name ## _coord; \
+    mesh_poly_ind = mesh_name ## _poly_ind; \
+    mesh_line_ind = mesh_name ## _line_ind; \
+    mesh_face_norm = mesh_name ## _face_norm;
 
 int main()
 {
@@ -116,10 +80,11 @@ int main()
     rotstep.y = FIX16(0.05);
 
     // set the current mesh
-    mesh_coord = metacube_coord;
-    mesh_poly_ind = metacube_poly_ind;
-    mesh_line_ind = metacube_line_ind;
-    mesh_face_norm = metacube_face_norm;
+    PART_3D_LOAD_MESH(metacube);
+    // mesh_coord = metacube_coord;
+    // mesh_poly_ind = metacube_poly_ind;
+    // mesh_line_ind = metacube_line_ind;
+    // mesh_face_norm = metacube_face_norm;
 
     zsort_switch = 0;
 
@@ -159,9 +124,9 @@ int main()
 void updatePointsPos()
 {
     // transform 3D point
-    M3D_transform(&transformation, mesh_coord, pts_3D, METACUBE_VTX_COUNT);
+    M3D_transform(&transformation, mesh_coord, pts_3D, metacube_VTX_COUNT);
     // project 3D point (f16) to 2D point (s16)
-    M3D_project_s16(pts_3D, pts_2D, METACUBE_VTX_COUNT);
+    M3D_project_s16(pts_3D, pts_2D, metacube_VTX_COUNT);
 }
 
 void drawPoints(u8 col)
@@ -180,7 +145,7 @@ void drawPoints(u8 col)
 	{
 		//	Feed an index table with the sum of the Z coordinate
 		//	of each polygon in the current mesh
-	    for(i = 0; i < METACUBE_FACE_COUNT; i++)
+	    for(i = 0; i < metacube_FACE_COUNT; i++)
 	    {
 	        j = i << 2;
 	        poly_zsort[i].index = i;
@@ -190,7 +155,7 @@ void drawPoints(u8 col)
 	    }
 
 	    //	Quicksort the table and order the polygons by depth
-	    QuickSort(METACUBE_FACE_COUNT, poly_zsort);
+	    QuickSort(metacube_FACE_COUNT, poly_zsort);
 	}
 
     //	Count 16 frames until the next depth sort
@@ -198,7 +163,7 @@ void drawPoints(u8 col)
 	zsort_switch &= 0xF;
 
     //  Draws the polygons
-    i = METACUBE_FACE_COUNT;
+    i = metacube_FACE_COUNT;
 
     while(i--)
     {
