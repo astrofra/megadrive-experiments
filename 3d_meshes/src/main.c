@@ -37,6 +37,7 @@ struct  QSORT_ENTRY poly_zsort[metacube_FACE_COUNT];
 void updatePointsPos();
 void drawPoints(u8 col);
 void handleJoyEvent(u16 joy, u16 changed, u16 state);
+void RSE_startingScreen(void);
 
 #define PART_3D_LOAD_MESH(mesh_name) \
     mesh_coord = mesh_name ## _coord; \
@@ -46,11 +47,9 @@ void handleJoyEvent(u16 joy, u16 changed, u16 state);
 
 int main()
 {
-    char str[16];
-
-    VDP_setScreenWidth256();
-    VDP_setHInterrupt(0);
-    VDP_setHilightShadow(0);
+	VDP_setScreenWidth256();
+	VDP_setHInterrupt(0);
+	VDP_setHilightShadow(0);
 
     // speed up controller checking
     JOY_setSupport(PORT_1, JOY_SUPPORT_6BTN);
@@ -59,6 +58,13 @@ int main()
     JOY_setEventHandler(handleJoyEvent);
 
     BMP_init(TRUE, PAL0, FALSE);
+
+	RSE_startingScreen();
+}
+
+void RSE_startingScreen(void)
+{
+    char str[16];
 
     camdist = FIX16(15);
 
@@ -112,7 +118,7 @@ int main()
         BMP_drawText(str, 11, 3);
 
         BMP_flip(1);
-    }
+    }	
 }
 
 void updatePointsPos()
