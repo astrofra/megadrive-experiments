@@ -7,13 +7,10 @@
 #include "genesis.h"
 #include "meshs.h"
 #include "quicksort.h"
-
-#define MAX_POINTS  256
+#include "RSE_3DFlatShadedScreen.h"
 
 extern Mat3D_f16 MatInv;
 extern Mat3D_f16 Mat;
-
-fix16 camdist;
 
 u16 zsort_switch;
 
@@ -22,20 +19,12 @@ const u16 *mesh_poly_ind;
 const u16 *mesh_line_ind;
 const Vect3D_f16 *mesh_face_norm;
 u16 vtx_count;
-u16 poly_count;
+// u16 poly_count;
 
 struct  QSORT_ENTRY poly_zsort[MAX_POINTS];
 
 void handleJoyEvent(u16 joy, u16 changed, u16 state);
 void RSE_3DFlatShadedScreen(void);
-
-#define PART_3D_LOAD_MESH(mesh_name) \
-    mesh_coord = mesh_name ## _coord; \
-    mesh_poly_ind = mesh_name ## _poly_ind; \
-    mesh_line_ind = mesh_name ## _line_ind; \
-    mesh_face_norm = mesh_name ## _face_norm; \
-    vtx_count = mesh_name ## _VTX_COUNT;\
-    poly_count = mesh_name ## _FACE_COUNT;
 
 int main()
 {
@@ -54,15 +43,15 @@ int main()
 	RSE_3DFlatShadedScreen();
 }
 
-void inline updatePointsPos(Transformation3D *transformation, Vect3D_f16 *pts_3D, Vect2D_s16 *pts_2D)
+void inline updatePointsPos(struct rendering_context *ctx)
 {
     // transform 3D point
-    M3D_transform(transformation, mesh_coord, pts_3D, vtx_count);
+    M3D_transform(&(ctx->transformation), mesh_coord, ctx->pts_3D, vtx_count);
     // project 3D point (f16) to 2D point (s16)
-    M3D_project_s16(pts_3D, pts_2D, vtx_count);
+    M3D_project_s16(ctx->pts_3D, ctx->pts_2D, vtx_count);
 }
 
-void inline drawPoints(u8 col, Transformation3D *transformation, Vect3D_f16 *pts_3D, Vect2D_s16 *pts_2D)
+void inline drawPoints(u8 col, struct rendering_context *ctx)
 {
     Vect2D_s16 v[4];
     const Vect3D_f16 *norm;
@@ -83,7 +72,7 @@ void inline drawPoints(u8 col, Transformation3D *transformation, Vect3D_f16 *pts
 	        j = i << 2;
 	        poly_zsort[i].index = i;
 
-	        z_sum = fix16Add(fix16Add(pts_3D[poly_ind[j]].z, pts_3D[poly_ind[j+1]].z), fix16Add(pts_3D[poly_ind[j+2]].z, pts_3D[poly_ind[j+3]].z));
+	        z_sum = fix16Add(fix16Add(ctx->pts_3D[poly_ind[j]].z, ctx->pts_3D[poly_ind[j+1]].z), fix16Add(ctx->pts_3D[poly_ind[j+2]].z, ctx->pts_3D[poly_ind[j+3]].z));
 	        poly_zsort[i].value = z_sum;
 	    }
 
@@ -106,19 +95,19 @@ void inline drawPoints(u8 col, Transformation3D *transformation, Vect3D_f16 *pts
 
         poly_ind = &mesh_poly_ind[poly_zsort[i].index << 2];
 
-        *pt_dst++ = pts_2D[*poly_ind++];
-        *pt_dst++ = pts_2D[*poly_ind++];
-        *pt_dst++ = pts_2D[*poly_ind++];
-        *pt_dst = pts_2D[*poly_ind++];
+        *pt_dst++ = ctx->pts_2D[*poly_ind++];
+        *pt_dst++ = ctx->pts_2D[*poly_ind++];
+        *pt_dst++ = ctx->pts_2D[*poly_ind++];
+        *pt_dst = ctx->pts_2D[*poly_ind++];
 
         //	If the polygon is facing the camera
         if (!BMP_isPolygonCulled(v, 4))
         {
         	//	Compute the lighting of the polygon
 	        norm = &mesh_face_norm[poly_zsort[i].index];
-            dp = fix16Mul(transformation->lightInv.x, norm->x) +
-				fix16Mul(transformation->lightInv.y, norm->y) +
-				fix16Mul(transformation->lightInv.z, norm->z);
+            dp = fix16Mul(ctx->transformation.lightInv.x, norm->x) +
+				fix16Mul(ctx->transformation.lightInv.y, norm->y) +
+				fix16Mul(ctx->transformation.lightInv.z, norm->z);
 
 	        if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
 	            BMP_drawPolygon(v, 4, col | (col << 4));
@@ -141,45 +130,39 @@ void RSE_3DFlatShadedScreen(void)
 {
     char str[16];
 
-    Rotation3D rotation;
-	Translation3D translation;
-	Transformation3D transformation;
-	Vect3D_f16 rotstep;
+    struct rendering_context ctx;
 
-    camdist = FIX16(15);
-
-    Vect3D_f16 pts_3D[MAX_POINTS];
-	Vect2D_s16 pts_2D[MAX_POINTS];
+    ctx.camdist = FIX16(15);
 
     M3D_reset();
-    M3D_setCamDistance(camdist);
+    M3D_setCamDistance(ctx.camdist);
     M3D_setLightEnabled(1);
     M3D_setLightXYZ(FIX16(0.9), FIX16(0.9), FIX16(-0.9));
 
     // allocate translation and rotation structure
-    M3D_setTransform(&transformation, &translation, &rotation);
-    M3D_setTranslation(&transformation, FIX16(0), FIX16(0), FIX16(20));
-    M3D_setRotation(&transformation, FIX16(0.0), FIX16(0.0), FIX16(0.0));
+    M3D_setTransform(&(ctx.transformation), &(ctx.translation), &(ctx.rotation));
+    M3D_setTranslation(&(ctx.transformation), FIX16(0), FIX16(0), FIX16(20));
+    M3D_setRotation(&(ctx.transformation), FIX16(0.0), FIX16(0.0), FIX16(0.0));
 
-    rotstep.x = FIX16(0.05);
-    rotstep.y = FIX16(0.05);
+    ctx.rotstep.x = FIX16(0.05);
+    ctx.rotstep.y = FIX16(0.05);
 
     // set the current mesh
-    PART_3D_LOAD_MESH(metacube);
+    PART_3D_LOAD_MESH(ctx, metacube);
 
     zsort_switch = 0;
 
     while (1)
     {
-        M3D_setCamDistance(camdist);
+        M3D_setCamDistance(ctx.camdist);
 
         // do work here
-        rotation.x += rotstep.x;
-        rotation.y += rotstep.y;
-        rotation.z += rotstep.z;
-        transformation.rebuildMat = 1;
+        ctx.rotation.x += ctx.rotstep.x;
+        ctx.rotation.y += ctx.rotstep.y;
+        ctx.rotation.z += ctx.rotstep.z;
+        ctx.transformation.rebuildMat = 1;
 
-        updatePointsPos(&transformation, pts_3D, pts_2D);
+        updatePointsPos(&ctx); // &(ctx.transformation), ctx.pts_3D, ctx.pts_2D);
 
         // ensure previous flip buffer request has been started
         BMP_waitWhileFlipRequestPending();
@@ -187,13 +170,13 @@ void RSE_3DFlatShadedScreen(void)
 
         BMP_clear();
 
-        drawPoints(0xFF, &transformation, pts_3D, pts_2D);
+        drawPoints(0xFF, &ctx); // &(ctx.transformation), ctx.pts_3D, ctx.pts_2D);
 
         BMP_drawText("trans z:", 0, 2);
-        fix16ToStr(translation.z, str, 2);
+        fix16ToStr(ctx.translation.z, str, 2);
         BMP_drawText(str, 10, 2);
         BMP_drawText("cam dist:", 0, 3);
-        fix16ToStr(camdist, str, 2);
+        fix16ToStr(ctx.camdist, str, 2);
         BMP_drawText(str, 11, 3);
 
         BMP_flip(1);
