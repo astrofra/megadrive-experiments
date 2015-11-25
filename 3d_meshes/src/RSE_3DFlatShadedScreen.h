@@ -7,8 +7,8 @@
     mesh_poly_ind = mesh_name ## _poly_ind; \
     mesh_line_ind = mesh_name ## _line_ind; \
     mesh_face_norm = mesh_name ## _face_norm; \
-    vtx_count = mesh_name ## _VTX_COUNT;
-    // poly_count = mesh_name ## _FACE_COUNT;
+    vtx_count = mesh_name ## _VTX_COUNT; \
+    poly_count = mesh_name ## _FACE_COUNT;
 
 struct rendering_context
 {
@@ -17,8 +17,8 @@ struct rendering_context
 	Transformation3D transformation;
 	Vect3D_f16 rotstep;
 
-    Vect3D_f16 pts_3D[MAX_POINTS];
-	Vect2D_s16 pts_2D[MAX_POINTS];	
+    Vect3D_f16 *pts_3D; // Pointer to the array of 3D polygons
+	Vect2D_s16 *pts_2D; // Pointer to the array of 2D polygons	
 
     fix16 camdist;
 };

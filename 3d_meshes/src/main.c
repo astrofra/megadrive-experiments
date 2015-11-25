@@ -19,7 +19,7 @@ const u16 *mesh_poly_ind;
 const u16 *mesh_line_ind;
 const Vect3D_f16 *mesh_face_norm;
 u16 vtx_count;
-// u16 poly_count;
+u16 poly_count;
 
 struct  QSORT_ENTRY poly_zsort[MAX_POINTS];
 
@@ -67,7 +67,7 @@ void inline drawPoints(u8 col, struct rendering_context *ctx)
 	{
 		//	Feed an index table with the sum of the Z coordinate
 		//	of each polygon in the current mesh
-	    for(i = 0; i < metacube_FACE_COUNT; i++)
+	    for(i = 0; i < poly_count; i++)
 	    {
 	        j = i << 2;
 	        poly_zsort[i].index = i;
@@ -77,7 +77,7 @@ void inline drawPoints(u8 col, struct rendering_context *ctx)
 	    }
 
 	    //	Quicksort the table and order the polygons by depth
-	    QuickSort(metacube_FACE_COUNT, poly_zsort);
+	    QuickSort(poly_count, poly_zsort);
 	}
 
     //	Count 16 frames until the next depth sort
@@ -85,7 +85,7 @@ void inline drawPoints(u8 col, struct rendering_context *ctx)
 	zsort_switch &= 0xF;
 
     //  Draws the polygons
-    i = metacube_FACE_COUNT;
+    i = poly_count;
 
     while(i--)
     {
@@ -131,6 +131,10 @@ void RSE_3DFlatShadedScreen(void)
     char str[16];
 
     struct rendering_context ctx;
+    Vect3D_f16 pts_3D[MAX_POINTS];
+	Vect2D_s16 pts_2D[MAX_POINTS];
+	ctx.pts_3D = pts_3D;
+	ctx.pts_2D = pts_2D;	
 
     ctx.camdist = FIX16(15);
 
