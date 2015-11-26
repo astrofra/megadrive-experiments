@@ -2,6 +2,7 @@ import os
 import string
 import codecs
 import ast
+import math
 from vector3 import Vector3
 
 # filename_list = [	"fish.obj", "bamboo.obj", "bomb.obj", "brain.obj", "communism.obj", 
@@ -12,7 +13,7 @@ from vector3 import Vector3
 folder_in = "meshes"
 scale_factor = 10.0
 
-def parse_obj_vector(_string, _scale_factor):
+def parse_obj_vector(_string, _scale_factor = 1.0):
 	_args = _string.split(' ')
 	_vector = Vector3(float(_args[1]), float(_args[2]), float(_args[3]))
 	_vector *= _scale_factor
@@ -58,6 +59,8 @@ def main():
 	fc = codecs.open(filename_out, 'w')
 	fc.write('#include "genesis.h"\n\n')
 
+	bounding_distance = 0.0
+
 	for filename_in in os.listdir(folder_in):
 		if filename_in.find(".obj") > -1:
 			face_list = []
@@ -75,11 +78,15 @@ def main():
 					line = line.strip()
 					if line.startswith('v '):
 						# print('found a vertex')
-						vertex_list.append(parse_obj_vector(line, scale_factor))
+						new_vertex = parse_obj_vector(line)
+						dist_to_origin = math.sqrt(new_vertex.x * new_vertex.x + new_vertex.y * new_vertex.y + new_vertex.z * new_vertex.z)
+						if dist_to_origin > bounding_distance:
+							bounding_distance = dist_to_origin
+						vertex_list.append(new_vertex)
 
 					if line.startswith('vn '):
 						# print('found a vertex normal')
-						vertex_normal_list.append(parse_obj_vector(line, 1.0))
+						vertex_normal_list.append(parse_obj_vector(line))
 
 					if line.startswith('f '):
 						# print('found a face')
@@ -101,6 +108,10 @@ def main():
 						if not already_in_list:
 							edge_list.append(new_edge)
 						new_edge = []
+
+			if bounding_distance > 0.0:
+				for i in range(len(vertex_list)):
+					vertex_list[i] = vertex_list[i] * (scale_factor / bounding_distance)
 
 
 			print('OBJ Parser : "' + filename_in + '", ' + str(len(vertex_list)) + ' vertices, ' + str(len(vertex_normal_list)) + ' normals, ' + str(len(face_list)) + ' faces, ')

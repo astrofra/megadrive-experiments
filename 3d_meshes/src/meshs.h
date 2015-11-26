@@ -2,8 +2,15 @@
 #define cube_FACE_COUNT 6
 const Vect3D_f16 cube_coord[24];
 const u16  cube_poly_ind[24];
-const u16  cube_line_ind[16];
+const u16  cube_line_ind[18];
 const Vect3D_f16  cube_face_norm[6];
+
+#define cubic_cross_VTX_COUNT 96
+#define cubic_cross_FACE_COUNT 30
+const Vect3D_f16 cubic_cross_coord[96];
+const u16  cubic_cross_poly_ind[120];
+const u16  cubic_cross_line_ind[92];
+const Vect3D_f16  cubic_cross_face_norm[30];
 
 #define cylinder_VTX_COUNT 54
 #define cylinder_FACE_COUNT 16
