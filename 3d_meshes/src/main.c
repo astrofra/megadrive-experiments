@@ -152,7 +152,7 @@ void RSE_3DFlatShadedScreen(void)
     ctx.rotstep.y = FIX16(0.05);
 
     // set the current mesh
-    PART_3D_LOAD_MESH(ctx, cubic_cross);
+    PART_3D_LOAD_MESH(ctx, cylinder_subd);
 
     zsort_switch = 0;
 

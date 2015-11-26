@@ -59,14 +59,13 @@ def main():
 	fc = codecs.open(filename_out, 'w')
 	fc.write('#include "genesis.h"\n\n')
 
-	bounding_distance = 0.0
-
 	for filename_in in os.listdir(folder_in):
 		if filename_in.find(".obj") > -1:
 			face_list = []
 			vertex_list = []
 			vertex_normal_list = []
 			edge_list = []
+			bounding_distance = 0.0
 
 			f = codecs.open(os.path.join(folder_in, filename_in), 'r')
 			for line in f:
@@ -112,6 +111,8 @@ def main():
 			if bounding_distance > 0.0:
 				for i in range(len(vertex_list)):
 					vertex_list[i] = vertex_list[i] * (scale_factor / bounding_distance)
+
+			print("bounding_distance = " + str(bounding_distance))
 
 
 			print('OBJ Parser : "' + filename_in + '", ' + str(len(vertex_list)) + ' vertices, ' + str(len(vertex_normal_list)) + ' normals, ' + str(len(face_list)) + ' faces, ')
