@@ -49,6 +49,9 @@ def parse_obj_face(_string):
 	# _face.append(_face.pop(0))
 	# _face.append(_face[0])
 
+	# if len(_face) == 3:
+	# 	_face.append(_face[:-1])
+
 	return _face
 
 def main():
@@ -128,7 +131,7 @@ def main():
 			fh.write('#define ' + obj_name + '_VTX_COUNT ' + str(len(vertex_list) * 3) + '\n')
 			fh.write('#define ' + obj_name + '_FACE_COUNT ' + str(len(face_list)) + '\n')
 			fh.write('const Vect3D_f16 ' + obj_name + '_coord[' + str(len(vertex_list) * 3) + '];\n')
-			fh.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '];\n')
+			fh.write('const short  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '];\n')
 			fh.write('const u16  ' + obj_name + '_line_ind[' + str(len(edge_list) * 2) + '];\n')
 			fh.write('const Vect3D_f16  ' + obj_name + '_face_norm[' + str(len(face_list)) + '];\n\n')
 
@@ -152,7 +155,7 @@ def main():
 			fc.write('\n')
 			fc.write('/* List of faces */' + '\n')
 
-			fc.write('const u16  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '] =\n')
+			fc.write('const short  ' + obj_name + '_poly_ind[' + str(len(face_list) * 4) + '] =\n')
 			fc.write('{\n')
 
 			for _face in face_list:
@@ -163,6 +166,9 @@ def main():
 					_str_out += str(_corners['vertex'])
 					corner_idx += 1
 					_str_out += ','
+
+				if len(_face) == 3:
+					_str_out += '-1,'
 
 				fc.write(_str_out + '\n')
 
