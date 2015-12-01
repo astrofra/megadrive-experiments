@@ -2,23 +2,25 @@
 #include <gfx.h>
 #define CHAR_SIZE 4
 
-u16 hInterruptCounter = 0;
-u32 hscroll = 0;
-u32 hscrollInc = 0x30;
-u16 vblCount = 0;
 
-void hBlank(){
-	hInterruptCounter++;
-	VDP_setHorizontalScroll(PLAN_A, hscroll >> 8);
-	if (hInterruptCounter % 2 == 0){
-		hscroll += hscrollInc;
-	}
-	else{
-		hscroll -= hscrollInc;
-	}
-}
 
 int main(){
+	u16 hInterruptCounter = 0;
+	u32 hscroll = 0;
+	u32 hscrollInc = 0x30;
+	u16 vblCount = 0;
+
+	void hBlank(){
+		hInterruptCounter++;
+		VDP_setHorizontalScroll(PLAN_A, hscroll >> 8);
+		if (hInterruptCounter % 2 == 0){
+			hscroll += hscrollInc;
+		}
+		else{
+			hscroll -= hscrollInc;
+		}
+	}
+
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
 	VDP_setScreenWidth320();
