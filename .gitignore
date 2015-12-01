@@ -13,3 +13,5 @@ raster/src/out/rom.out
 
 raster/src/out/sega.o
 
+
+raster/src/out/res/gfx.o
