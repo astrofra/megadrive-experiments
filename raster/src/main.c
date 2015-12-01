@@ -3,9 +3,13 @@
 #define CHAR_SIZE 4
 
 u16 hInterruptCounter = 0;
+u32 hscroll = 0;
 
-void hBlanck(){
+void hBlank(){
 	hInterruptCounter++;	
+	VDP_setHorizontalScroll(PLAN_A, hscroll >> 8);
+	//hscroll += 0x30;
+	hscroll += 10;
 }
 
 int main(){
@@ -18,10 +22,12 @@ int main(){
 
 	SYS_enableInts();
 	VDP_setHInterrupt(1);
-	SYS_setHIntCallback(&hBlanck); //hBlanck function is called on each h interruption
+	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption
 	
 	while (1){
 		//VDP_waitVSync();
+		VDP_setHorizontalScroll(PLAN_A, 0);
+		hscroll = 0;
 		KDebug_Alert("SGDK HCOUNTER");
 		KDebug_AlertNumber(GET_HCOUNTER);
 

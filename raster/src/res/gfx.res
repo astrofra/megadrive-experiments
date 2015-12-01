@@ -1,0 +1,1 @@
+IMAGE car_image "car.png" -1
