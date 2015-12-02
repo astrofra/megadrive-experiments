@@ -1,0 +1,16 @@
+TOTO equ 1	
+	move.l 0x00, %d0
+	
+setPalette:
+	
+palette:
+	dc.w	0x000
+	dc.w	0x000
+	dc.w	0x460
+	dc.w	0xEEE
+	dc.w	0xCCC
+	dc.w	0x444
+	dc.w	0x00E
+	dc.w	0x88E
+
+

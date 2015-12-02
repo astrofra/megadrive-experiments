@@ -15,3 +15,11 @@ raster/src/out/sega.o
 
 
 raster/src/out/res/gfx.o
+
+asm/src/build_MD_NN.bat
+
+asm/src/out/rom_head.bin
+
+asm/src/out/rom_head.o
+
+asm/src/out/sega.o
