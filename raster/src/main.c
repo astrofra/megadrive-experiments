@@ -1,5 +1,6 @@
 #include <genesis.h>
 #include <gfx.h>
+#include "cosine_table.h"
 #define CHAR_SIZE 4
 
 int main(){
@@ -7,18 +8,14 @@ int main(){
 	u32 hscroll = 0;
 	u32 hscrollInc = 0x30;
 	u16 vblCount = 0;
-	char hInterruptCounterStr[CHAR_SIZE];
+	// char hInterruptCounterStr[CHAR_SIZE];
 	u16 vramIndex = TILE_USERINDEX;
 
 	void hBlank(){
 		hInterruptCounter++;
-		VDP_setHorizontalScroll(PLAN_A, hscroll >> 8);
-		if (hInterruptCounter % 2 == 0){
-			hscroll += hscrollInc;
-		}
-		else{
-			hscroll -= hscrollInc;
-		}
+		VDP_setHorizontalScroll(PLAN_A, hscroll);
+		hscroll = (tsin[(hscrollInc + vblCount) & 0xFF]) >> 3;
+		hscrollInc++;
 	}
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
@@ -34,9 +31,9 @@ int main(){
 	while (1){
 		VDP_waitVSync();
 		vblCount++;
-		hscrollInc += 0x8;
-		uintToStr(hInterruptCounter, hInterruptCounterStr, CHAR_SIZE);
-		VDP_drawText(hInterruptCounterStr, 0, 10);
+		hscrollInc = 0;
+		// uintToStr(hscrollInc, hInterruptCounterStr, CHAR_SIZE);
+		// VDP_drawText(hInterruptCounterStr, 0, 10);
 	}
 	return 0;
 }
