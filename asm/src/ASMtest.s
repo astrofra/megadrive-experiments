@@ -1,4 +1,3 @@
-TOTO equ 1	
 	move.l 0x00, %d0
 	
 setPalette:
