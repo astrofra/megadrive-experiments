@@ -3,10 +3,12 @@
 #include "cosine_table.h"
 static void rasterPalette();
 static void rasterScroll();
+static void rasterScrollPalette();
 
 int main(){
 	VDP_drawText("A - SCROLL RASTER", 10, 10);
 	VDP_drawText("B - PALETTE RASTER", 10, 12);
+	VDP_drawText("C - BOOTH", 10, 14);	
 	JOY_init();
 	while(1){
 		VDP_waitVSync();
@@ -16,6 +18,9 @@ int main(){
 		if (JOY_readJoypad(JOY_1) & BUTTON_B){
 			rasterPalette();
 		}
+		if (JOY_readJoypad(JOY_1) & BUTTON_C){
+			rasterScrollPalette();
+		}		
 	}
 	return 0;
 }
@@ -155,6 +160,42 @@ static void rasterScroll(){
 		hscroll = (tsin[(hscrollInc + vblCount) & 0xFF]) >> 3;
 		hscrollInc++;
 	}	
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);
+	VDP_setScreenWidth320();
+	SYS_disableInts();
+	VDP_setPalette(PAL0, car_image.palette->data);
+	VDP_drawImageEx(BPLAN, &car_image, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 1, 15, FALSE, FALSE);
+	vramIndex += car_image.tileset->numTile;
+	SYS_enableInts();
+	VDP_drawTextBG(APLAN,"SCROLLING RASTER TEST",0, 0, 0);
+	VDP_setHInterrupt(1);
+	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption
+	while (1){
+		VDP_waitVSync();
+		vblCount++;
+		hscrollInc = 0;
+	}
+}
+
+u16 palette_y[512];
+
+static void rasterScrollPalette(){
+	u16 hInterruptCounter = 0;
+	u32 hscroll = 0;
+	u32 hscrollInc = 0x30;
+	u16 vblCount = 0;
+	u16 vramIndex = TILE_USERINDEX;
+	static void hBlank(){
+		hInterruptCounter++;
+		hscroll = (tsin[(hscrollInc + vblCount) & 0xFF]) >> 3;
+		hscrollInc++;
+		VDP_setHorizontalScroll(PLAN_B, hscroll);
+		VDP_setPalette(0, &palette_y[hscroll]);
+	}	
+	for (hscroll = 0; hscroll < 512; hscroll++)
+		palette_y[hscroll] = hscroll;
+
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
 	VDP_setScreenWidth320();
