@@ -23,3 +23,5 @@ asm/src/out/rom_head.bin
 asm/src/out/rom_head.o
 
 asm/src/out/sega.o
+
+raster/src/out/cosine_table.o
