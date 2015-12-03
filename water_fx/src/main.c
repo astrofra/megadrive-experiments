@@ -18,8 +18,8 @@ static void rasterScroll(){
 	u16 vramIndex = TILE_USERINDEX;
 	static void hBlank(){
 		hInterruptCounter++;
+		VDP_setHorizontalScroll(PLAN_B, tcos[((hscrollInc + vblCount) << 2) & 0xFF] >> 4);
 		VDP_setHorizontalScroll(PLAN_A, tsin[(hscrollInc + vblCount) & 0xFF] >> 3);
-		VDP_setHorizontalScroll(PLAN_B, tcos[(hscrollInc + vblCount) & 0xFF] >> 3);
 		hscrollInc++;
 	}	
 	VDP_clearPlan(APLAN, 0);
