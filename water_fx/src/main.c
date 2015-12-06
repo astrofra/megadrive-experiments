@@ -11,16 +11,15 @@ int main(){
 }
 
 static void waterScrollingFX(){
-	u16 hInterruptCounter = 0;
 	u32 hscroll = 0;
 	u32 hscrollInc = 0x30;
 	u16 vblCount = 0;
+	u16 vblResetFlag = FALSE;
 	u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[16];
 
 	/*	Hblank-based water fx */
 	static void hBlank(){
-		hInterruptCounter++;
 		/* Background */
 		VDP_setHorizontalScroll(PLAN_B, tcos[((hscrollInc + vblCount) << 2)	/* horiz. wave fx */
 										& (COSINE_TABLE_LEN - 1)] >> 5);	/* modulo the size of the sin table */
@@ -33,6 +32,19 @@ static void waterScrollingFX(){
 		VDP_setVerticalScroll(PLAN_A, (tcos[((hscrollInc + vblCount) << 2) 	/* vert. wave fx */
 										& (COSINE_TABLE_LEN - 1)] >> 7) 	/* modulo the size of the sin table */
 										+ 0xFF - ((vblCount >> 1) & 0xFF));	/* plus vert. scrolling increment */
+
+		/*	Updates the sprites list
+			once a vblank, thanks to a boolean flag
+			that is re-enabled every vblank */
+		if (vblResetFlag)
+		{
+			SPR_setPosition(&sprites[0], ((VDP_getScreenWidth() - 128) >> 1)						/* Horiz. center */
+										+ (tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)] >> 5), 	/* plus horiz. sine motion */
+										(VDP_getScreenHeight() - 128) >> 1);						/* Vert. center */
+			SPR_update(sprites, 1);
+			vblResetFlag = FALSE;
+		}
+
 		hscrollInc++;
 	}	
 	VDP_clearPlan(APLAN, 0);
@@ -76,5 +88,6 @@ static void waterScrollingFX(){
 		vblCount++;
 		/* Reset the line counter for the Hblank routine */
 		hscrollInc = 0;
+		vblResetFlag = TRUE;
 	}
 }
