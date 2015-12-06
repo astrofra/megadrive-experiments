@@ -157,7 +157,7 @@ static void rasterScroll(){
 	static void hBlank(){
 		hInterruptCounter++;
 		VDP_setHorizontalScroll(PLAN_B, hscroll);
-		hscroll = (tsin[(hscrollInc + vblCount) & 0xFF]) >> 3;
+		hscroll = (tsin[(hscrollInc + vblCount) & (COSINE_TABLE_LEN - 1)]) >> 3;
 		hscrollInc++;
 	}	
 	VDP_clearPlan(APLAN, 0);
@@ -178,7 +178,7 @@ static void rasterScroll(){
 	}
 }
 
-u16 palette_y[512];
+u16 palette_y[1024];
 
 static void rasterScrollPalette(){
 	u16 hInterruptCounter = 0;
@@ -188,13 +188,13 @@ static void rasterScrollPalette(){
 	u16 vramIndex = TILE_USERINDEX;
 	static void hBlank(){
 		hInterruptCounter++;
-		hscroll = (tsin[(hscrollInc + vblCount) & 0xFF]) >> 3;
+		hscroll = (tsin[(hscrollInc + vblCount) & (COSINE_TABLE_LEN - 1)]) >> 3;
 		hscrollInc++;
 		VDP_setHorizontalScroll(PLAN_B, hscroll);
-		VDP_setPalette(0, &palette_y[hscroll]);
+		VDP_setPalette(0, &palette_y[hscroll & 255]);
 	}	
-	for (hscroll = 0; hscroll < 512; hscroll++)
-		palette_y[hscroll] = hscroll;
+	for (hscroll = 0; hscroll < 1024; hscroll++)
+		palette_y[hscroll] = (hscroll  >> 1) | ((hscroll >> 3) & 0xE) << 8;
 
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
