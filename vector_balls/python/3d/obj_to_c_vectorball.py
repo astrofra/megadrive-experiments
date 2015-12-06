@@ -123,16 +123,15 @@ def main():
 			##  Creates the H file that lists the arrays
 			############################################
 
-			fh.write('#define ' + obj_name + '_VTX_COUNT ' + str(len(vertex_list) * 3) + '\n')
-			fh.write('const Vect3D_f16 vb_' + obj_name + '_vertex_pos[' + str(len(vertex_list) * 3) + '];\n')
-			fh.write('const Vect3D_f16  vb_' + obj_name + '_vertex_norm[' + str(len(vertex_normal_list)) + '];\n\n')
+			fh.write('#define ' + obj_name + '_VTX_COUNT ' + str(len(vertex_list)) + '\n')
+			fh.write('const Vect3D_f16 vb_' + obj_name + '_vertex_pos[' + str(len(vertex_list)) + '];\n')
 
 
 			##  Creates the C file that lists the meshes
 			############################################
 			fc.write('/* ' + filename_in + ' */' + '\n')
 			fc.write('/* List of vertices */' + '\n')
-			fc.write('const Vect3D_f16 vb_' + obj_name + '_vertex_pos[' + str(len(vertex_list) * 3) + '] =\n')
+			fc.write('const Vect3D_f16 vb_' + obj_name + '_vertex_pos[' + str(len(vertex_list)) + '] =\n')
 			fc.write('{\n')
 
 			##  Iterate on vertices
@@ -142,21 +141,6 @@ def main():
 
 			_str_out = '};'
 			fc.write(_str_out + '\n')
-
-			##  Iterate on face normals
-			fc.write('/* List of vertex normals */' + '\n')
-
-			fc.write('const Vect3D_f16  vb_' + obj_name + '_vertex_norm[' + str(len(vertex_normal_list)) + '] =\n')
-			fc.write('{\n')
-
-			for _vertex in vertex_normal_list:
-				_str_out = '\t'
-				_str_out = '{FIX16(' + str(_vertex.x) + '),\t' + 'FIX16(' + str(_vertex.z) + '),\t' + 'FIX16(' + str(_vertex.y * -1.0) + ')},'
-				fc.write('\t' + _str_out + '\n')
-
-			_str_out = '};'
-			fc.write(_str_out + '\n')
-			fc.write('\n')
 
 
 	fh.close()
