@@ -2,20 +2,21 @@
 #include <gfx.h>
 #include "cosine_table.h"
 
-static void rasterScroll();
+static void waterScrollingFX();
 
 int main(){
 	JOY_init();
-	rasterScroll();
+	waterScrollingFX();
 	return 0;
 }
 
-static void rasterScroll(){
+static void waterScrollingFX(){
 	u16 hInterruptCounter = 0;
 	u32 hscroll = 0;
 	u32 hscrollInc = 0x30;
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
+	Sprite sprites[16];
 
 	/*	Hblank-based water fx */
 	static void hBlank(){
@@ -40,7 +41,7 @@ static void rasterScroll(){
 	VDP_setPlanSize(64, 64);
 	SYS_disableInts();
 
-	/* Background */
+	/* Draw the background */
 	VDP_setPalette(PAL1, water_tex_back.palette->data);
 	VDP_drawImageEx(BPLAN, &water_tex_back, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	VDP_drawImageEx(BPLAN, &water_tex_back, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
@@ -48,7 +49,7 @@ static void rasterScroll(){
 	VDP_drawImageEx(BPLAN, &water_tex_back, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
 	vramIndex += water_tex_back.tileset->numTile;
 
-	/* Foreground */
+	/* Draw the foreground */
 	VDP_setPalette(PAL0, water_tex_front.palette->data);
 	VDP_drawImageEx(APLAN, &water_tex_front, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	VDP_drawImageEx(APLAN, &water_tex_front, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
@@ -56,8 +57,14 @@ static void rasterScroll(){
 	VDP_drawImageEx(APLAN, &water_tex_front, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
 	vramIndex += water_tex_front.tileset->numTile;
 
+	/* Sprites */
+	VDP_setPalette(PAL2, pirate_logo.palette->data);
+	SPR_init(257);
+    SPR_initSprite(&sprites[0], &pirate_logo, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(&sprites[0], (VDP_getScreenWidth() - 128) >> 1, (VDP_getScreenHeight() - 128) >> 1);
+    SPR_update(sprites, 1);
+
 	SYS_enableInts();
-	// VDP_drawTextBG(APLAN,"SCROLLING RASTER TEST",0, 0, 0);
 
 	VDP_setHInterrupt(1);
 	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption
