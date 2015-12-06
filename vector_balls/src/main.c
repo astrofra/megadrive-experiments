@@ -21,7 +21,9 @@ void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
 	short x, y;
 	Vect3D_f16 _vtx, t_vtx;
 	fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
+	u16 distance = 1100;
 	u16 x_screen, y_screen;
+
 	x_screen = (VDP_getScreenWidth() - 32) >> 1;
 	y_screen = (VDP_getScreenHeight() - 32) >> 1;
 
@@ -48,13 +50,19 @@ void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
 		*/
 
 		//	2D rotation (on X and Y axis)
-	    t_vtx.x = fix16Mul(_vtx.x, _sinx) + fix16Mul(_vtx.y, _cosx);
-	    t_vtx.y = fix16Mul(_vtx.x, cs) - fix16Mul(_vtx.y, ss) + fix16Mul(_vtx.z, _cosy);
-	    t_vtx.z = fix16Mul(_vtx.x, cc) - fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny);
+	    t_vtx.x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
+	    t_vtx.y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
+	    t_vtx.z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
 
 	    //	Isometric 2D projection
-		x = t_vtx.x;
-		y = t_vtx.y + (t_vtx.z >> 1);
+	    /*
+			x = t_vtx.x;
+			y = t_vtx.y + (t_vtx.z >> 1);
+		*/
+
+		//	Classic 3D -> 2D projection
+	    x = (t_vtx.x << 10) / (t_vtx.z + distance);
+	    y = (t_vtx.y << 10) / (t_vtx.z + distance);		
 
 		x >>= 3;
 		y >>= 3;
