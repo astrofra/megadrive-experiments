@@ -1,1 +1,1 @@
-SPRITE ball_metal "ball_metal.png" 4 4 -1
+SPRITE ball_metal "ball_metal.png" 2 2 -1
