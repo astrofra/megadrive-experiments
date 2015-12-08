@@ -191,7 +191,7 @@ static void rasterScrollPalette(){
 		hscroll = (tsin[(hscrollInc + vblCount) & (COSINE_TABLE_LEN - 1)]) >> 3;
 		hscrollInc++;
 		VDP_setHorizontalScroll(PLAN_B, hscroll);
-		VDP_setPalette(0, &palette_y[hscroll & 255]);
+		VDP_setPaletteColors(0, &palette_y[hscroll & 255], 1);
 	}	
 	for (hscroll = 0; hscroll < 1024; hscroll++)
 		palette_y[hscroll] = (hscroll  >> 1) | ((hscroll >> 3) & 0xE) << 8;
