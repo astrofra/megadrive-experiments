@@ -17,6 +17,7 @@ int main(){
 
 static void vectorBallFX(){
 	u16 loop, j;
+	u16 zsort_switch = 0;
 	Sprite sprites[MAX_VECTOR_BALL];
 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
 	u16 angle = 0;
@@ -54,14 +55,24 @@ static void vectorBallFX(){
 		    t_vtx[loop].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
 		    t_vtx[loop].z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
 
-		    //	Fill the sort table
-		    vball_zsort[loop].index = loop;
-		    vball_zsort[loop].value = t_vtx[loop].z;
-
 		}
 
 		/* Z-sort the vector balls */
-		QuickSort(BALL_COUNT, vball_zsort);
+		if (zsort_switch == 0)
+		{
+			for(loop = 0; loop < BALL_COUNT; loop++)
+			{
+			    //	Fill the sort table
+			    vball_zsort[loop].index = loop;
+			    vball_zsort[loop].value = t_vtx[loop].z;
+			}
+
+			QuickSort(BALL_COUNT, vball_zsort);
+		}
+
+		//	Count 16 frames until the next depth sort
+		zsort_switch++;
+		zsort_switch &= 0xF;
 
 		/* Display the vector balls using sprites */
 		for(loop = 0; loop < BALL_COUNT; loop++)
@@ -103,6 +114,7 @@ static void vectorBallFX(){
 
 	while (TRUE){
 		VDP_waitVSync();
+		BMP_showFPS(1);
 		drawVectorBalls(sprites, angle & 0x3FF, (angle << 1) & 0x3FF); // 0x3FF = size of SGDK cosine table
 		angle++;
 	}
