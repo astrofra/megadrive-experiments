@@ -35,9 +35,9 @@ static void vectorBallFX(){
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
 
-		xc = fix16Mul(cosFix16((rx << 4) & 0x3FF), FIX16(4.0));
-		yc = fix16Mul(sinFix16((rx << 3) & 0x3FF), FIX16(1.0));
-		zc = fix16Mul(sinFix16((rx << 2) & 0x3FF), FIX16(3.0));
+		xc = fix16Mul(cosFix16(rx << 4), FIX16(4.0));
+		yc = fix16Mul(sinFix16(rx << 3), FIX16(1.0));
+		zc = fix16Mul(sinFix16(rx << 2), FIX16(3.0));
 
 		/* precalculate the rotation */
 		_cosx = cosFix16(rx);
@@ -130,7 +130,7 @@ static void vectorBallFX(){
 	while (TRUE){
 		VDP_waitVSync();
 		BMP_showFPS(1);
-		drawVectorBalls(sprites, angle & 0x3FF, (angle << 1) & 0x3FF); // 0x3FF = size of SGDK cosine table
+		drawVectorBalls(sprites, angle, angle << 1);
 		angle++;
 	}
 }
