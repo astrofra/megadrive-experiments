@@ -38,9 +38,6 @@ static void waterScrollingFX(){
 			that is re-enabled every vblank */
 		if (vblResetFlag)
 		{
-			SPR_setPosition(&sprites[0], ((VDP_getScreenWidth() - 128) >> 1)						/* Horiz. center */
-										+ (tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)] >> 5), 	/* plus horiz. sine motion */
-										(VDP_getScreenHeight() - 128) >> 1);						/* Vert. center */
 			SPR_update(sprites, 1);
 			vblResetFlag = FALSE;
 		}
@@ -88,6 +85,10 @@ static void waterScrollingFX(){
 		vblCount++;
 		/* Reset the line counter for the Hblank routine */
 		hscrollInc = 0;
+
+		SPR_setPosition(&sprites[0], ((VDP_getScreenWidth() - 128) >> 1)						/* Horiz. center */
+									+ (tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)] >> 5), 	/* plus horiz. sine motion */
+									(VDP_getScreenHeight() - 128) >> 1);						/* Vert. center */		
 		vblResetFlag = TRUE;
 	}
 }
