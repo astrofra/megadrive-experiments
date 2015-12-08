@@ -54,7 +54,6 @@ static void vectorBallFX(){
 		    t_vtx[loop].x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
 		    t_vtx[loop].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
 		    t_vtx[loop].z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
-
 		}
 
 		/* Z-sort the vector balls */
@@ -109,8 +108,6 @@ static void vectorBallFX(){
     SPR_update(sprites, BALL_COUNT);
 
 	SYS_enableInts();
-
-	VDP_setHInterrupt(1);
 
 	while (TRUE){
 		VDP_waitVSync();
