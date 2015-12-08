@@ -25,15 +25,19 @@ static void vectorBallFX(){
 	static void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
 	{
 		u16 loop;
-		short x, y;
+		short x, y, z, xc, yc, zc;
 		Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
 		fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
 		u16 distance = 1100;
-		u16 x_screen, y_screen;
+		short x_screen, y_screen;
 
 		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
+
+		xc = fix16Mul(cosFix16((rx << 4) & 0x3FF), FIX16(4.0));
+		yc = fix16Mul(sinFix16((rx << 3) & 0x3FF), FIX16(1.0));
+		zc = fix16Mul(sinFix16((rx << 2) & 0x3FF), FIX16(3.0));
 
 		/* precalculate the rotation */
 		_cosx = cosFix16(rx);
@@ -54,6 +58,10 @@ static void vectorBallFX(){
 		    t_vtx[loop].x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
 		    t_vtx[loop].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
 		    t_vtx[loop].z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
+
+		    t_vtx[loop].x += xc;
+		    t_vtx[loop].y += yc;
+		    t_vtx[loop].z += zc;
 		}
 
 		/* Z-sort the vector balls */
@@ -85,7 +93,17 @@ static void vectorBallFX(){
 			x >>= 3;
 			y >>= 3;
 
+			z = t_vtx[j].z + FIX16(8.0);
+			if (z < FIX16(0.0))
+				z = FIX16(0.0);
+
+			z >>= 7;
+
+			if (z > 7)
+				z = 7;
+
 			SPR_setPosition(&sprites[loop], x_screen + x, y_screen + y);
+			SPR_setFrame(&sprites[loop], z);
 		}
 
 		/* Update the whole list of sprites */
