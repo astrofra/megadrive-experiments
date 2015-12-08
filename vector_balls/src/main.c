@@ -30,9 +30,11 @@ static void vectorBallFX(){
 		u16 distance = 1100;
 		u16 x_screen, y_screen;
 
+		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
 
+		/* precalculate the rotation */
 		_cosx = cosFix16(rx);
 		_sinx = sinFix16(rx);
 		_cosy = cosFix16(ry);
@@ -42,6 +44,7 @@ static void vectorBallFX(){
 		cc = fix16Mul(_cosx, _cosy);
 		sc = fix16Mul(_sinx, _cosy);
 
+		/* rotate the vector balls */
 		for(loop = 0; loop < BALL_COUNT; loop++)
 		{
 			_vtx = VECTOR_BALL_ARRAY[loop];
@@ -51,13 +54,16 @@ static void vectorBallFX(){
 		    t_vtx[loop].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
 		    t_vtx[loop].z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
 
+		    //	Fill the sort table
 		    vball_zsort[loop].index = loop;
 		    vball_zsort[loop].value = t_vtx[loop].z;
 
 		}
 
+		/* Z-sort the vector balls */
 		QuickSort(BALL_COUNT, vball_zsort);
 
+		/* Display the vector balls using sprites */
 		for(loop = 0; loop < BALL_COUNT; loop++)
 		{
 			j = vball_zsort[loop].index;
@@ -72,21 +78,23 @@ static void vectorBallFX(){
 			SPR_setPosition(&sprites[loop], x_screen + x, y_screen + y);
 		}
 
+		/* Update the whole list of sprites */
 		SPR_update(sprites, BALL_COUNT);
 	}	
 	
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
-	/* Set a larger tileplan to be able to scroll */
+
 	SYS_disableInts();
 
-	/* Sprites */
+	/* Set the palette taken from the vector ball sprite */
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 	SPR_init(MAX_VECTOR_BALL);
 
+	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < BALL_COUNT; loop++)
 	    SPR_initSprite(&sprites[loop], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	// SPR_setPosition(&sprites[0], (VDP_getScreenWidth() - 32) >> 1, (VDP_getScreenHeight() - 32) >> 1);
+
     SPR_update(sprites, BALL_COUNT);
 
 	SYS_enableInts();
@@ -95,7 +103,7 @@ static void vectorBallFX(){
 
 	while (TRUE){
 		VDP_waitVSync();
-		drawVectorBalls(sprites, angle & 0x3FF, (angle << 1) & 0x3FF);
+		drawVectorBalls(sprites, angle & 0x3FF, (angle << 1) & 0x3FF); // 0x3FF = size of SGDK cosine table
 		angle++;
 	}
 }
