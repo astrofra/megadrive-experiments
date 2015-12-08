@@ -1,7 +1,7 @@
 #include <genesis.h>
 #include <gfx.h>
-#include "fp_cosine_table.h"
 #include "ball_coords.h"
+#include "quicksort.h"
 
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
@@ -15,68 +15,65 @@ int main(){
 	return 0;
 }
 
-void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
-{
-	u16 loop;
-	short x, y;
-	Vect3D_f16 _vtx, t_vtx;
-	fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
-	u16 distance = 1100;
-	u16 x_screen, y_screen;
-
-	x_screen = (VDP_getScreenWidth() - 32) >> 1;
-	y_screen = (VDP_getScreenHeight() - 32) >> 1;
-
-	_cosx = cosFix16(rx);
-	_sinx = sinFix16(rx);
-	_cosy = cosFix16(ry);
-	_siny = sinFix16(ry);
-	cs = fix16Mul(_cosx, _siny);
-	ss = fix16Mul(_siny, _sinx);
-	cc = fix16Mul(_cosx, _cosy);
-	sc = fix16Mul(_sinx, _cosy);
-
-	for(loop = 0; loop < BALL_COUNT; loop++)
-	{
-		_vtx = VECTOR_BALL_ARRAY[loop];
-
-		//	1D rotation (on Y axis)
-		/*
-			//	x' = x cos f - y sin f
-			t_vtx.x = fix16Sub(fix16Mul(_vtx.x, _cosy), fix16Mul(_vtx.y, _siny));
-			//	y' = y cos f + x sin f
-			t_vtx.y = fix16Add(fix16Mul(_vtx.y, _cosy), fix16Mul(_vtx.x, _siny));
-			t_vtx.z = _vtx.z;
-		*/
-
-		//	2D rotation (on X and Y axis)
-	    t_vtx.x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
-	    t_vtx.y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
-	    t_vtx.z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
-
-	    //	Isometric 2D projection
-	    /*
-			x = t_vtx.x;
-			y = t_vtx.y + (t_vtx.z >> 1);
-		*/
-
-		//	Classic 3D -> 2D projection
-	    x = (t_vtx.x << 10) / (t_vtx.z + distance);
-	    y = (t_vtx.y << 10) / (t_vtx.z + distance);		
-
-		x >>= 3;
-		y >>= 3;
-
-		SPR_setPosition(&sprites[loop], x_screen + x, y_screen + y);
-	}
-
-	SPR_update(sprites, BALL_COUNT);
-}
-
 static void vectorBallFX(){
-	u16 loop;
+	u16 loop, j;
 	Sprite sprites[MAX_VECTOR_BALL];
+	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
 	u16 angle = 0;
+
+	static void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
+	{
+		u16 loop;
+		short x, y;
+		Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
+		fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
+		u16 distance = 1100;
+		u16 x_screen, y_screen;
+
+		x_screen = (VDP_getScreenWidth() - 32) >> 1;
+		y_screen = (VDP_getScreenHeight() - 32) >> 1;
+
+		_cosx = cosFix16(rx);
+		_sinx = sinFix16(rx);
+		_cosy = cosFix16(ry);
+		_siny = sinFix16(ry);
+		cs = fix16Mul(_cosx, _siny);
+		ss = fix16Mul(_siny, _sinx);
+		cc = fix16Mul(_cosx, _cosy);
+		sc = fix16Mul(_sinx, _cosy);
+
+		for(loop = 0; loop < BALL_COUNT; loop++)
+		{
+			_vtx = VECTOR_BALL_ARRAY[loop];
+
+			//	2D rotation (on X and Y axis)
+		    t_vtx[loop].x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
+		    t_vtx[loop].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
+		    t_vtx[loop].z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
+
+		    vball_zsort[loop].index = loop;
+		    vball_zsort[loop].value = t_vtx[loop].z;
+
+		}
+
+		QuickSort(BALL_COUNT, vball_zsort);
+
+		for(loop = 0; loop < BALL_COUNT; loop++)
+		{
+			j = vball_zsort[loop].index;
+
+			//	Classic 3D -> 2D projection
+		    x = (t_vtx[j].x << 10) / (t_vtx[j].z + distance);
+		    y = (t_vtx[j].y << 10) / (t_vtx[j].z + distance);		
+
+			x >>= 3;
+			y >>= 3;
+
+			SPR_setPosition(&sprites[loop], x_screen + x, y_screen + y);
+		}
+
+		SPR_update(sprites, BALL_COUNT);
+	}	
 	
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
@@ -98,7 +95,7 @@ static void vectorBallFX(){
 
 	while (TRUE){
 		VDP_waitVSync();
-		drawVectorBalls(sprites, angle & (FP_COSINE_TABLE_LEN - 1), (angle << 1) & (FP_COSINE_TABLE_LEN - 1));
+		drawVectorBalls(sprites, angle & 0x3FF, (angle << 1) & 0x3FF);
 		angle++;
 	}
 }
