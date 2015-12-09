@@ -1,6 +1,9 @@
 #include <genesis.h>
 #include <gfx.h>
 
+#define PLAN_MAX_X 64
+#define PLAN_MAX_Y 32
+
 static void rogMainScreen();
 
 int main(){
@@ -21,13 +24,15 @@ static void rogMainScreen(){
 	SYS_disableInts();
 
 	/* Draw the background */
-	VDP_setPalette(PAL0, fish.palette->data);
-	VDP_drawImageEx(APLAN, &fish, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_setPalette(PAL1, fish.palette->data);
+	for (x = 0; x < PLAN_MAX_X; x += 2)
+		for (y = 0; y < PLAN_MAX_Y; y += 2)
+			VDP_drawImageEx(BPLAN, &fish, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), x, y, FALSE, FALSE);
 	vramIndex += fish.tileset->numTile;
 
 	/* Draw the foreground */
-	VDP_setPalette(PAL1, cat.palette->data);
-	VDP_drawImageEx(BPLAN, &cat, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_setPalette(PAL0, cat.palette->data);
+	VDP_drawImageEx(APLAN, &cat, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (VDP_getScreenWidth() - 108) >> 4 , (VDP_getScreenHeight() - 200) >> 4, FALSE, FALSE);
 	vramIndex += cat.tileset->numTile;
 
 	/* Sprites */
