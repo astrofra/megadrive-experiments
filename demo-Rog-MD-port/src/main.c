@@ -2,7 +2,7 @@
 #include <gfx.h>
 
 #define PLAN_MAX_X 64
-#define PLAN_MAX_Y 32
+#define PLAN_MAX_Y 64
 
 static void rogMainScreen();
 
@@ -14,6 +14,7 @@ int main(){
 
 static void rogMainScreen(){
 	u16 x,y;
+	u16 scroll_phase = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	// Sprite sprites[16];
 	
@@ -32,7 +33,7 @@ static void rogMainScreen(){
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL0, cat.palette->data);
-	VDP_drawImageEx(APLAN, &cat, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (VDP_getScreenWidth() - 108) >> 4 , (VDP_getScreenHeight() - 200) >> 4, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &cat, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (VDP_getScreenWidth() - 108) >> 4 , (VDP_getScreenHeight() - 200) >> 3, FALSE, FALSE);
 	vramIndex += cat.tileset->numTile;
 
 	/* Sprites */
@@ -48,6 +49,16 @@ static void rogMainScreen(){
 
 	while (1){
 		VDP_waitVSync();
+		BMP_showFPS(1);
+		scroll_phase++;
+		x = fix16Mul(cosFix16(scroll_phase << 1), FIX16(3.0));
+		y = fix16Mul(sinFix16(scroll_phase << 2), FIX16(2.0));
+
+		x >>= 2;
+		y >>= 2;
+
+		VDP_setHorizontalScroll(PLAN_B, x);
+		VDP_setVerticalScroll(PLAN_B, y + 16);
 		// SPR_setPosition(&sprites[0], ((VDP_getScreenWidth() - 128) >> 1)						/* Horiz. center */
 		// 							+ (tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)] >> 5), 	/* plus horiz. sine motion */
 		// 							(VDP_getScreenHeight() - 128) >> 1);						/* Vert. center */		
