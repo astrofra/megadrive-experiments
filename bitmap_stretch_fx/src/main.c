@@ -37,14 +37,14 @@ static void xRotatingCube(){
 			i &= ((1 << STEP_AMOUNT) - 1);
 			j = scroll_jump_table[hscrollInc + (i << 8) - 0x8];
 
-			if (j > 200)
+			if (j > 180)
 				VDP_setVerticalScroll(PLAN_A, 0);
 			else
 			{
 				if (logo_y_reverse)
-					VDP_setVerticalScroll(PLAN_A, Y_OFFSET + 160 - j);
+					VDP_setVerticalScroll(PLAN_A, Y_OFFSET - (j >> 4));
 				else
-					VDP_setVerticalScroll(PLAN_A, Y_OFFSET + j);
+					VDP_setVerticalScroll(PLAN_A, Y_OFFSET + (j >> 3));
 			}
 		}
 	}	
@@ -76,7 +76,7 @@ static void xRotatingCube(){
 		BMP_showFPS(1);
 		/*	Count the VBL, 
 			used in the Hblank routine as the main scrolling increment */
-		vblCount += 4;
+		vblCount += 6;
 		if (vblCount > COSINE_TABLE_LEN - 1)
 		{
 			vblCount = 0;
