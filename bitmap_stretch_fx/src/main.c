@@ -11,9 +11,9 @@ int main(){
 }
 
 #define	Y_OFFSET	(32 << 3)
-#define STEP_AMOUNT 16
+#define STEP_AMOUNT 5
 
-u16 scroll_jump_table[256 * STEP_AMOUNT];
+u16 scroll_jump_table[256 * (1 << STEP_AMOUNT)];
 
 static void xRotatingCube(){
 	u32 hscrollInc = 0x30;
@@ -32,7 +32,7 @@ static void xRotatingCube(){
 			/* Foreground */
 			i = tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)];
 			i += 512;
-			i >>= 7;
+			i >>= (STEP_AMOUNT + 2);
 			j = scroll_jump_table[hscrollInc + (i << 8) - 0x8];
 
 			if (j > 160)
@@ -49,7 +49,7 @@ static void xRotatingCube(){
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL0, wood_plank.palette->data);
-	VDP_drawImageEx(APLAN, &wood_plank, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, Y_OFFSET >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &wood_plank, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (Y_OFFSET >> 3) + 1, FALSE, FALSE);
 	vramIndex += wood_plank.tileset->numTile;
 
 	SYS_enableInts();
@@ -57,7 +57,7 @@ static void xRotatingCube(){
 	VDP_setHInterrupt(1);
 	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption
 
-	for(j = 0; j  < STEP_AMOUNT; j++)
+	for(j = 0; j < (1 << STEP_AMOUNT); j++)
 		for(i = 0; i < 256; i++)
 		{
 			scroll_jump_table[i + (j * 256)] = i << j;
