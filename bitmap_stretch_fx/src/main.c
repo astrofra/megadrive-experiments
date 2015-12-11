@@ -11,7 +11,7 @@ int main(){
 }
 
 #define	Y_OFFSET	(32 << 3)
-#define STEP_AMOUNT 5
+#define STEP_AMOUNT 6
 
 u16 scroll_jump_table[256 * (1 << STEP_AMOUNT)];
 
@@ -20,6 +20,7 @@ static void xRotatingCube(){
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	u16 i, j;
+	u16 logo_y_reverse = 0;
 
 	/*	Hblank-based water fx */
 	static void hBlank(){
@@ -30,15 +31,21 @@ static void xRotatingCube(){
 		else
 		{
 			/* Foreground */
-			i = tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)];
+			i = tcos[vblCount];
 			i += 512;
-			i >>= (STEP_AMOUNT + 2);
+			i >>= (STEP_AMOUNT + 1);
+			i &= ((1 << STEP_AMOUNT) - 1);
 			j = scroll_jump_table[hscrollInc + (i << 8) - 0x8];
 
-			if (j > 160)
+			if (j > 200)
 				VDP_setVerticalScroll(PLAN_A, 0);
 			else
-				VDP_setVerticalScroll(PLAN_A, j + Y_OFFSET);
+			{
+				if (logo_y_reverse)
+					VDP_setVerticalScroll(PLAN_A, Y_OFFSET + 160 - j);
+				else
+					VDP_setVerticalScroll(PLAN_A, Y_OFFSET + j);
+			}
 		}
 	}	
 	VDP_clearPlan(APLAN, 0);
@@ -60,15 +67,21 @@ static void xRotatingCube(){
 	for(j = 0; j < (1 << STEP_AMOUNT); j++)
 		for(i = 0; i < 256; i++)
 		{
-			scroll_jump_table[i + (j * 256)] = i << j;
+			scroll_jump_table[i + (j << 8)] = i << j;
 		}
 
 
 	while (1){
 		VDP_waitVSync();
+		BMP_showFPS(1);
 		/*	Count the VBL, 
 			used in the Hblank routine as the main scrolling increment */
-		vblCount++;
+		vblCount += 4;
+		if (vblCount > COSINE_TABLE_LEN - 1)
+		{
+			vblCount = 0;
+			logo_y_reverse = !logo_y_reverse;
+		}
 		/* Reset the line counter for the Hblank routine */
 		hscrollInc = 0;
 	}
