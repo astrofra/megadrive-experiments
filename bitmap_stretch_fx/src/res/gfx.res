@@ -1,0 +1,1 @@
+IMAGE wood_plank "wood_plank.png" -1

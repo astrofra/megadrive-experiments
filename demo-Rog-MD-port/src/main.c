@@ -33,8 +33,10 @@ static void rogMainScreen(){
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL0, cat.palette->data);
-	VDP_drawImageEx(APLAN, &cat, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (VDP_getScreenWidth() - 108) >> 4 , (VDP_getScreenHeight() - 200) >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &cat, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (VDP_getScreenWidth() - 108) >> 4 , (VDP_getScreenHeight() - 192) >> 3, FALSE, FALSE);
 	vramIndex += cat.tileset->numTile;
+
+	VDP_loadTileData(fish.tileset->tiles, vramIndex, 4, 1);
 
 	/* Sprites */
 	// VDP_setPalette(PAL2, pirate_logo.palette->data);
@@ -47,10 +49,14 @@ static void rogMainScreen(){
 
 	VDP_setHInterrupt(1);
 
+	vramIndex = 0;
+
 	while (1){
 		VDP_waitVSync();
 		BMP_showFPS(1);
+	
 		scroll_phase++;
+
 		x = fix16Mul(cosFix16(scroll_phase << 1), FIX16(3.0));
 		y = fix16Mul(sinFix16(scroll_phase << 2), FIX16(2.0));
 
@@ -59,6 +65,9 @@ static void rogMainScreen(){
 
 		VDP_setHorizontalScroll(PLAN_B, x);
 		VDP_setVerticalScroll(PLAN_B, y + 16);
+
+		// VDP_drawImageEx(APLAN, &fish, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (scroll_phase & 0x20) << 1, 20, FALSE, FALSE);
+		VDP_setTileMapXY(VDP_PLAN_A, 16 + (scroll_phase & 0x1), scroll_phase, 2); // (scroll_phase & 0x20) << 1, 2);
 		// SPR_setPosition(&sprites[0], ((VDP_getScreenWidth() - 128) >> 1)						/* Horiz. center */
 		// 							+ (tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)] >> 5), 	/* plus horiz. sine motion */
 		// 							(VDP_getScreenHeight() - 128) >> 1);						/* Vert. center */		
