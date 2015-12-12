@@ -1,0 +1,1 @@
+IMAGE clouds "clouds.png" -1
