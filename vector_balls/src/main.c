@@ -35,19 +35,19 @@ static void vectorBallFX(){
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
 
-		xc = fix16Mul(cosFix16(rx << 4), FIX16(4.0));
-		yc = fix16Mul(sinFix16(rx << 3), FIX16(1.0));
-		zc = fix16Mul(sinFix16(rx << 2), FIX16(3.0));
+		xc = cosFix32(rx << 4) >> 2;
+		yc = sinFix32(rx << 3) >> 2;
+		zc = sinFix32(rx << 2) >> 2;
 
 		/* precalculate the rotation */
-		_cosx = cosFix16(rx);
-		_sinx = sinFix16(rx);
-		_cosy = cosFix16(ry);
-		_siny = sinFix16(ry);
-		cs = fix16Mul(_cosx, _siny);
-		ss = fix16Mul(_siny, _sinx);
-		cc = fix16Mul(_cosx, _cosy);
-		sc = fix16Mul(_sinx, _cosy);
+		_cosx = cosFix32(rx);
+		_sinx = sinFix32(rx);
+		_cosy = cosFix32(ry);
+		_siny = sinFix32(ry);
+		cs = fix32Mul(_cosx, _siny);
+		ss = fix32Mul(_siny, _sinx);
+		cc = fix32Mul(_cosx, _cosy);
+		sc = fix32Mul(_sinx, _cosy);
 
 		/* rotate the vector balls */
 		for(loop = 0; loop < BALL_COUNT; loop++)
@@ -55,9 +55,9 @@ static void vectorBallFX(){
 			_vtx = VECTOR_BALL_ARRAY[loop];
 
 			//	2D rotation (on X and Y axis)
-		    t_vtx[loop].x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
-		    t_vtx[loop].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
-		    t_vtx[loop].z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
+		    t_vtx[loop].x = fix32Add(fix32Mul(_vtx.x, _sinx), fix32Mul(_vtx.y, _cosx));
+		    t_vtx[loop].y = fix32Sub(fix32Mul(_vtx.x, cs), fix32Add(fix32Mul(_vtx.y, ss), fix32Mul(_vtx.z, _cosy)));
+		    t_vtx[loop].z = fix32Sub(fix32Mul(_vtx.x, cc), fix32Mul(_vtx.y, sc) - fix32Mul(_vtx.z, _siny));
 
 		    t_vtx[loop].x += xc;
 		    t_vtx[loop].y += yc;
@@ -93,11 +93,11 @@ static void vectorBallFX(){
 			x >>= 3;
 			y >>= 3;
 
-			z = t_vtx[j].z + FIX16(8.0);
-			if (z < FIX16(0.0))
-				z = FIX16(0.0);
+			z = t_vtx[j].z;
+			if (z < FIX32(0.0))
+				z = FIX32(0.0);
 
-			z >>= 7;
+			z >>= 5;
 
 			if (z > 7)
 				z = 7;
