@@ -44,7 +44,7 @@ static void xRotatingCube(){
 				if (logo_y_reverse)
 					VDP_setVerticalScroll(PLAN_A, Y_OFFSET - (j >> 4));
 				else
-					VDP_setVerticalScroll(PLAN_A, Y_OFFSET + (j >> 3));
+					VDP_setVerticalScroll(PLAN_A, Y_OFFSET - (j >> 2));
 			}
 		}
 	}	
