@@ -12,7 +12,6 @@ int main(){
 #define	TABLE_LEN 512
 
 u16 scroll_jump_table_v[512];
-u16 scroll_jump_table_h[512];
 
 static void axelayFX(){
 	u32 hscrollInc = 0;
@@ -25,10 +24,7 @@ static void axelayFX(){
 		hscrollInc++;
 
 		VDP_setVerticalScroll(PLAN_A, scroll_jump_table_v[hscrollInc] - (vblCount & (64 * 8 - 1)));
-		VDP_setHorizontalScroll(PLAN_A, scroll_jump_table_h[hscrollInc] - (vblCount & (64 * 8 - 1)));
-
 		VDP_setVerticalScroll(PLAN_B, scroll_jump_table_v[hscrollInc] - ((vblCount >> 1) & (64 * 8 - 1)));
-		VDP_setHorizontalScroll(PLAN_B, scroll_jump_table_h[hscrollInc] - ((vblCount >> 1) & (64 * 8 - 1)));
 	}
 
 	VDP_clearPlan(APLAN, 0);
@@ -43,7 +39,7 @@ static void axelayFX(){
 	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
 	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);
 	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
-	vramIndex += sea.tileset->numTile;	
+	vramIndex += clouds.tileset->numTile;	
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL0, clouds.palette->data);
@@ -51,7 +47,7 @@ static void axelayFX(){
 	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
 	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);
 	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
-	vramIndex += clouds.tileset->numTile;
+	// vramIndex += clouds.tileset->numTile;
 
 	SYS_enableInts();
 
@@ -63,7 +59,6 @@ static void axelayFX(){
 	for(i = 0; i < TABLE_LEN; i++)
 	{
 		scroll_jump_table_v[i] = hscrollInc;
-		scroll_jump_table_h[i] = hscrollInc >> 1;
 		hscrollInc += (j >> 2);
 
 		if (i < 8)
