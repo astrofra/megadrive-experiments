@@ -42,7 +42,7 @@ static void beastScrollingFX(){
 	vramIndex += ground.tileset->numTile;
 
 	VDP_setPalette(PAL0, rse_logo.palette->data);
-	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 5, FALSE, FALSE);
 	vramIndex += rse_logo.tileset->numTile;	
 
 	SYS_enableInts();
@@ -65,6 +65,7 @@ static void beastScrollingFX(){
 	while (1){
 		hscrollInc = 0;
 		VDP_waitVSync();
+		VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
 		vblCount += 1;
 	}
 }
