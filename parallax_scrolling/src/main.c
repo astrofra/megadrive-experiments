@@ -2,6 +2,9 @@
 #include <gfx.h>
 #include "resources.h"
 
+#define	TABLE_LEN 80
+#define BALL_COUNT 8
+
 static void beastScrollingFX();
 
 int main(){
@@ -10,23 +13,22 @@ int main(){
 	return 0;
 }
 
-#define	TABLE_LEN 80
-
-
 static void beastScrollingFX(){
 	u32 hscrollInc = 0;
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	short i, j;
 	u16 scroll_jump_table_v[TABLE_LEN];
+	u16 sw_framerate;
 
 	/*	Hblank-based water fx */
 	static void hBlank(){
 		hscrollInc++;
+
 		if (hscrollInc < TABLE_LEN)
 			VDP_setHorizontalScroll(PLAN_B, 320 - ((scroll_jump_table_v[hscrollInc] * vblCount) >> 4));
 		else
-			VDP_setHorizontalScroll(PLAN_B, 0);
+			return;
 	}
 
 	SYS_disableInts();
@@ -44,7 +46,7 @@ static void beastScrollingFX(){
 
 	VDP_setPalette(PAL0, rse_logo.palette->data);
 	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 5, FALSE, FALSE);
-	vramIndex += rse_logo.tileset->numTile;	
+	vramIndex += rse_logo.tileset->numTile;	    	
 
 	SYS_enableInts();
 
@@ -65,6 +67,7 @@ static void beastScrollingFX(){
 	SND_startPlay_XGM(midnight);
 
 	hscrollInc = 0;
+	sw_framerate = FALSE;
 	while (1){
 		hscrollInc = 0;
 		VDP_waitVSync();
