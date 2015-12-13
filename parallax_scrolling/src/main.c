@@ -2,7 +2,8 @@
 #include <gfx.h>
 #include "resources.h"
 
-#define	TABLE_LEN 80
+#define	TABLE_LEN 160
+#define PERSPECTIVE_STEP 5
 #define BALL_COUNT 8
 
 static void beastScrollingFX();
@@ -18,7 +19,7 @@ static void beastScrollingFX(){
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	short i, j;
-	u16 scroll_jump_table_v[TABLE_LEN];
+	u16 scroll_jump_table_v[TABLE_LEN / PERSPECTIVE_STEP];
 	u16 sw_framerate;
 
 	/*	Hblank-based water fx */
@@ -26,7 +27,7 @@ static void beastScrollingFX(){
 		hscrollInc++;
 
 		if (hscrollInc < TABLE_LEN)
-			VDP_setHorizontalScroll(PLAN_B, 320 - ((scroll_jump_table_v[hscrollInc] * vblCount) >> 4));
+			VDP_setHorizontalScroll(PLAN_B, 320 - ((scroll_jump_table_v[hscrollInc] * vblCount) >> 2));
 		else
 			return;
 	}
@@ -50,6 +51,7 @@ static void beastScrollingFX(){
 
 	SYS_enableInts();
 
+	VDP_setHIntCounter(PERSPECTIVE_STEP);
 	VDP_setHInterrupt(1);
 	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption
 
@@ -58,10 +60,13 @@ static void beastScrollingFX(){
 	{
 		scroll_jump_table_v[i] = (u16)j;
 
-		if (i < 40)
+		if (i < TABLE_LEN / (2 * PERSPECTIVE_STEP))
 			j++;
 		else
 			j--;
+
+		if (j < 0)
+			j = 0;
 	}
 
 	SND_startPlay_XGM(midnight);
