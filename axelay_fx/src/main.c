@@ -16,7 +16,7 @@ u16 scroll_jump_table_v[512];
 static void axelayFX(){
 	u32 hscrollInc = 0;
 	u16 vblCount = 0;
-	u16 vramIndex = TILE_USERINDEX;
+	u16 vramIndex = TILE_USERINDEX << 1;
 	u16 i, j;
 
 	/*	Hblank-based water fx */
@@ -30,24 +30,18 @@ static void axelayFX(){
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
 	/* Set a larger tileplan to be able to scroll */
-	VDP_setPlanSize(64, 64);
+	VDP_setPlanSize(256 >> 3, 256 >> 3);
 	SYS_disableInts();
-
-	/* Draw the background */
-	VDP_setPalette(PAL1, sea.palette->data);
-	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
-	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);
-	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
-	vramIndex += clouds.tileset->numTile;	
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL0, clouds.palette->data);
-	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
-	// vramIndex += clouds.tileset->numTile;
+	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += clouds.tileset->numTile;	
+
+	/* Draw the background */
+	VDP_setPalette(PAL1, sea.palette->data);
+	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += sea.tileset->numTile;
 
 	SYS_enableInts();
 
