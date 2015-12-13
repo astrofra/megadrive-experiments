@@ -16,7 +16,7 @@ u16 scroll_jump_table_v[512];
 static void axelayFX(){
 	u32 hscrollInc = 0;
 	u16 vblCount = 0;
-	u16 vramIndex = TILE_USERINDEX << 1;
+	u16 vramIndex = TILE_USERINDEX;
 	u16 i, j;
 
 	/*	Hblank-based water fx */
@@ -27,11 +27,12 @@ static void axelayFX(){
 		VDP_setVerticalScroll(PLAN_B, scroll_jump_table_v[hscrollInc] - ((vblCount >> 1) & (64 * 8 - 1)));
 	}
 
+	SYS_disableInts();
+
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(256 >> 3, 256 >> 3);
-	SYS_disableInts();
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL0, clouds.palette->data);
