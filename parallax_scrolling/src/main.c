@@ -1,5 +1,6 @@
 #include <genesis.h>
 #include <gfx.h>
+#include "resources.h"
 
 static void beastScrollingFX();
 
@@ -60,6 +61,8 @@ static void beastScrollingFX(){
 		else
 			j--;
 	}
+
+	SND_startPlay_XGM(midnight);
 
 	hscrollInc = 0;
 	while (1){
