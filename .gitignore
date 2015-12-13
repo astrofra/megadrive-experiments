@@ -33,3 +33,21 @@ asm/src/out/main.o
 asm/src/out/rom.bin
 
 asm/src/out/rom.out
+
+water_fx/src/out/cosine_table.o
+
+water_fx/src/out/main.o
+
+water_fx/src/out/res/gfx.o
+
+water_fx/src/out/rom_head.bin
+
+water_fx/src/out/rom_head.o
+
+water_fx/src/out/rom.bin
+
+water_fx/src/out/rom.out
+
+water_fx/src/out/sega.o
+
+water_fx/src/build_MD_NN.bat
