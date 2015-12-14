@@ -4,7 +4,7 @@
 #include "quicksort.h"
 #include <kdebug.h>
 
-//#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
+#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
 
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
@@ -35,6 +35,8 @@ void RSE_SPR_init(u16 cacheSize)
 	u16 size;
 	
 	// already initialized --> end it first
+	
+	
 //	if (SPR_isInitialized()) SPR_end();
 	
 	// alloc cache structure memory
