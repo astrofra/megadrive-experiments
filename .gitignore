@@ -51,3 +51,21 @@ water_fx/src/out/rom.out
 water_fx/src/out/sega.o
 
 water_fx/src/build_MD_NN.bat
+
+spr_custom_engine/src/build_MD_NN.bat
+
+spr_custom_engine/src/out/ball_coords.o
+
+spr_custom_engine/src/out/main.o
+
+spr_custom_engine/src/out/quicksort.o
+
+spr_custom_engine/src/out/res/gfx.o
+
+spr_custom_engine/src/out/rom_head.o
+
+spr_custom_engine/src/out/rom.bin
+
+spr_custom_engine/src/out/rom.out
+
+spr_custom_engine/src/out/sega.o
