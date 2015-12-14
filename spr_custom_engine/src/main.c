@@ -4,7 +4,7 @@
 #include "quicksort.h"
 #include <kdebug.h>
 
-#define CUSTOM_SPR_ON	0 // use standard SPR SGDK functions or customs
+//#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
 
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
@@ -18,7 +18,65 @@ int main(){
 }
 
 static void workOnSprUpdate(){
-	static inline void RSE_SPR_update();
+	static void RSE_SPR_update(Sprite *sprites, u16 num){
+		#define VISIBILITY_ALWAYS_FLAG  0x40000000
+		#define VISIBILITY_ALWAYS_ON    (VISIBILITY_ALWAYS_FLAG | 0x3FFFFFFF)
+		#define VISIBILITY_ALWAYS_OFF   (VISIBILITY_ALWAYS_FLAG | 0x00000000)
+		
+		u16 i, j;
+		u16 ind;
+		static TileCache tcSprite;
+
+		Sprite *sprite;
+		VDPSprite *cache;
+		
+		// flush sprite tile cache
+		TC_flushCache(&tcSprite);
+
+		// do a first pass to re allocate tileset still present in cache
+		sprite = sprites;
+		i = num;
+		while(i--)
+		{
+			// auto allocation
+			if (sprite->fixedIndex == -1)
+			{
+				s32 visibility = sprite->visibility;
+				
+				// don't run for disabled sprite
+				if (visibility != VISIBILITY_ALWAYS_OFF)
+				{
+					AnimationFrame *frame;
+					FrameSprite **frameSprites;
+					
+					frame = sprite->frame;
+					j = frame->numSprite;
+					frameSprites = frame->frameSprites;
+					
+					// need update ?
+					if (visibility == -1)
+					{
+						computeVisibility(sprite);
+						visibility = sprite->visibility;
+					}
+					
+					while(j--)
+					{
+						// sprite visible --> try fast re alloc
+						if (visibility & 1)
+							TC_reAlloc(&tcSprite, (*frameSprites)->tileset);
+						
+						frameSprites++;
+						visibility >>= 1;
+					}
+				}
+			}
+			
+			
+			
+			
+			
+	}
 	
 	u32 totalSubtick = 0;
 	u32 vblCount = 0;
@@ -115,11 +173,13 @@ static void workOnSprUpdate(){
 
 		/* Update the whole list of sprites */
 		u32 startSubTick = getSubTick();
+		#ifndef SPR_CUSTOM_ON
 		SPR_update(sprites, BALL_COUNT);
-		//u32 endSubTick = getSubTick() - startSubTick;
-		totalSubtick += getSubTick() - startSubTick;
-		
-		//KDebug_AlertNumber(endSubTick);
+		#endif
+		#ifdef SPR_CUSTOM_ON
+		RSE_SPR_update();
+		#endif
+		totalSubtick += getSubTick() - startSubTick; //compute the total subTick passed in SPR_update function
 	}
 	
 	VDP_clearPlan(APLAN, 0);
