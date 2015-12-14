@@ -69,3 +69,5 @@ spr_custom_engine/src/out/rom.bin
 spr_custom_engine/src/out/rom.out
 
 spr_custom_engine/src/out/sega.o
+
+spr_custom_engine/src/out/rom_head.bin
