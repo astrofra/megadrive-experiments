@@ -275,6 +275,15 @@ static void RSE_SPR_update(Sprite *sprites, u16 num){
 		toUpload = 1;
 	}
 
+	//SPR_doVBlankProcess()
+	if (toUpload)
+	{
+		// send to VRAM
+		VDP_doVRamDMA((u32) VDPSpriteCache, VDP_getSpriteListAddress(), (toUpload * sizeof(VDPSprite)) / 2);
+		toUpload = 0;
+	}
+
+
 }
 static void workOnSprUpdate(){
 	u32 totalSubtick = 0;
