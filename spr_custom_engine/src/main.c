@@ -6,6 +6,20 @@
 
 #define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
 
+/*
+ 
+	comment the SPR_CUSTOM_ON for use the native SPR engine
+ 
+ 
+	Average subtick for								-----------------------
+		the native SGDK SPR_update function -------> 0x0000348 / 0x000034B
+													-----------------------
+ 
+ 
+ 
+ */
+
+
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
 #define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
