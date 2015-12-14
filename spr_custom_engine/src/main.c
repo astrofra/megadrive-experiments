@@ -4,7 +4,7 @@
 #include "quicksort.h"
 #include <kdebug.h>
 
-//#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
+#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
 
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
@@ -17,67 +17,266 @@ int main(){
 	return 0;
 }
 
-static void workOnSprUpdate(){
-	static void RSE_SPR_update(Sprite *sprites, u16 num){
-		#define VISIBILITY_ALWAYS_FLAG  0x40000000
-		#define VISIBILITY_ALWAYS_ON    (VISIBILITY_ALWAYS_FLAG | 0x3FFFFFFF)
-		#define VISIBILITY_ALWAYS_OFF   (VISIBILITY_ALWAYS_FLAG | 0x00000000)
-		
-		u16 i, j;
-		u16 ind;
-		static TileCache tcSprite;
 
-		Sprite *sprite;
-		VDPSprite *cache;
-		
-		// flush sprite tile cache
-		TC_flushCache(&tcSprite);
+/* FROM STANDARD SPR ENGINE */
+#define VISIBILITY_ALWAYS_FLAG  0x40000000
+#define VISIBILITY_ALWAYS_ON    (VISIBILITY_ALWAYS_FLAG | 0x3FFFFFFF)
+#define VISIBILITY_ALWAYS_OFF   (VISIBILITY_ALWAYS_FLAG | 0x00000000)
+VDPSprite *VDPSpriteCache = NULL;
+static TileCache tcSprite;
+static u16 toUpload;
 
-		// do a first pass to re allocate tileset still present in cache
-		sprite = sprites;
-		i = num;
-		while(i--)
-		{
-			// auto allocation
-			if (sprite->fixedIndex == -1)
-			{
-				s32 visibility = sprite->visibility;
-				
-				// don't run for disabled sprite
-				if (visibility != VISIBILITY_ALWAYS_OFF)
-				{
-					AnimationFrame *frame;
-					FrameSprite **frameSprites;
-					
-					frame = sprite->frame;
-					j = frame->numSprite;
-					frameSprites = frame->frameSprites;
-					
-					// need update ?
-					if (visibility == -1)
-					{
-						computeVisibility(sprite);
-						visibility = sprite->visibility;
-					}
-					
-					while(j--)
-					{
-						// sprite visible --> try fast re alloc
-						if (visibility & 1)
-							TC_reAlloc(&tcSprite, (*frameSprites)->tileset);
-						
-						frameSprites++;
-						visibility >>= 1;
-					}
-				}
-			}
-			
-			
-			
-			
-			
+
+
+/* FROM STANDARD SPR ENGINE */
+void RSE_computeVisibility(Sprite *sprite)
+{
+	AnimationFrame *frame = sprite->frame;
+	FrameSprite **frameSprites;
+	u32 visibility;
+	s16 xmin, ymin;
+	s16 xmax, ymax;
+	s16 fw, fh;
+	u16 attr;
+	u16 i;
+	
+	xmin = 0x80 - sprite->x;
+	ymin = 0x80 - sprite->y;
+	xmax = screenWidth + xmin;
+	ymax = screenHeight + ymin;
+	fw = frame->w;
+	fh = frame->h;
+	attr = sprite->attribut;
+	
+	i = frame->numSprite;
+	// start from the last one
+	frameSprites = &(frame->frameSprites[i]);
+	visibility = 0;
+	
+	while(i--)
+	{
+		FrameSprite* frameSprite = *--frameSprites;
+		s16 x, y;
+		s16 w, h;
+		
+		w = ((frameSprite->vdpSprite.size_link & 0x0C00) >> 7) + 8;
+		h = ((frameSprite->vdpSprite.size_link & 0x0300) >> 5) + 8;
+		
+		if (attr & TILE_ATTR_VFLIP_MASK)
+			y = fh - (frameSprite->vdpSprite.y + h);
+		else
+			y = frameSprite->vdpSprite.y;
+		if (attr & TILE_ATTR_HFLIP_MASK)
+			x = fw - (frameSprite->vdpSprite.x + w);
+		else
+			x = frameSprite->vdpSprite.x;
+		
+		visibility <<= 1;
+		
+		// compute visibility
+		if (((x + w) > xmin) && (x < xmax) && ((y + h) > ymin) && (y < ymax))
+			visibility |= 1;
 	}
 	
+	// store visibility info
+	sprite->visibility = visibility;
+}
+
+/* FROM STANDARD SPR ENGINE */
+static void RSE_SPR_update(Sprite *sprites, u16 num){
+	u16 i, j;
+	u16 ind;
+	Sprite *sprite;
+	VDPSprite *cache;
+	
+	// flush sprite tile cache
+	TC_flushCache(&tcSprite);
+	
+	// do a first pass to re allocate tileset still present in cache
+	sprite = sprites;
+	i = num;
+	while(i--)
+	{
+		// auto allocation
+		if (sprite->fixedIndex == -1)
+		{
+			s32 visibility = sprite->visibility;
+			
+			// don't run for disabled sprite
+			if (visibility != VISIBILITY_ALWAYS_OFF)
+			{
+				AnimationFrame *frame;
+				FrameSprite **frameSprites;
+				
+				frame = sprite->frame;
+				j = frame->numSprite;
+				frameSprites = frame->frameSprites;
+				
+				// need update ?
+				if (visibility == -1)
+				{
+					RSE_computeVisibility(sprite);
+					visibility = sprite->visibility;
+				}
+				
+				while(j--)
+				{
+					// sprite visible --> try fast re alloc
+					if (visibility & 1)
+						TC_reAlloc(&tcSprite, (*frameSprites)->tileset);
+					
+					frameSprites++;
+					visibility >>= 1;
+				}
+			}
+		}
+		
+		sprite++;
+	}
+	
+	cache = VDPSpriteCache;
+	
+	ind = 0;
+	sprite = sprites;
+	i = num;
+	while(i--)
+	{
+		u16 timer;
+		s32 visibility;
+		
+		timer = sprite->timer;
+		// handle frame animation
+		if (timer)
+		{
+			// timer elapsed --> next frame
+			if (--timer == 0) SPR_nextFrame(sprite);
+			// just update remaining timer
+			else sprite->timer = timer;
+		}
+		
+		visibility = sprite->visibility;
+		
+		// don't run for disabled sprite
+		if (visibility != VISIBILITY_ALWAYS_OFF)
+		{
+			AnimationFrame *frame;
+			FrameSprite **frameSprites;
+			u16 attr;
+			s16 fw, fh;
+			s16 vramInd;
+			
+			// need update ?
+			if (visibility == -1)
+			{
+				RSE_computeVisibility(sprite);
+				visibility = sprite->visibility;
+			}
+			
+			frame = sprite->frame;
+			attr = sprite->attribut;
+			vramInd = sprite->fixedIndex;
+			j = frame->numSprite;
+			frameSprites = frame->frameSprites;
+			fw = frame->w;
+			fh = frame->h;
+			
+			if (vramInd == -1)
+			{
+				// auto allocation
+				while(visibility && j--)
+				{
+					FrameSprite* frameSprite = *frameSprites++;
+					
+					// sprite visible ?
+					if (visibility & 1)
+					{
+						if (attr & TILE_ATTR_VFLIP_MASK)
+						{
+							s16 sh = ((frameSprite->vdpSprite.size_link & 0x0300) >> 5) + 8;
+							cache->y = sprite->y + (fh - (frameSprite->vdpSprite.y + sh));
+						}
+						else
+							cache->y = sprite->y + frameSprite->vdpSprite.y;
+						
+						cache->size_link = frameSprite->vdpSprite.size_link | ++ind;
+						cache->attr = (frameSprite->vdpSprite.attr ^ attr) +
+						TC_alloc(&tcSprite, frameSprite->tileset, UPLOAD_VINT);
+						
+						if (attr & TILE_ATTR_HFLIP_MASK)
+						{
+							s16 sw = ((frameSprite->vdpSprite.size_link & 0x0C00) >> 7) + 8;
+							cache->x = sprite->x + (fw - (frameSprite->vdpSprite.x + sw));
+						}
+						else
+							cache->x = sprite->x + frameSprite->vdpSprite.x;
+						
+						cache++;
+					}
+					
+					visibility >>= 1;
+				}
+			}
+			else
+			{
+				// fixed allocation
+				while(visibility && j--)
+				{
+					FrameSprite* frameSprite = *frameSprites++;
+					
+					// sprite visible ?
+					if (visibility & 1)
+					{
+						if (attr & TILE_ATTR_VFLIP_MASK)
+						{
+							s16 sh = ((frameSprite->vdpSprite.size_link & 0x0300) >> 5) + 8;
+							cache->y = sprite->y + (fh - (frameSprite->vdpSprite.y + sh));
+						}
+						else
+							cache->y = sprite->y + frameSprite->vdpSprite.y;
+						
+						cache->size_link = frameSprite->vdpSprite.size_link | ++ind;
+						cache->attr = (frameSprite->vdpSprite.attr ^ attr) + vramInd;
+						
+						if (attr & TILE_ATTR_HFLIP_MASK)
+						{
+							s16 sw = ((frameSprite->vdpSprite.size_link & 0x0C00) >> 7) + 8;
+							cache->x = sprite->x + (fw - (frameSprite->vdpSprite.x + sw));
+						}
+						else
+							cache->x = sprite->x + frameSprite->vdpSprite.x;
+						
+						cache++;
+					}
+					
+					visibility >>= 1;
+					vramInd += frameSprite->tileset->numTile;
+				}
+			}
+		}
+		
+		sprite++;
+	}
+	
+	// if at least one sprite is visible
+	if (ind)
+	{
+		cache--;
+		// end sprite list
+		cache->size_link &= 0xFF00;
+		// save number of sprite to upload
+		toUpload = ind;
+	}
+	else
+	{
+		// single sprite not visible so nothing is displayed
+		cache->y = 0;
+		cache->size_link = 0;
+		
+		toUpload = 1;
+	}
+
+}
+static void workOnSprUpdate(){
 	u32 totalSubtick = 0;
 	u32 vblCount = 0;
 	
@@ -177,7 +376,7 @@ static void workOnSprUpdate(){
 		SPR_update(sprites, BALL_COUNT);
 		#endif
 		#ifdef SPR_CUSTOM_ON
-		RSE_SPR_update();
+		RSE_SPR_update(sprites, BALL_COUNT);
 		#endif
 		totalSubtick += getSubTick() - startSubTick; //compute the total subTick passed in SPR_update function
 	}
