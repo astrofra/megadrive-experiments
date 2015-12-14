@@ -11,9 +11,9 @@
 	comment the SPR_CUSTOM_ON for use the native SPR engine
  
  
-	Average subtick for								-----------------------
+	Average subtick for
 		the native SGDK SPR_update function -------> 0x0000348 / 0x000034B
-													-----------------------
+													
  
  
  
