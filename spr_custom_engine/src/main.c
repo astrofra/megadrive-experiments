@@ -394,7 +394,12 @@ static void workOnSprUpdate(){
 	for(loop = 0; loop < BALL_COUNT; loop++)
 	    SPR_initSprite(&sprites[loop], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 
+	#ifndef SPR_CUSTOM_ON
     SPR_update(sprites, BALL_COUNT);
+	#endif
+	#ifdef SPR_CUSTOM_ON
+	RSE_SPR_update(sprites, BALL_COUNT);
+	#endif
 
 	SYS_enableInts();
 
