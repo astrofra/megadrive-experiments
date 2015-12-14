@@ -4,7 +4,7 @@
 #include "quicksort.h"
 #include <kdebug.h>
 
-#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
+//#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
 
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
@@ -25,7 +25,35 @@ int main(){
 VDPSprite *VDPSpriteCache = NULL;
 static TileCache tcSprite;
 static u16 toUpload;
+extern vu32 VIntProcess;
 
+
+/* FROM STANDARD SPR ENGINE */
+void RSE_SPR_init(u16 cacheSize)
+{
+	u16 index;
+	u16 size;
+	
+	// already initialized --> end it first
+//	if (SPR_isInitialized()) SPR_end();
+	
+	// alloc cache structure memory
+	VDPSpriteCache = MEM_alloc(SPRITE_CACHE_SIZE * sizeof(VDPSprite));
+	// reset
+	toUpload = 0;
+	
+	// enabled sprite engine VInt processing
+	VIntProcess |= PROCESS_SPRITEENGINE_TASK;
+	
+	size = cacheSize?cacheSize:384;
+	// get start tile index for sprite cache (reserve VRAM area just before system font)
+	index = TILE_FONTINDEX - size;
+	
+	// init tile cache engine if needed
+	TC_init();
+	// and create a tile cache for the sprite
+	TC_createCache(&tcSprite, index, size);
+}
 
 
 /* FROM STANDARD SPR ENGINE */
@@ -397,7 +425,13 @@ static void workOnSprUpdate(){
 
 	/* Set the palette taken from the vector ball sprite */
 	VDP_setPalette(PAL2, ball_metal.palette->data);
+	#ifndef SPR_CUSTOM_ON
 	SPR_init(MAX_VECTOR_BALL);
+	#endif
+	#ifdef SPR_CUSTOM_ON
+	RSE_SPR_init(MAX_VECTOR_BALL);
+	#endif
+	
 
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < BALL_COUNT; loop++)
