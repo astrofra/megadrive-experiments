@@ -54,8 +54,10 @@ static void beastScrollingFX(){
 
 		tmp_spr_traj = spr_traj + (vblCount * SPRITE_COUNT);
 		for(i = 0; i < SPRITE_COUNT; i++)
-			SPR_setPosition(&sprites[i], spr_traj[vblCount * SPRITE_COUNT + i], spr_traj[vblCount * SPRITE_COUNT + i + 1]);
-			// SPR_setPosition(&sprites[i], *(tmp_spr_traj++), *(tmp_spr_traj++));
+		{
+			sprites[i].x = *(tmp_spr_traj++);
+			sprites[i].y = *(tmp_spr_traj++);
+		}
 
 		SPR_update(sprites, SPRITE_COUNT);
 		vblCount += 1;

@@ -6,17 +6,19 @@ import math
 from vector3 import Vector3
 
 filename_out			=	"../../src/sprites_traj"
-sprite_count			=	32
+sprite_count			=	64
 
-rotation_steps		 	=	256
+rotation_steps		 	=	600
 
 traj_x_amplitude 		=	128
 traj_y_amplitude 		=	64
 
-sprite_padding			=	16
+sprite_padding			=	8
 
 scr_x_center 			=	160
 scr_y_center 			=	128
+
+hardware_offset			=	0x80
 
 def  main():
 	##	Creates the header
@@ -47,10 +49,10 @@ def  main():
 	for step in range(rotation_steps):
 		f.write('\t/* Step #' + str(step) + ' */\n\t');
 		for sprite in range(sprite_count):
-			angle = step + sprite_padding * sprite
-			x = scr_x_center + int(traj_x_amplitude * math.cos(angle * math.pi / (rotation_steps / 2.0)))
-			y = scr_y_center + int(traj_y_amplitude * math.sin(angle * math.pi / (rotation_steps / 2.0)))
-			_str_out = str(x) + ',' + str(y) + ','
+			angle = step + (sprite * sprite_padding)
+			x = scr_x_center + int(traj_x_amplitude * math.cos(3.0 * angle * math.pi / (rotation_steps / 2.0)))
+			y = scr_y_center + int(traj_y_amplitude * math.sin(2.0 * angle * math.pi / (rotation_steps / 2.0)))
+			_str_out = str(x + hardware_offset) + ',' + str(y + hardware_offset) + ','
 			f.write(_str_out)
 
 		# if angle%15 == 0:
