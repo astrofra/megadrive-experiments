@@ -73,3 +73,5 @@ spr_custom_engine/src/out/sega.o
 spr_custom_engine/src/out/rom_head.bin
 
 spr_custom_engine/src/res/gfx.h
+
+spr_custom_engine/src/out/profiler.o
