@@ -2,34 +2,65 @@
 #include <gfx.h>
 #include "ball_coords.h"
 #include "quicksort.h"
-#include <kdebug.h>
 
-#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
+/* comment the SPR_CUSTOM_ON for use the native SPR engine  */
+//#define SPR_CUSTOM_ON	// use standard SPR SGDK functions or customs
+ 
+static void workOnSprUpdate();
+static void profilingSample();
 
-/*
- 
-	comment the SPR_CUSTOM_ON for use the native SPR engine
- 
- 
-	Average subtick for
-		the native SGDK SPR_update function -------> 0x0000348 / 0x000034B
-													
- 
- 
- 
- */
+int main(){
+	profilingSample();
+	return 0;
+}
 
+/*****************************************************
+
+			BASIC PROFILER SAMPLE
+
+************************/
+
+#include "profiler.h"
+
+static void profilingSample(){
+	u32 vblCount = 0;
+
+	profiler profiler;
+	profiler = profilerMake();
+	u16 probe1, probe2;
+
+	probe1 = profilerAddProbe(&profiler, "IDLE");
+	probe2 = profilerAddProbe(&profiler, "FULL CYCLE");
+
+	while (1){
+		profilerStartProbe(&profiler, probe2);	//measure the average full cycle time
+		profilerStartProbe(&profiler, probe1);	//measure the average idle time (VDP_waitVsync)
+		VDP_waitVSync();
+		profilerStopProbe(&profiler, probe1);	//measure the average idle time (VDP_waitVsync)
+		waitSubTick(10);
+		vblCount++;
+		profilerStopProbe(&profiler, probe2);	//measure the average full cycle time
+		profilerDebug(&profiler, 1000);			//write kdebug log each 1000 loop cycles
+	}
+
+/***********************************************************
+
+	IDLE(VDP_waitVsync)		DECIMAL AVERAGE SUBTICK : 1175
+	FULL CYCLE				DECIMAL AVERAGE SUBTICK : 1265	
+
+***********************************************************/
+}
+
+
+/*************************************
+
+		VECTOR BALL SAMPLE
+
+********************/
 
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
 #define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
-
-static void workOnSprUpdate();
-
-int main(){
-	workOnSprUpdate();
-	return 0;
-}
 
 
 /* FROM STANDARD SPR ENGINE */
@@ -43,7 +74,7 @@ extern vu32 VIntProcess;
 
 
 /* FROM STANDARD SPR ENGINE */
-void RSE_SPR_init(u16 cacheSize)
+static inline void RSE_SPR_init(u16 cacheSize)
 {
 	u16 index;
 	u16 size;
@@ -73,7 +104,7 @@ void RSE_SPR_init(u16 cacheSize)
 
 
 /* FROM STANDARD SPR ENGINE */
-void RSE_computeVisibility(Sprite *sprite)
+static inline void RSE_computeVisibility(Sprite *sprite)
 {
 	AnimationFrame *frame = sprite->frame;
 	FrameSprite **frameSprites;
@@ -127,7 +158,7 @@ void RSE_computeVisibility(Sprite *sprite)
 }
 
 /* FROM STANDARD SPR ENGINE */
-static void RSE_SPR_update(Sprite *sprites, u16 num){
+static inline void RSE_SPR_update(Sprite *sprites, u16 num){
 	u16 i, j;
 	u16 ind;
 	Sprite *sprite;
@@ -443,6 +474,7 @@ static void workOnSprUpdate(){
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 	#ifndef SPR_CUSTOM_ON
 	SPR_init(MAX_VECTOR_BALL);
+	u16 i; for(i = 0; i < MAX_VECTOR_BALL; i++){ sprites[i].visibility = FALSE; }
 	#endif
 	#ifdef SPR_CUSTOM_ON
 	RSE_SPR_init(MAX_VECTOR_BALL);
@@ -454,7 +486,7 @@ static void workOnSprUpdate(){
 	    SPR_initSprite(&sprites[loop], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 
 	#ifndef SPR_CUSTOM_ON
-    SPR_update(sprites, BALL_COUNT);
+	SPR_update(sprites, BALL_COUNT);
 	#endif
 	#ifdef SPR_CUSTOM_ON
 	RSE_SPR_update(sprites, BALL_COUNT);
@@ -467,7 +499,7 @@ static void workOnSprUpdate(){
 		vblCount++;
 		BMP_showFPS(1);
 		drawVectorBalls(sprites, angle, angle << 1);
-		KDebug_AlertNumber(totalSubtick / vblCount); //average subtick in spr_update
+		//KDebug_AlertNumber(totalSubtick / vblCount); //average subtick in spr_update
 		angle++;
 	}
 }
