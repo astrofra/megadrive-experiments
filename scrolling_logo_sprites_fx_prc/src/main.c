@@ -3,6 +3,8 @@
 #include "resources.h"
 #include "sprites_traj.h"
 
+#define SPRITE_COUNT 50
+
 static void beastScrollingFX();
 
 int main(){
@@ -33,7 +35,7 @@ static void beastScrollingFX(){
 	vramIndex += ground.tileset->numTile;
 
 	VDP_setPalette(PAL0, rse_logo.palette->data);
-	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 6, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 8, FALSE, FALSE);
 	vramIndex += rse_logo.tileset->numTile;	    	
 
 	for(i = 0; i < SPRITE_COUNT; i++)
@@ -52,17 +54,15 @@ static void beastScrollingFX(){
 		VDP_setHorizontalScroll(PLAN_B, -vblCount);
 		VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
 
-		tmp_spr_traj = spr_traj + (vblCount * SPRITE_COUNT);
+		tmp_spr_traj = spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
 		for(i = 0; i < SPRITE_COUNT; i++)
 		{
 			sprites[i].x = *(tmp_spr_traj++);
 			sprites[i].y = *(tmp_spr_traj++);
+			tmp_spr_traj += 12;
 		}
 
 		SPR_update(sprites, SPRITE_COUNT);
 		vblCount += 1;
-
-		if (vblCount > ROTATION_STEPS)
-			vblCount = 0;
 	}
 }
