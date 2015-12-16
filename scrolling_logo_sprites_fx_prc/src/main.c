@@ -23,10 +23,15 @@ static void beastScrollingFX(){
 
 	SYS_disableInts();
 
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);
+
+	/* Load the fond tiles */
+	VDP_drawImageEx(BPLAN, &squarish_font, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	vramIndex += squarish_font.tileset->numTile;	
+
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL1, ground.palette->data);
@@ -34,9 +39,10 @@ static void beastScrollingFX(){
 	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 24, 4, FALSE, FALSE);
 	vramIndex += ground.tileset->numTile;
 
+	/* Draw the logo */
 	VDP_setPalette(PAL0, rse_logo.palette->data);
 	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 8, FALSE, FALSE);
-	vramIndex += rse_logo.tileset->numTile;	    	
+	vramIndex += rse_logo.tileset->numTile;	    
 
 	for(i = 0; i < SPRITE_COUNT; i++)
 		SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
@@ -63,6 +69,9 @@ static void beastScrollingFX(){
 		}
 
 		SPR_update(sprites, SPRITE_COUNT);
+
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_USERINDEX + vblCount, vblCount, 16);
+
 		vblCount += 1;
 	}
 }
