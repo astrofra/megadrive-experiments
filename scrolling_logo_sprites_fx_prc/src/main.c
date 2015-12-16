@@ -21,6 +21,17 @@ static void beastScrollingFX(){
 	Sprite sprites[SPRITE_COUNT];
 	u16 *tmp_spr_traj;
 
+	/*	Hblank-based water fx */
+	static void hBlank(){
+		hscrollInc++;
+
+		if (hscrollInc <= 1)
+			VDP_setHorizontalScroll(PLAN_B, -vblCount);
+		else
+		if (hscrollInc >= 15)
+			VDP_setHorizontalScroll(PLAN_B, 0);
+	}
+
 	SYS_disableInts();
 
 	/* Set a larger tileplan to be able to scroll */
@@ -52,12 +63,16 @@ static void beastScrollingFX(){
 
 	SYS_enableInts();
 
+	VDP_setHIntCounter(15);
+	VDP_setHInterrupt(1);
+	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption	
+
 	SND_startPlay_XGM(midnight);
 
 	while (1){
 		hscrollInc = 0;
 		VDP_waitVSync();
-		VDP_setHorizontalScroll(PLAN_B, -vblCount);
+		// VDP_setHorizontalScroll(PLAN_B, -vblCount);
 		VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
 
 		tmp_spr_traj = spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
@@ -70,7 +85,7 @@ static void beastScrollingFX(){
 
 		SPR_update(sprites, SPRITE_COUNT);
 
-		VDP_setTileMapXY(VDP_PLAN_B, TILE_USERINDEX + vblCount, vblCount, 16);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_USERINDEX + vblCount, vblCount, 20);
 
 		vblCount += 1;
 	}
