@@ -26,9 +26,15 @@ static void beastScrollingFX(){
 	static void hBlank(){
 		hscrollInc++;
 		if (hscrollInc < (200 / HBLANK_STEP))
+		{
+			VDP_setPaletteColors(0, rse_logo.palette->data, 8);
 			VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
+		}	
 		else
+		{
 			VDP_setHorizontalScroll(PLAN_A, 0);
+			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
+		}
 	}
 
 	SYS_disableInts();
