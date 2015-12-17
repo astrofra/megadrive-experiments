@@ -1,0 +1,7 @@
+const char *demo_strings[] = 
+{
+	"HELLO GIRLS, BOYS AND ROBOTS!\0",
+	"THIS IS RESISTANCE SPEAKING\0",
+	"DEEP FROM INSIDE THE HEART OF A MEGADRIVE\0",
+	"\0"
+};
