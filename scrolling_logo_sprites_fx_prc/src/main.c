@@ -60,11 +60,11 @@ static u16 inline charToTileIndex(char c)
 static void inline drawCharTiles(u16 char_idx, u16 x)
 {
 	x <<= 1;
-	char_idx <<= 1;
+	char_idx <<= 2;
 	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx, x, 22);
 	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 1, x + 1, 22);
-	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 96, x, 23);
-	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 1 + 96, x + 1, 23);	
+	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 2, x, 23);
+	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 3, x + 1, 23);	
 }
 
 static void RSE_xmasIntro()
