@@ -78,6 +78,7 @@ static void RSE_xmasIntro()
 	u16 vramIndex = TILE_USERINDEX;
 	short i;
 	Sprite sprites[SPRITE_COUNT];
+	int sprites_attr[SPRITE_COUNT];
 	u16 *tmp_spr_traj;
 
 	u16 writer_state;
@@ -207,6 +208,9 @@ static void RSE_xmasIntro()
 	current_char_x = 0;
 	writer_timer = 0;
 
+	for(i = 0; i < SPRITE_COUNT; i++)
+		sprites_attr[i] = sprites[i].attribut;
+
 	writer_state = WRT_CENTER_CUR_LINE;
 
 	while (1)
@@ -220,10 +224,16 @@ static void RSE_xmasIntro()
 		{
 			sprites[i].x = *(tmp_spr_traj++);
 			sprites[i].y = *(tmp_spr_traj++);
-			if (sprites[i].x > 160 + 0x80)
-				sprites[i].attribut = sprites[i].attribut | 0x8000;
+
+			if (sprites[i].y >= SCR_Y_CENTER + 64)
+				sprites_attr[i] = sprites_attr[i] & 0x7FFF; // Sprite goes behind
 			else
-				sprites[i].attribut = sprites[i].attribut & 0x7FFF;
+			{
+				if (sprites[i].y <= SCR_Y_CENTER - 64)
+					sprites_attr[i] = sprites_attr[i] | 0x8000; // Sprite goes in front
+			}
+
+			sprites[i].attribut = sprites_attr[i];
 			tmp_spr_traj += 12;
 		}
 
