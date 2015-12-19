@@ -6,7 +6,12 @@
 
 #define SPRITE_COUNT 50
 #define HBLANK_STEP 50
-#define FONT_PUNCT_OFFSET 36
+#define FONT_PUNCT_OFFSET 37
+
+#define WRT_CENTER_CUR_LINE 0
+#define WRT_WRITE_CUR_LINE 1
+#define WRT_WAIT 2
+#define WRT_CLEAR_LINE 3
 
 static void RSE_xmasIntro();
 
@@ -16,13 +21,22 @@ int main(){
 	return 0;
 }
 
+static u16 inline computeStringLen(char *str)
+{
+	u16 l = 0;
+	while(str[l])
+		l++;
+
+	return l;
+}
+
 static u16 inline charToTileIndex(char c)
 {
 	if (c >= 'A' && c <= 'Z')
 		return (u16)(c - 'A'); 
 
 	if (c >= '0' && c <= '9')
-		return (u16)(c - '0');
+		return (u16)(c - '0') + 27;
 
 	switch(c)
 	{
@@ -57,16 +71,6 @@ static u16 inline charToTileIndex(char c)
 	return 0xFF;
 }
 
-static void inline drawCharTiles(u16 char_idx, u16 x)
-{
-	x <<= 1;
-	char_idx <<= 2;
-	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx, x, 22);
-	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 1, x + 1, 22);
-	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 2, x, 23);
-	VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + char_idx + 3, x + 1, 23);	
-}
-
 static void RSE_xmasIntro()
 {
 	u32 hscrollInc = 0;
@@ -75,9 +79,12 @@ static void RSE_xmasIntro()
 	short i;
 	Sprite sprites[SPRITE_COUNT];
 	u16 *tmp_spr_traj;
+
+	u16 writer_state;
 	u16 current_string_idx;
 	u16 current_char_idx;
 	u16 current_char_x;
+	u16 writer_timer;
 
 	static u16 drawString(char *str)
 	{
@@ -92,7 +99,7 @@ static void RSE_xmasIntro()
 		{
 			i = charToTileIndex(c);
 			if (i != 0xFF)
-				drawCharTiles(i, current_char_x);
+				VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + i, current_char_x, 22); // drawCharTiles(i, current_char_x);
 		}
 
 		current_char_x++;
@@ -156,6 +163,9 @@ static void RSE_xmasIntro()
 	current_string_idx = 0;
 	current_char_idx = 0;
 	current_char_x = 0;
+	writer_timer = 0;
+
+	writer_state = WRT_CENTER_CUR_LINE;
 
 	while (1)
 	{
@@ -174,8 +184,47 @@ static void RSE_xmasIntro()
 
 		SPR_update(sprites, SPRITE_COUNT);
 
-		drawString(demo_strings[current_string_idx]);
+		switch(writer_state)
+		{
+			case WRT_CENTER_CUR_LINE:
+				current_char_x = ((320 / 8) - computeStringLen(demo_strings[current_string_idx])) >> 1;
+				writer_state = WRT_WRITE_CUR_LINE;
+				break;
+
+			case WRT_WRITE_CUR_LINE:
+				if (!drawString(demo_strings[current_string_idx]))
+				{
+					writer_timer = 0;
+					writer_state = WRT_WAIT;
+				}
+				break;
+
+			case WRT_WAIT:
+				if (writer_timer++ > 50)
+				{
+					writer_state = WRT_CLEAR_LINE;
+					current_char_x = 0;
+				}
+				break;
+
+			case WRT_CLEAR_LINE:
+				VDP_setTileMapXY(VDP_PLAN_A, 0, current_char_x, 22);
+				current_char_x++;
+				if (current_char_x > 320 / 8)
+				{
+					current_char_x = 0;
+					current_char_idx = 0;
+					current_string_idx++;
+					if (demo_strings[current_string_idx][0] == '\0')
+						current_string_idx = 0;
+
+					writer_state = WRT_CENTER_CUR_LINE;
+				}
+
+		}
+		
 
 		vblCount += 1;
 	}
 }
+
