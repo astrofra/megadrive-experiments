@@ -3,6 +3,7 @@
 #include "resources.h"
 #include "sprites_traj.h"
 #include "demo_strings.h"
+#include "RSE_startingScreen.h"
 
 #define SPRITE_COUNT 48
 #define HBLANK_STEP 50
@@ -16,7 +17,7 @@
 static void RSE_xmasIntro();
 
 int main(){
-	JOY_init();
+	// RSE_startingScreen(10, 10);
 	RSE_xmasIntro();
 	return 0;
 }
