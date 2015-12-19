@@ -108,82 +108,8 @@ static void RSE_xmasIntro()
 		return TRUE;
 	}
 
-	/*	Hblank-based water fx */
-	static void hBlank(){
-		hscrollInc++;
-		if (hscrollInc < (200 / HBLANK_STEP))
-		{
-			VDP_setPaletteColors(0, rse_logo.palette->data, 8);
-			VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
-		}	
-		else
-		{
-			VDP_setHorizontalScroll(PLAN_A, 0);
-			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
-		}
-	}
-
-	SYS_disableInts();
-
-	/* Set a larger tileplan to be able to scroll */
-	VDP_setPlanSize(64, 32);
-
-	/* Load the fond tiles */
-	VDP_drawImageEx(BPLAN, &squarish_font, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	vramIndex += squarish_font.tileset->numTile;	
-
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);
-
-	/* Draw the foreground */
-	VDP_setPalette(PAL1, ground.palette->data);
-	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 2, FALSE, FALSE);
-	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 24, 2, FALSE, FALSE);
-	vramIndex += ground.tileset->numTile;
-
-	/* Draw the logo */
-	VDP_setPalette(PAL0, rse_logo.palette->data);
-	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 7, FALSE, FALSE);
-	vramIndex += rse_logo.tileset->numTile;	    
-
-	for(i = 0; i < SPRITE_COUNT; i++)
-		SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-
-	VDP_setPalette(PAL2, ball_metal.palette->data);
-	SPR_init(SPRITE_COUNT);
-
-	SYS_enableInts();
-
-	VDP_setHIntCounter(HBLANK_STEP);
-	VDP_setHInterrupt(1);
-	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption	
-
-	SND_startPlay_XGM(midnight);
-
-	current_string_idx = 0;
-	current_char_idx = 0;
-	current_char_x = 0;
-	writer_timer = 0;
-
-	writer_state = WRT_CENTER_CUR_LINE;
-
-	while (1)
+	static void inline RSE_updateLineWriter(void)
 	{
-		hscrollInc = 0;
-		VDP_waitVSync();
-		VDP_setHorizontalScroll(PLAN_B, -vblCount);
-		// VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
-
-		tmp_spr_traj = spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
-		for(i = 0; i < SPRITE_COUNT; i++)
-		{
-			sprites[i].x = *(tmp_spr_traj++);
-			sprites[i].y = *(tmp_spr_traj++);
-			tmp_spr_traj += 12;
-		}
-
-		SPR_update(sprites, SPRITE_COUNT);
-
 		switch(writer_state)
 		{
 			case WRT_CENTER_CUR_LINE:
@@ -221,8 +147,89 @@ static void RSE_xmasIntro()
 					writer_state = WRT_CENTER_CUR_LINE;
 				}
 
+		}		
+	}
+
+	/*	Hblank-based water fx */
+	static void hBlank(){
+		hscrollInc++;
+		if (hscrollInc < (200 / HBLANK_STEP))
+		{
+			VDP_setPaletteColors(0, rse_logo.palette->data, 8);
+			VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
+		}	
+		else
+		{
+			VDP_setHorizontalScroll(PLAN_A, 0);
+			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
 		}
-		
+	}
+
+	SYS_disableInts();
+
+	/* Set a larger tileplan to be able to scroll */
+	VDP_setPlanSize(64, 32);
+
+	/* Load the fond tiles */
+	VDP_drawImageEx(BPLAN, &squarish_font, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	vramIndex += squarish_font.tileset->numTile;	
+
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);
+
+	/* Draw the foreground */
+	VDP_setPalette(PAL1, ground.palette->data);
+	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 2, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 24, 2, FALSE, FALSE);
+	vramIndex += ground.tileset->numTile;
+
+	/* Draw the logo */
+	VDP_setPalette(PAL0, rse_logo.palette->data);
+	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 7, FALSE, FALSE);
+	vramIndex += rse_logo.tileset->numTile;	    
+
+	for(i = 0; i < SPRITE_COUNT; i++)
+		SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
+
+	VDP_setPalette(PAL2, ball_metal.palette->data);
+	SPR_init(SPRITE_COUNT);
+
+	SYS_enableInts();
+
+	VDP_setHIntCounter(HBLANK_STEP);
+	VDP_setHInterrupt(1);
+	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption	
+
+	SND_startPlay_XGM(midnight);
+
+	current_string_idx = 0;
+	current_char_idx = 0;
+	current_char_x = 0;
+	writer_timer = 0;
+
+	writer_state = WRT_CENTER_CUR_LINE;
+
+	while (1)
+	{
+		hscrollInc = 0;
+		VDP_waitVSync();
+		VDP_setHorizontalScroll(PLAN_B, -vblCount);
+
+		tmp_spr_traj = spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
+		for(i = 0; i < SPRITE_COUNT; i++)
+		{
+			sprites[i].x = *(tmp_spr_traj++);
+			sprites[i].y = *(tmp_spr_traj++);
+			if (sprites[i].x > 160 + 0x80)
+				sprites[i].attribut = sprites[i].attribut | 0x8000;
+			else
+				sprites[i].attribut = sprites[i].attribut & 0x7FFF;
+			tmp_spr_traj += 12;
+		}
+
+		SPR_update(sprites, SPRITE_COUNT);
+
+		RSE_updateLineWriter();		
 
 		vblCount += 1;
 	}
