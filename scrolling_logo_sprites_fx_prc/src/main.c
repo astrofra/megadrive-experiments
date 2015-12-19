@@ -4,9 +4,9 @@
 #include "sprites_traj.h"
 #include "demo_strings.h"
 
-#define SPRITE_COUNT 50
+#define SPRITE_COUNT 48
 #define HBLANK_STEP 50
-#define FONT_PUNCT_OFFSET 37
+#define FONT_PUNCT_OFFSET 36
 
 #define WRT_CENTER_CUR_LINE 0
 #define WRT_WRITE_CUR_LINE 1
