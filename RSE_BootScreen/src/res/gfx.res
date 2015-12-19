@@ -1,0 +1,1 @@
+IMAGE logostart_image "logostart.png" -1
