@@ -210,23 +210,28 @@ static void RSE_xmasIntro()
 	VDP_clearPlan(BPLAN, 0);
 
 	/* Draw the foreground */
-	VDP_setPalette(PAL1, ground.palette->data);
+	VDP_setPalette(PAL1, (u16*)palette_black);
 	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 24, 2, FALSE, FALSE);
 	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 2, FALSE, FALSE);
 	vramIndex += ground.tileset->numTile;
 
 	/* Draw the logo */
-	VDP_setPalette(PAL0, rse_logo.palette->data);
-	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 7, FALSE, FALSE);
+	VDP_setPalette(PAL0, (u16*)palette_black);
+	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 7, FALSE, FALSE);
 	vramIndex += rse_logo.tileset->numTile;	    
 
 	for(i = 0; i < SPRITE_COUNT; i++)
 		SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
 
-	VDP_setPalette(PAL2, ball_metal.palette->data);
+	VDP_setPalette(PAL2, (u16*)palette_black);
 	SPR_init(SPRITE_COUNT);
 
 	SYS_enableInts();
+
+	VDP_waitVSync();
+	VDP_setPalette(PAL0, rse_logo.palette->data);
+	VDP_setPalette(PAL1, ground.palette->data);
+	VDP_setPalette(PAL2, ball_metal.palette->data);	
 
 	VDP_setHIntCounter(HBLANK_STEP);
 	VDP_setHInterrupt(1);
