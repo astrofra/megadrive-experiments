@@ -7,7 +7,7 @@
 
 #define SPRITE_COUNT 48
 #define HBLANK_STEP 50
-#define FONT_PUNCT_OFFSET 36
+#define FONT_PUNCT_OFFSET 35
 
 #define WRT_CENTER_CUR_LINE 0
 #define WRT_WRITE_CUR_LINE 1
@@ -41,30 +41,58 @@ static u16 inline charToTileIndex(char c)
 
 	switch(c)
 	{
-		case '.':
-			return FONT_PUNCT_OFFSET;
-		case '/':
-			return FONT_PUNCT_OFFSET + 1;
-		case ':':
-			return FONT_PUNCT_OFFSET + 2;
 		case '!':
-			return FONT_PUNCT_OFFSET + 3;
-		case ',':
-			return FONT_PUNCT_OFFSET + 4;
-		case ';':
-			return FONT_PUNCT_OFFSET + 5;
-		case '(':
-			return FONT_PUNCT_OFFSET + 6;
-		case ')':
-			return FONT_PUNCT_OFFSET + 7;
-		case '=':
-			return FONT_PUNCT_OFFSET + 8;
-		case '+':
-			return FONT_PUNCT_OFFSET + 9;
-		case '*':
-			return FONT_PUNCT_OFFSET + 10;
+			return FONT_PUNCT_OFFSET;
+		case '"':
+			return FONT_PUNCT_OFFSET + 1;
 		case '#':
+			return FONT_PUNCT_OFFSET + 2;
+		case '$':
+			return FONT_PUNCT_OFFSET + 3;
+		case '%':
+			return FONT_PUNCT_OFFSET + 4;
+		case '&':
+			return FONT_PUNCT_OFFSET + 5;
+		case '\'':
+			return FONT_PUNCT_OFFSET + 6;
+		case '(':
+			return FONT_PUNCT_OFFSET + 7;
+		case ')':
+			return FONT_PUNCT_OFFSET + 8;
+		case '*':
+			return FONT_PUNCT_OFFSET + 9;
+		case '+':
+			return FONT_PUNCT_OFFSET + 10;
+		case ',':
 			return FONT_PUNCT_OFFSET + 11;
+		case '-':
+			return FONT_PUNCT_OFFSET + 12;
+		case '.':
+			return FONT_PUNCT_OFFSET + 13;
+		case '/':
+			return FONT_PUNCT_OFFSET + 14;
+		case ':':
+			return FONT_PUNCT_OFFSET + 15;
+		case ';':
+			return FONT_PUNCT_OFFSET + 16;
+		case '<':
+			return FONT_PUNCT_OFFSET + 17;
+		case '=':
+			return FONT_PUNCT_OFFSET + 18;
+		case '>':
+			return FONT_PUNCT_OFFSET + 19;
+		case '?':
+			return FONT_PUNCT_OFFSET + 20;
+		case '[':
+			return FONT_PUNCT_OFFSET + 21;
+		case '\\':
+			return FONT_PUNCT_OFFSET + 22;
+		case ']':
+			return FONT_PUNCT_OFFSET + 23;
+		case '^':
+			return FONT_PUNCT_OFFSET + 24;									
+		case '_':
+			return FONT_PUNCT_OFFSET + 25;									
 	};
 
 	/* if no character was found,

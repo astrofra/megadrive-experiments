@@ -3,6 +3,7 @@ const char *demo_strings[] =
 	/*
 	 <----------- MAX HEADROOM ------------>
 	*/
+	"!!! \" ###\0",
 	"HO HO, MERRY XMAS BOYS AND GIRLS, RSE\0",
 	"POSSE BACK ON THE SEGA MEGADRIVE-\0",
 	"GENESIS ONCE AGAIN, ENJOY THIS LITLE\0",
