@@ -1,17 +1,21 @@
 #include <genesis.h>
+#include "resources.h"
 #include "gfx.h"
 #include "RSE_startingScreen.h"
 
 void RSE_startingScreen(u16 fadeSpeed, u16 fadeSpeed2)
 {
 	u16 fade_timer = 0;
+
 	SYS_disableInts();
 	VDP_setScreenWidth320();
-	// SPR_init(64);
+
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 	VDP_setPalette(PAL0, palette_grey);
 	VDP_drawImageEx(APLAN, &logostart_image, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 8, 10, FALSE, TRUE);
 	SYS_enableInts();
+
+	SND_startPlay_PCM(sfx_startup_sound, sizeof(sfx_startup_sound), SOUND_RATE_8000, SOUND_PAN_CENTER, FALSE);
 
 	const u16 palLogoStartFade1[16] =  {0x000,0x000,0x000,0x000,0x620,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000};
 	const u16 palLogoStartFade2[16] =  {0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x820,0x000,0x000,0x000,0x000,0x000,0x000};
