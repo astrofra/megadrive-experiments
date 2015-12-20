@@ -8,6 +8,7 @@
 #define SPRITE_COUNT 48
 #define HBLANK_STEP 50
 #define FONT_PUNCT_OFFSET 35
+#define FONT_LINE_OFFSET ((504 >> 3) - 1)
 
 #define WRT_CENTER_CUR_LINE 0
 #define WRT_WRITE_CUR_LINE 1
@@ -16,8 +17,9 @@
 
 static void RSE_xmasIntro();
 
-int main(){
-	// RSE_startingScreen(10, 10);
+int main()
+{
+	RSE_startingScreen(10, 10);
 	RSE_xmasIntro();
 	return 0;
 }
@@ -209,8 +211,8 @@ static void RSE_xmasIntro()
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL1, ground.palette->data);
-	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 2, FALSE, FALSE);
 	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 24, 2, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &ground, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 2, FALSE, FALSE);
 	vramIndex += ground.tileset->numTile;
 
 	/* Draw the logo */
