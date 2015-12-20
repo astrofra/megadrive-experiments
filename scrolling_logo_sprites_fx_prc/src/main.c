@@ -113,7 +113,9 @@ static void RSE_xmasIntro()
 	u16 *tmp_spr_traj;
 
 	u16 writer_state;
+	u16 writer_switch;
 	u16 current_string_idx;
+	u16 current_string_len;
 	u16 current_char_idx;
 	u16 current_char_x;
 	u16 writer_timer;
@@ -121,17 +123,21 @@ static void RSE_xmasIntro()
 	static u16 drawString(char *str)
 	{
 		char c;
-		u16 i;
-		c = str[current_char_idx];
-
-		if (c == 0)
-			return FALSE;
-
-		if (c != ' ')
+		u16 i, fade, faded_idx;
+		for (fade = 0; fade < 3; fade++)
 		{
-			i = charToTileIndex(c);
-			if (i != 0xFF)
-				VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + i, current_char_x, 22); // drawCharTiles(i, current_char_x);
+			faded_idx = current_char_idx + fade;
+			c = str[faded_idx];
+
+			if (fade == 0 && c == 0)
+				return FALSE;
+
+			if (c != ' ')
+			{
+				i = charToTileIndex(c);
+				if (faded_idx < current_string_len && i != 0xFF)
+					VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade, 22);
+			}
 		}
 
 		current_char_x++;
@@ -145,7 +151,8 @@ static void RSE_xmasIntro()
 		switch(writer_state)
 		{
 			case WRT_CENTER_CUR_LINE:
-				current_char_x = ((320 / 8) - computeStringLen(demo_strings[current_string_idx])) >> 1;
+				current_string_len = computeStringLen(demo_strings[current_string_idx]);
+				current_char_x = ((320 / 8) - current_string_len) >> 1;
 				writer_state = WRT_WRITE_CUR_LINE;
 				break;
 
@@ -217,7 +224,7 @@ static void RSE_xmasIntro()
 
 	/* Draw the logo */
 	VDP_setPalette(PAL0, (u16*)palette_black);
-	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 7, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &rse_logo, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 7, FALSE, FALSE);
 	vramIndex += rse_logo.tileset->numTile;	    
 
 	for(i = 0; i < SPRITE_COUNT; i++)
@@ -243,6 +250,7 @@ static void RSE_xmasIntro()
 	current_char_idx = 0;
 	current_char_x = 0;
 	writer_timer = 0;
+	writer_switch = FALSE;
 
 	for(i = 0; i < SPRITE_COUNT; i++)
 		sprites_attr[i] = sprites[i].attribut;
@@ -275,7 +283,9 @@ static void RSE_xmasIntro()
 
 		SPR_update(sprites, SPRITE_COUNT);
 
-		RSE_updateLineWriter();		
+		if (writer_switch || writer_state == WRT_CLEAR_LINE)
+			RSE_updateLineWriter();
+		writer_switch = !writer_switch;	
 
 		vblCount += 1;
 	}

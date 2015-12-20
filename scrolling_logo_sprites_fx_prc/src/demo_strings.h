@@ -16,6 +16,11 @@ const char *demo_strings[] =
 	"FRA GREETINGS FLY TO: MANDARINE,\0",
 	"FLUSH, DEFENCE FORCE, RED SECTOR INC\0",
 	"AND CONDENSE.\0",
+	"CREDITS OF THIS LITTLE INTRO : \0",
+	"- SCROLLER : 4PLAY -\0",
+	"- CODE : FRA -\0",
+	"- PIXELS : GRASS -\0",
+	"- MUSIC : NAINAIN -\0",
 
 	/*	Do no remove the next line */
 	"\0"
