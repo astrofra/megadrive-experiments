@@ -39,7 +39,7 @@ static u16 inline charToTileIndex(char c)
 		return (u16)(c - 'A'); 
 
 	if (c >= '0' && c <= '9')
-		return (u16)(c - '0') + 27;
+		return (u16)(c - '0') + 25;
 
 	switch(c)
 	{
