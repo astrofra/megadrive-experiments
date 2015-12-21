@@ -3,7 +3,8 @@ const char *demo_strings[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"HO HO, MERRY XMAS BOYS AND GIRLS,\0",
+	"HO HO, BOYS AND GIRLS\0",
+	"MERRY XMAS AND HAPPY NEW YEAR 2016...\0",
 	"RSE POSSE BACK ON SEGA MEGADRIVE-GENESIS\0",
 	"...ONCE AGAIN !\0",
 	"PLEASE ENJOY THIS LITTLE PRODUCTION\0",
