@@ -6,9 +6,8 @@ import math
 from vector3 import Vector3
 
 filename_out			=	"../../src/sprites_traj"
-sprite_count			=	64
 
-rotation_steps		 	=	600
+rotation_steps		 	=	1024
 
 traj_x_amplitude 		=	128
 traj_y_amplitude 		=	64
@@ -16,7 +15,7 @@ traj_y_amplitude 		=	64
 sprite_padding			=	8
 
 scr_x_center 			=	160
-scr_y_center 			=	128
+scr_y_center 			=	100 - 16
 
 hardware_offset			=	0x80
 
@@ -26,12 +25,12 @@ def  main():
 	f.write('#include <genesis.h>\n')
 	f.write('#include <gfx.h>\n\n')
 
-	f.write('#define SPRT_TABLE_LEN ' + str(sprite_count * rotation_steps * 2) + '\n')
-	f.write('#define SPRITE_COUNT ' + str(sprite_count) + '\n')
-	f.write('#define ROTATION_STEPS ' + str(rotation_steps) + '\n')
+	f.write('#define SPRT_TABLE_LEN ' + str(rotation_steps * 2) + '\n')
+	f.write('#define SCR_X_CENTER ' + str(scr_x_center + hardware_offset) + '\n')
+	f.write('#define SCR_Y_CENTER ' + str(scr_y_center + hardware_offset) + '\n')
 	f.write('\n')
 
-	f.write('extern const u16 spr_traj[SPRT_TABLE_LEN];' + '\n')
+	f.write('extern const u16 spr_traj[SPRT_TABLE_LEN << 1];' + '\n')
 
 	f.close()
 
@@ -46,14 +45,12 @@ def  main():
 	f.write('{' + '\n')
 
 	# _str_out = '\t'
-	for step in range(rotation_steps):
-		f.write('\t/* Step #' + str(step) + ' */\n\t');
-		for sprite in range(sprite_count):
-			angle = step + (sprite * sprite_padding)
-			x = scr_x_center + int(traj_x_amplitude * math.cos(3.0 * angle * math.pi / (rotation_steps / 2.0)))
-			y = scr_y_center + int(traj_y_amplitude * math.sin(2.0 * angle * math.pi / (rotation_steps / 2.0)))
-			_str_out = str(x + hardware_offset) + ',' + str(y + hardware_offset) + ','
-			f.write(_str_out)
+	for angle in range(rotation_steps * 2):
+		f.write('\t/* Step #' + str(angle) + ' */\n\t');
+		x = scr_x_center + int(traj_x_amplitude * math.cos(3.0 * angle * math.pi / (rotation_steps / 2.0)))
+		y = scr_y_center + int(traj_y_amplitude * math.sin(2.0 * angle * math.pi / (rotation_steps / 2.0)))
+		_str_out = str(x + hardware_offset) + ',' + str(y + hardware_offset) + ','
+		f.write(_str_out)
 
 		# if angle%15 == 0:
 		f.write('\n')
