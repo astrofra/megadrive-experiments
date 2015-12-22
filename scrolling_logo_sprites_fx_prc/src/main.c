@@ -10,10 +10,21 @@
 #define FONT_PUNCT_OFFSET 35
 #define FONT_LINE_OFFSET ((504 >> 3) - 1)
 
+/*
+	States of the text writer
+*/
 #define WRT_CENTER_CUR_LINE 0
 #define WRT_WRITE_CUR_LINE 1
 #define WRT_WAIT 2
 #define WRT_CLEAR_LINE 3
+
+/*	
+	States of the sprites animation
+*/
+#define SPR_RUNNING 0
+#define SPR_WAIT_END_FADEOUT 1
+#define SPR_CHANGE_TRAJECTORY 2
+#define SPR_WAIT_END_FADEIN 3
 
 static void RSE_xmasIntro();
 
@@ -107,7 +118,7 @@ static void RSE_xmasIntro()
 	u32 hscrollInc = 0;
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
-	short i;
+	short i, j, k;
 	Sprite sprites[SPRITE_COUNT];
 	int sprites_attr[SPRITE_COUNT];
 	const u16 *tmp_spr_traj, *current_spr_traj = NULL;
@@ -119,6 +130,8 @@ static void RSE_xmasIntro()
 	u16 current_char_idx;
 	u16 current_char_x;
 	u16 writer_timer;
+
+	u16 sprite_anim_state;
 
 	static u16 RSE_drawString(char *str)
 	{
@@ -204,7 +217,7 @@ static void RSE_xmasIntro()
 		}
 	}
 
-	static const u16* getNextSpriteTrajectories(const u16 *cur_traj)
+	static const u16* RSE_getNextSpriteTrajectories(const u16 *cur_traj)
 	{
 		if (cur_traj == NULL)
 				return spr_traj;
@@ -252,7 +265,7 @@ static void RSE_xmasIntro()
 	VDP_waitVSync();
 	VDP_setPalette(PAL0, rse_logo.palette->data);
 	VDP_setPalette(PAL1, ground.palette->data);
-	VDP_setPalette(PAL2, ball_metal.palette->data);	
+	VDP_setPalette(PAL2, ball_metal.palette->data);
 
 	VDP_setHIntCounter(HBLANK_STEP);
 	VDP_setHInterrupt(1);
@@ -271,7 +284,9 @@ static void RSE_xmasIntro()
 
 	writer_state = WRT_CENTER_CUR_LINE;
 
-	current_spr_traj = getNextSpriteTrajectories(current_spr_traj);
+	current_spr_traj = RSE_getNextSpriteTrajectories(current_spr_traj);
+
+	sprite_anim_state = SPR_RUNNING;
 
 	while (1)
 	{
@@ -305,10 +320,68 @@ static void RSE_xmasIntro()
 		writer_switch = !writer_switch;	
 
 		vblCount += 1;
+		switch(sprite_anim_state)
+		{
+			case SPR_RUNNING:
+				if ((vblCount & ((SPRT_TABLE_LEN >> 2) - 1)) == 0)
+				{
+					j = 0;
+					k = 0;
+					sprite_anim_state = SPR_WAIT_END_FADEOUT;
+				}
+				break;
 
-		if ((vblCount & ((SPRT_TABLE_LEN >> 1) - 1)) == 0)
-			current_spr_traj = getNextSpriteTrajectories(current_spr_traj);
+			case SPR_WAIT_END_FADEOUT:
+				if (j >= SPRITE_COUNT)
+				{
+					j = 0;
+					k++;
+				}
+
+				if (k >= 4)
+					sprite_anim_state = SPR_CHANGE_TRAJECTORY;
+				else
+				{
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);					
+				}
+				break;
+
+			case SPR_CHANGE_TRAJECTORY:
+				current_spr_traj = RSE_getNextSpriteTrajectories(current_spr_traj);
+				j = 0;
+				k = 3;
+				sprite_anim_state = SPR_WAIT_END_FADEIN;
+				break;
+
+			case SPR_WAIT_END_FADEIN:
+				if (j >= SPRITE_COUNT)
+				{
+					j = 0;
+					k--;
+				}
+
+				if (k < 0)
+					sprite_anim_state = SPR_RUNNING;
+				else
+				{
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);
+					SPR_setFrame(&sprites[j++], k);					
+				}
+				break;
+		}
 
 	}
 }
-
