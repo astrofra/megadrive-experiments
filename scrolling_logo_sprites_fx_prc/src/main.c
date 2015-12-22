@@ -6,7 +6,8 @@
 #include "RSE_startingScreen.h"
 
 #define SPRITE_COUNT 48
-#define HBLANK_STEP 50
+#define HBLANK_STEP 40
+#define HBLANK_STEP_NTSC 50
 #define FONT_PUNCT_OFFSET 35
 #define FONT_LINE_OFFSET ((504 >> 3) - 1)
 
@@ -115,7 +116,6 @@ static u16 inline charToTileIndex(char c)
 
 static void RSE_xmasIntro()
 {
-	u32 hscrollInc = 0;
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	short i, j, k;
@@ -202,10 +202,8 @@ static void RSE_xmasIntro()
 		}		
 	}
 
-	/*	Hblank-based water fx */
 	static void RSE_hBlank(){
-		hscrollInc++;
-		if (hscrollInc < (200 / HBLANK_STEP))
+		if (GET_VCOUNTER < 160)
 		{
 			VDP_setPaletteColors(0, rse_logo.palette->data, 8);
 			VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
@@ -216,6 +214,20 @@ static void RSE_xmasIntro()
 			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
 		}
 	}
+
+	static void RSE_hBlank_NTSC(){
+		if (GET_VCOUNTER < 140)
+		{
+			VDP_setPaletteColors(0, rse_logo.palette->data, 8);
+			VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
+		}	
+		else
+		{
+			VDP_setHorizontalScroll(PLAN_A, 0);
+			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
+		}
+	}
+
 
 	static const u16* RSE_getNextSpriteTrajectories(const u16 *cur_traj)
 	{
@@ -267,9 +279,18 @@ static void RSE_xmasIntro()
 	VDP_setPalette(PAL1, ground.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
-	VDP_setHIntCounter(HBLANK_STEP);
-	VDP_setHInterrupt(1);
-	SYS_setHIntCallback(&RSE_hBlank); //RSE_hBlank function is called on each h interruption	
+	if (SYS_isNTSC())
+	{
+		VDP_setHIntCounter(HBLANK_STEP_NTSC);
+		VDP_setHInterrupt(1);
+		SYS_setHIntCallback(&RSE_hBlank_NTSC); //RSE_hBlank function is called on each h interruption	
+	}
+	else
+	{
+		VDP_setHIntCounter(HBLANK_STEP);
+		VDP_setHInterrupt(1);
+		SYS_setHIntCallback(&RSE_hBlank); //RSE_hBlank function is called on each h interruption	
+	}
 
 	SND_startPlay_XGM(midnight);
 
@@ -290,7 +311,6 @@ static void RSE_xmasIntro()
 
 	while (1)
 	{
-		hscrollInc = 0;
 		VDP_waitVSync();
 		VDP_setHorizontalScroll(PLAN_B, -vblCount);
 
@@ -317,6 +337,7 @@ static void RSE_xmasIntro()
 
 		if (writer_switch || writer_state == WRT_CLEAR_LINE)
 			RSE_updateLineWriter();
+
 		writer_switch = !writer_switch;	
 
 		vblCount += 1;
