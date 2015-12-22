@@ -110,7 +110,7 @@ static void RSE_xmasIntro()
 	short i;
 	Sprite sprites[SPRITE_COUNT];
 	int sprites_attr[SPRITE_COUNT];
-	u16 *tmp_spr_traj;
+	const u16 *tmp_spr_traj, *current_spr_traj = NULL;
 
 	u16 writer_state;
 	u16 writer_switch;
@@ -120,7 +120,7 @@ static void RSE_xmasIntro()
 	u16 current_char_x;
 	u16 writer_timer;
 
-	static u16 drawString(char *str)
+	static u16 RSE_drawString(char *str)
 	{
 		char c;
 		u16 i, fade, faded_idx;
@@ -157,7 +157,7 @@ static void RSE_xmasIntro()
 				break;
 
 			case WRT_WRITE_CUR_LINE:
-				if (!drawString(demo_strings[current_string_idx]))
+				if (!RSE_drawString(demo_strings[current_string_idx]))
 				{
 					writer_timer = 0;
 					writer_state = WRT_WAIT;
@@ -190,7 +190,7 @@ static void RSE_xmasIntro()
 	}
 
 	/*	Hblank-based water fx */
-	static void hBlank(){
+	static void RSE_hBlank(){
 		hscrollInc++;
 		if (hscrollInc < (200 / HBLANK_STEP))
 		{
@@ -202,6 +202,20 @@ static void RSE_xmasIntro()
 			VDP_setHorizontalScroll(PLAN_A, 0);
 			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
 		}
+	}
+
+	static const u16* getNextSpriteTrajectories(const u16 *cur_traj)
+	{
+		if (cur_traj == NULL)
+				return spr_traj;
+		if (cur_traj == spr_traj)
+				return spr_traj_1;
+		if (cur_traj == spr_traj_1)
+				return spr_traj_bnc;
+		if (cur_traj == spr_traj_bnc)
+				return spr_traj_2;
+		if (cur_traj == spr_traj_2)
+				return spr_traj;
 	}
 
 	SYS_disableInts();
@@ -242,7 +256,7 @@ static void RSE_xmasIntro()
 
 	VDP_setHIntCounter(HBLANK_STEP);
 	VDP_setHInterrupt(1);
-	SYS_setHIntCallback(&hBlank); //hBlank function is called on each h interruption	
+	SYS_setHIntCallback(&RSE_hBlank); //RSE_hBlank function is called on each h interruption	
 
 	SND_startPlay_XGM(midnight);
 
@@ -257,13 +271,16 @@ static void RSE_xmasIntro()
 
 	writer_state = WRT_CENTER_CUR_LINE;
 
+	current_spr_traj = getNextSpriteTrajectories(current_spr_traj);
+
 	while (1)
 	{
 		hscrollInc = 0;
 		VDP_waitVSync();
 		VDP_setHorizontalScroll(PLAN_B, -vblCount);
 
-		tmp_spr_traj = spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
+		tmp_spr_traj = current_spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
+
 		for(i = 0; i < SPRITE_COUNT; i++)
 		{
 			sprites[i].x = *(tmp_spr_traj++);
@@ -288,6 +305,10 @@ static void RSE_xmasIntro()
 		writer_switch = !writer_switch;	
 
 		vblCount += 1;
+
+		if ((vblCount & ((SPRT_TABLE_LEN >> 1) - 1)) == 0)
+			current_spr_traj = getNextSpriteTrajectories(current_spr_traj);
+
 	}
 }
 
