@@ -272,12 +272,11 @@ static void RSE_xmasIntro()
 	VDP_setPalette(PAL2, (u16*)palette_black);
 	SPR_init(SPRITE_COUNT);
 
-	SYS_enableInts();
-
-	VDP_waitVSync();
 	VDP_setPalette(PAL0, rse_logo.palette->data);
 	VDP_setPalette(PAL1, ground.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
+
+	SYS_enableInts();
 
 	if (SYS_isNTSC())
 	{
@@ -293,6 +292,7 @@ static void RSE_xmasIntro()
 	}
 
 	SND_startPlay_XGM(midnight);
+	SND_setMusicTempo_XGM(50);
 
 	current_string_idx = 0;
 	current_char_idx = 0;
@@ -370,7 +370,7 @@ static void RSE_xmasIntro()
 					SPR_setFrame(&sprites[j++], k);
 					SPR_setFrame(&sprites[j++], k);
 					SPR_setFrame(&sprites[j++], k);
-					SPR_setFrame(&sprites[j++], k);					
+					SPR_setFrame(&sprites[j++], k);
 				}
 				break;
 
@@ -399,7 +399,7 @@ static void RSE_xmasIntro()
 					SPR_setFrame(&sprites[j++], k);
 					SPR_setFrame(&sprites[j++], k);
 					SPR_setFrame(&sprites[j++], k);
-					SPR_setFrame(&sprites[j++], k);					
+					SPR_setFrame(&sprites[j++], k);
 				}
 				break;
 		}
