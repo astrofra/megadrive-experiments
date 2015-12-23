@@ -13,6 +13,9 @@ void RSE_startingScreen(u16 fadeSpeed, u16 fadeSpeed2)
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 	VDP_setPalette(PAL0, palette_grey);
 	VDP_drawImageEx(APLAN, &logostart_image, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 8, 10, FALSE, TRUE);
+
+	RSE_displayVersionAndFrequency();
+
 	SYS_enableInts();
 
 	SND_startPlay_PCM(sfx_startup_sound, sizeof(sfx_startup_sound), SOUND_RATE_8000, SOUND_PAN_CENTER, FALSE);
