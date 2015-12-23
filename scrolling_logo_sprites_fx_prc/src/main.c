@@ -5,7 +5,7 @@
 #include "demo_strings.h"
 #include "RSE_startingScreen.h"
 
-#define SPRITE_COUNT 48
+#define SPRITE_COUNT 56	//	Must be a multiple of 8
 #define FONT_PUNCT_OFFSET 35
 #define FONT_LINE_OFFSET ((504 >> 3) - 1)
 
@@ -282,8 +282,6 @@ static void RSE_xmasIntro()
 	while (1)
 	{
 		VDP_waitVSync();
-		// VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
-		// VDP_setHorizontalScroll(PLAN_B, -vblCount);
 
 		for(i = 0; i < PLAN_B_TILE_H; i++)
 			scroll_PLAN_B[i] = -vblCount;
