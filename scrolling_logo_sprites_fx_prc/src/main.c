@@ -6,8 +6,7 @@
 #include "RSE_startingScreen.h"
 
 #define SPRITE_COUNT 48
-#define HBLANK_STEP 40
-#define HBLANK_STEP_NTSC 50
+#define HBLANK_STEP 32
 #define FONT_PUNCT_OFFSET 35
 #define FONT_LINE_OFFSET ((504 >> 3) - 1)
 
@@ -117,6 +116,8 @@ static u16 inline charToTileIndex(char c)
 static void RSE_xmasIntro()
 {
 	u16 vblCount = 0;
+	u16 scroll_stopped = TRUE;
+
 	u16 vramIndex = TILE_USERINDEX;
 	short i, j, k;
 	Sprite sprites[SPRITE_COUNT];
@@ -202,32 +203,15 @@ static void RSE_xmasIntro()
 		}		
 	}
 
-	static void RSE_hBlank(){
-		if (GET_VCOUNTER < 160)
+	static void RSE_hBlank()
+	{
+		if (!scroll_stopped && GET_VCOUNTER > 140)
 		{
-			VDP_setPaletteColors(0, rse_logo.palette->data, 8);
-			VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
-		}	
-		else
-		{
+			scroll_stopped = TRUE;
 			VDP_setHorizontalScroll(PLAN_A, 0);
 			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
 		}
 	}
-
-	static void RSE_hBlank_NTSC(){
-		if (GET_VCOUNTER < 140)
-		{
-			VDP_setPaletteColors(0, rse_logo.palette->data, 8);
-			VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
-		}	
-		else
-		{
-			VDP_setHorizontalScroll(PLAN_A, 0);
-			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
-		}
-	}
-
 
 	static const u16* RSE_getNextSpriteTrajectories(const u16 *cur_traj)
 	{
@@ -277,19 +261,9 @@ static void RSE_xmasIntro()
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
 	SYS_enableInts();
-
-	if (SYS_isNTSC())
-	{
-		VDP_setHIntCounter(HBLANK_STEP_NTSC);
-		VDP_setHInterrupt(1);
-		SYS_setHIntCallback(&RSE_hBlank_NTSC); //RSE_hBlank function is called on each h interruption	
-	}
-	else
-	{
-		VDP_setHIntCounter(HBLANK_STEP);
-		VDP_setHInterrupt(1);
-		SYS_setHIntCallback(&RSE_hBlank); //RSE_hBlank function is called on each h interruption	
-	}
+	VDP_setHIntCounter(HBLANK_STEP - 1);
+	VDP_setHInterrupt(1);
+	SYS_setHIntCallback(&RSE_hBlank); //RSE_hBlank function is called on each h interruption	
 
 	SND_startPlay_XGM(midnight);
 	SND_setMusicTempo_XGM(50);
@@ -312,7 +286,10 @@ static void RSE_xmasIntro()
 	while (1)
 	{
 		VDP_waitVSync();
+		VDP_setPaletteColors(0, rse_logo.palette->data, 8);
+		VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
 		VDP_setHorizontalScroll(PLAN_B, -vblCount);
+		scroll_stopped = FALSE;
 
 		tmp_spr_traj = current_spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
 
