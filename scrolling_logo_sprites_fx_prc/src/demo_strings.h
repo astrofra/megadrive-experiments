@@ -20,7 +20,7 @@ const char *demo_strings[] =
 	"CREDITS OF THIS LITTLE INTRO : \0",
 	"- SCROLLER : 4PLAY -\0",
 	"- CODE : FRA -\0",
-	"- PIXELS : GRASS -\0",
+	"- PIXELS & HARDWARE TESTING : GRASS -\0",
 	"- MUSIC : NAINAIN -\0",
 	"- BOOT SFX : MORUSQUE -\0",
 	"- POWERED BY SGDK -\0",

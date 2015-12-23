@@ -6,9 +6,11 @@
 #include "RSE_startingScreen.h"
 
 #define SPRITE_COUNT 48
-#define HBLANK_STEP 32
 #define FONT_PUNCT_OFFSET 35
 #define FONT_LINE_OFFSET ((504 >> 3) - 1)
+
+#define PLAN_B_TILE_H 20
+#define PLAN_A_TILE_H 10
 
 /*
 	States of the text writer
@@ -116,13 +118,15 @@ static u16 inline charToTileIndex(char c)
 static void RSE_xmasIntro()
 {
 	u16 vblCount = 0;
-	u16 scroll_stopped = TRUE;
 
 	u16 vramIndex = TILE_USERINDEX;
 	short i, j, k;
 	Sprite sprites[SPRITE_COUNT];
 	int sprites_attr[SPRITE_COUNT];
 	const u16 *tmp_spr_traj, *current_spr_traj = NULL;
+
+	s16 scroll_PLAN_B[PLAN_B_TILE_H];
+	s16 scroll_PLAN_A[PLAN_A_TILE_H];
 
 	u16 writer_state;
 	u16 writer_switch;
@@ -162,6 +166,7 @@ static void RSE_xmasIntro()
 
 	static void inline RSE_updateLineWriter(void)
 	{
+		SYS_disableInts();
 		switch(writer_state)
 		{
 			case WRT_CENTER_CUR_LINE:
@@ -201,16 +206,7 @@ static void RSE_xmasIntro()
 				}
 
 		}		
-	}
-
-	static void RSE_hBlank()
-	{
-		if (!scroll_stopped && GET_VCOUNTER > 140)
-		{
-			scroll_stopped = TRUE;
-			VDP_setHorizontalScroll(PLAN_A, 0);
-			VDP_setPaletteColors(0, squarish_font.palette->data, 8);
-		}
+		SYS_enableInts();
 	}
 
 	static const u16* RSE_getNextSpriteTrajectories(const u16 *cur_traj)
@@ -261,9 +257,8 @@ static void RSE_xmasIntro()
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
 	SYS_enableInts();
-	VDP_setHIntCounter(HBLANK_STEP - 1);
-	VDP_setHInterrupt(1);
-	SYS_setHIntCallback(&RSE_hBlank); //RSE_hBlank function is called on each h interruption	
+
+	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
 
 	SND_startPlay_XGM(midnight);
 	SND_setMusicTempo_XGM(50);
@@ -286,10 +281,16 @@ static void RSE_xmasIntro()
 	while (1)
 	{
 		VDP_waitVSync();
-		VDP_setPaletteColors(0, rse_logo.palette->data, 8);
-		VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
-		VDP_setHorizontalScroll(PLAN_B, -vblCount);
-		scroll_stopped = FALSE;
+		// VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
+		// VDP_setHorizontalScroll(PLAN_B, -vblCount);
+
+		for(i = 0; i < PLAN_B_TILE_H; i++)
+			scroll_PLAN_B[i] = -vblCount;
+		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, FALSE);
+
+		for (i = 0, j = sinFix16(vblCount << 2); i < PLAN_A_TILE_H; i++)
+			scroll_PLAN_A[i] = j;
+		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, FALSE);
 
 		tmp_spr_traj = current_spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
 
