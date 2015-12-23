@@ -127,6 +127,7 @@ static void RSE_xmasIntro()
 
 	s16 scroll_PLAN_B[PLAN_B_TILE_H];
 	s16 scroll_PLAN_A[PLAN_A_TILE_H];
+	s16 scroll_sin_precalc;
 
 	u16 writer_state;
 	u16 writer_switch;
@@ -288,8 +289,8 @@ static void RSE_xmasIntro()
 			scroll_PLAN_B[i] = -vblCount;
 		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, FALSE);
 
-		for (i = 0, j = sinFix16(vblCount << 2); i < PLAN_A_TILE_H; i++)
-			scroll_PLAN_A[i] = j;
+		for (i = 0, scroll_sin_precalc = sinFix16(vblCount << 2); i < PLAN_A_TILE_H; i++)
+			scroll_PLAN_A[i] = scroll_sin_precalc;
 		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, FALSE);
 
 		tmp_spr_traj = current_spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
