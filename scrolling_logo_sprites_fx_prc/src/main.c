@@ -5,7 +5,7 @@
 #include "demo_strings.h"
 #include "RSE_startingScreen.h"
 
-#define SPRITE_COUNT 56	//	Must be a multiple of 8
+#define SPRITE_COUNT (6 << 3)	//	Must be a multiple of 8
 #define FONT_PUNCT_OFFSET 35
 #define FONT_LINE_OFFSET ((504 >> 3) - 1)
 
@@ -230,7 +230,7 @@ static void RSE_xmasIntro()
 	}
 
 	SYS_disableInts();
-	VDP_setEnable(FALSE);
+	// VDP_setEnable(FALSE);
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);
@@ -265,7 +265,7 @@ static void RSE_xmasIntro()
 
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
 
-	VDP_setEnable(TRUE);
+	// VDP_setEnable(TRUE);
 	SYS_enableInts();
 
 	SND_startPlay_XGM(midnight);
@@ -288,6 +288,11 @@ static void RSE_xmasIntro()
 
 	while (TRUE)
 	{
+		VDP_waitVSync();
+		SPR_update(sprites, SPRITE_COUNT);
+		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, FALSE);
+		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, FALSE);
+		
 		for(i = 0; i < PLAN_B_TILE_H; i++)
 			scroll_PLAN_B[i] = -vblCount;
 		for (i = 0, scroll_sin_precalc = sinFix16(vblCount << 2); i < PLAN_A_TILE_H; i++)
@@ -380,10 +385,5 @@ static void RSE_xmasIntro()
 				}
 				break;
 		}
-
-		SPR_update(sprites, SPRITE_COUNT);
-		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, TRUE);
-		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, TRUE);
-		VDP_waitVSync();
 	}
 }
