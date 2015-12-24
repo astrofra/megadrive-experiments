@@ -33,7 +33,12 @@ static void RSE_xmasIntro();
 int main()
 {
 	RSE_startingScreen(10, 10);
-	RSE_xmasIntro();
+	if (SYS_isPAL())
+	{
+		RSE_guruMeditation();
+	}
+	else
+		RSE_xmasIntro();
 	return 0;
 }
 
@@ -167,7 +172,7 @@ static void RSE_xmasIntro()
 
 	static void inline RSE_updateLineWriter(void)
 	{
-		SYS_disableInts();
+		// SYS_disableInts();
 		switch(writer_state)
 		{
 			case WRT_CENTER_CUR_LINE:
@@ -207,7 +212,7 @@ static void RSE_xmasIntro()
 				}
 
 		}		
-		SYS_enableInts();
+		// SYS_enableInts();
 	}
 
 	static const u16* RSE_getNextSpriteTrajectories(const u16 *cur_traj)
@@ -222,12 +227,6 @@ static void RSE_xmasIntro()
 				return spr_traj_2;
 		if (cur_traj == spr_traj_2)
 				return spr_traj;
-	}
-
-	static void vblank()
-	{
-		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, TRUE);
-		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, TRUE);
 	}
 
 	SYS_disableInts();
@@ -264,7 +263,6 @@ static void RSE_xmasIntro()
 	VDP_setPalette(PAL1, ground.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
-	SYS_setVIntCallback(vblank);
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
 
 	VDP_setEnable(TRUE);
@@ -313,8 +311,6 @@ static void RSE_xmasIntro()
 			sprites[i].attribut = sprites_attr[i];
 			tmp_spr_traj += 12;
 		}
-
-		SPR_update(sprites, SPRITE_COUNT);
 
 		if (writer_switch || writer_state == WRT_CLEAR_LINE)
 			RSE_updateLineWriter();
@@ -385,6 +381,9 @@ static void RSE_xmasIntro()
 				break;
 		}
 
+		SPR_update(sprites, SPRITE_COUNT);
+		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, TRUE);
+		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, TRUE);
 		VDP_waitVSync();
 	}
 }
