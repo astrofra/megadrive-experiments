@@ -224,7 +224,14 @@ static void RSE_xmasIntro()
 				return spr_traj;
 	}
 
+	static void vblank()
+	{
+		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, TRUE);
+		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, TRUE);
+	}
+
 	SYS_disableInts();
+	VDP_setEnable(FALSE);
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);
@@ -257,9 +264,11 @@ static void RSE_xmasIntro()
 	VDP_setPalette(PAL1, ground.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
-	SYS_enableInts();
-
+	SYS_setVIntCallback(vblank);
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
+
+	VDP_setEnable(TRUE);
+	SYS_enableInts();
 
 	SND_startPlay_XGM(midnight);
 	SND_setMusicTempo_XGM(50);
@@ -281,15 +290,10 @@ static void RSE_xmasIntro()
 
 	while (1)
 	{
-		VDP_waitVSync();
-
 		for(i = 0; i < PLAN_B_TILE_H; i++)
 			scroll_PLAN_B[i] = -vblCount;
-		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, PLAN_B_TILE_H, FALSE);
-
 		for (i = 0, scroll_sin_precalc = sinFix16(vblCount << 2); i < PLAN_A_TILE_H; i++)
 			scroll_PLAN_A[i] = scroll_sin_precalc;
-		VDP_setHorizontalScrollTile(PLAN_A, 7, scroll_PLAN_A, PLAN_A_TILE_H, FALSE);
 
 		tmp_spr_traj = current_spr_traj + ((vblCount << 1) & (SPRT_TABLE_LEN - 1));
 
@@ -381,5 +385,6 @@ static void RSE_xmasIntro()
 				break;
 		}
 
+		VDP_waitVSync();
 	}
 }

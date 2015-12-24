@@ -14,7 +14,7 @@ void RSE_startingScreen(u16 fadeSpeed, u16 fadeSpeed2)
 	VDP_setPalette(PAL0, palette_grey);
 	VDP_drawImageEx(APLAN, &logostart_image, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 8, 10, FALSE, TRUE);
 
-	// RSE_displayVersionAndFrequency();
+	RSE_displayVersionAndFrequency();
 
 	SYS_enableInts();
 
