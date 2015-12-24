@@ -288,7 +288,7 @@ static void RSE_xmasIntro()
 
 	sprite_anim_state = SPR_RUNNING;
 
-	while (1)
+	while (TRUE)
 	{
 		for(i = 0; i < PLAN_B_TILE_H; i++)
 			scroll_PLAN_B[i] = -vblCount;
