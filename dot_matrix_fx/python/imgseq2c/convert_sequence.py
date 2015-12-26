@@ -7,9 +7,10 @@ fx_folder_list = ['tore_tunnel']
 filename_out = "../../src/img_seq"
 
 in_file_ext = '.png'
+tile_bits = 4
+tile_steps = (1 << tile_bits)
 w = 40
 h = 30
-tile_steps = (1 << 4)
 
 def quantizeTexel(texel):
 	texel *= tile_steps
@@ -25,6 +26,8 @@ def main():
 	f = codecs.open(filename_out + '.c', 'w')
 	f.write('#include <genesis.h>\n')
 	f.write('#include <gfx.h>\n\n')
+	f.write('#define TILE_BITS ' + str(tile_bits) + '\n')
+	f.write('#define TILE_STEPS ' + str(tile_steps) + '\n\n')
 
 	for fx_path in fx_folder_list:
 		image_count = 0
@@ -36,15 +39,24 @@ def main():
 				print("Loading picture '" + pic_path + "'.")
 				pic = gs.LoadPicture(pic_path)
 
-				out_str = '\t'
+				out_str = '\t/* image #' + str(image_count - 1) + ' */\n'
+				out_str += '\t'
 				for y in range(h):
+					tex_list = []
 					for x in range(w):
 						texel = pic.GetPixelRGBA(x,y)
 						quant_texel = quantizeTexel(texel.x)
-						if quant_texel < 10:
-							out_str += ' ' + str(int(quant_texel)) + ','
-						else:
-							out_str += str(int(quant_texel)) + ','
+						tex_list.append(quant_texel)
+						if len(tex_list) == 4:
+							packed_texel = (tex_list[0] << 3) | (tex_list[1] << 2) | (tex_list[2] << 1) | tex_list[3]
+							tex_list = []
+							if packed_texel < 10:
+								out_str += '00' + str(int(packed_texel)) + ','
+							else:
+								if packed_texel < 100:
+									out_str += '0' + str(int(packed_texel)) + ','
+								else:
+									out_str += str(int(packed_texel)) + ','
 					out_str += '\n\t'
 
 				out_str += '\n'
