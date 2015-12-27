@@ -33,13 +33,17 @@ static void RSE_gridTileAnimation()
 		{
 			k++;
 			luma = tore_tunnel_seq[k + (vblCount * tore_tunnel_IMG_LEN)];
-			unpacked_luma = luma & MASK_1;
+
+			unpacked_luma = (luma & MASK_4) >> UNPACK_4;
 			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + unpacked_luma, i++, j);
-			unpacked_luma = (luma & MASK_2) >> UNPACK_2;
-			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + unpacked_luma, i++, j);
+
 			unpacked_luma = (luma & MASK_3) >> UNPACK_3;
 			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + unpacked_luma, i++, j);
-			unpacked_luma = (luma & MASK_4) >> UNPACK_4;
+
+			unpacked_luma = (luma & MASK_2) >> UNPACK_2;
+			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + unpacked_luma, i++, j);
+
+			unpacked_luma = luma & MASK_1;
 			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + unpacked_luma, i++, j);
 			if (i >= 40)
 			{
