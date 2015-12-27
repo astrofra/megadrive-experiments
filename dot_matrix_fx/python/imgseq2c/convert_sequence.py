@@ -26,11 +26,10 @@ def main():
 	f = codecs.open(filename_out + '.c', 'w')
 	f.write('#include <genesis.h>\n')
 	f.write('#include <gfx.h>\n\n')
-	f.write('#define TILE_BITS ' + str(tile_bits) + '\n')
-	f.write('#define TILE_STEPS ' + str(tile_steps) + '\n\n')
 
 	for fx_path in fx_folder_list:
 		image_count = 0
+		word_count = 0
 		total_str = ''
 		for img in os.listdir(fx_path):
 			if img.find(in_file_ext) > -1:
@@ -48,28 +47,34 @@ def main():
 						quant_texel = quantizeTexel(texel.x)
 						tex_list.append(quant_texel)
 						if len(tex_list) == 4:
-							packed_texel = (tex_list[0] << 3) | (tex_list[1] << 2) | (tex_list[2] << 1) | tex_list[3]
+							packed_texel = (tex_list[0] << (tile_bits * 3)) | (tex_list[1] << (tile_bits * 2)) | (tex_list[2] << tile_bits) | tex_list[3]
+							word_count += 1
 							tex_list = []
-							if packed_texel < 10:
-								out_str += '00' + str(int(packed_texel)) + ','
-							else:
-								if packed_texel < 100:
-									out_str += '0' + str(int(packed_texel)) + ','
-								else:
-									out_str += str(int(packed_texel)) + ','
+							out_str += str(int(packed_texel)) + ','
 					out_str += '\n\t'
 
 				out_str += '\n'
 				total_str += out_str
 
 	f.write('/* ' + fx_path + ' */\n')
-	f.write('#define ' + fx_path + '_IMG_COUNT ' + str(image_count) + '\n')
-	f.write('#define ' + fx_path + '_IMG_LEN ' + str(int(w * h / tile_steps)) + '\n\n')
 	f.write('const u16 ' + fx_path + '_seq[] = \n')
 	f.write('{\n')	
 	f.write(total_str)
 	f.write('};\n')	
 
+	f.close()
+
+	f = codecs.open(filename_out + '.h', 'w')
+	f.write('#include <genesis.h>\n')
+	f.write('#include <gfx.h>\n\n')
+	f.write('#define TILE_BITS ' + str(tile_bits) + '\n')
+	f.write('#define TILE_STEPS ' + str(tile_steps) + '\n\n')
+
+	f.write('#define ' + fx_path + '_IMG_COUNT ' + str(image_count) + '\n')
+	f.write('#define ' + fx_path + '_IMG_LEN ' + str(int(w * h * tile_bits / 16)) + '\n\n')
+	# f.write('#define ' + fx_path + '_IMG_WORD_COUNT ' + str(int(w * h / tile_steps)) + '\n\n')
+
+	f.write('const u16 ' + fx_path + '_seq[' + str(word_count) + '];\n')
 	# image_count = 0
 	# frame_offset = 3
 	# input_picture_width = 512
