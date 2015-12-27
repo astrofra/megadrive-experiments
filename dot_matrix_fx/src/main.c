@@ -27,12 +27,14 @@ static void RSE_gridTileAnimation()
 
 	static void drawDotMatrix(void)
 	{
-		u16 i = 0, j = 0, k, luma, unpacked_luma;
-		k = 0;
-		while(k < tore_tunnel_IMG_LEN)
+		u16 i = 0, j = 0, k, tile_index, luma, unpacked_luma;
+		
+		k = tore_tunnel_IMG_LEN;
+		tile_index = vblCount * tore_tunnel_IMG_LEN;
+
+		while(k--)
 		{
-			k++;
-			luma = tore_tunnel_seq[k + (vblCount * tore_tunnel_IMG_LEN)];
+			luma = tore_tunnel_seq[tile_index];
 
 			unpacked_luma = (luma & MASK_4) >> UNPACK_4;
 			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + unpacked_luma, i++, j);
@@ -50,6 +52,8 @@ static void RSE_gridTileAnimation()
 				i = 0;
 				j++;
 			}
+
+			tile_index++;
 		}
 	}
 	// 				VDP_setTileMapXY(VDP_PLAN_A, 0, current_char_x, 22);
