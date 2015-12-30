@@ -6,31 +6,9 @@ import gs.plus.input as input
 import gs.plus.scene as scene
 import gs.plus.clock as clock
 from math import pi, cos, sin, asin
+import codecs
 
-
-def add_kapla_tower(scn, width, height, length, radius, level_count: int, x=0, y=0, z=0):
-	"""Create a Kapla tower, return a list of created nodes"""
-	level_y = y + height / 2
-
-	for i in range(level_count // 2):
-		def fill_ring(r, ring_y, size, r_adjust, y_off):
-			step = asin((size * 1.01) / 2 / (r - r_adjust)) * 2
-			cube_count = (2 * pi) // step
-			error = 2 * pi - step * cube_count
-			step += error / cube_count  # distribute error
-
-			a = 0
-			while a < (2 * pi - error):
-				world = gs.Matrix4.TransformationMatrix(gs.Vector3(cos(a) * r + x, ring_y, sin(a) * r + z), gs.Vector3(0, -a + y_off, 0))
-				scene.add_physic_cube(scn, world, width, height, length, 2)
-				a += step
-
-		fill_ring(radius - length / 2, level_y, width, length / 2, pi / 2)
-		level_y += height
-		fill_ring(radius - length + width / 2, level_y, length, width / 2, 0)
-		fill_ring(radius - width / 2, level_y, length, width / 2, 0)
-		level_y += height
-
+filename_out			=	"../src/simulation"
 
 gs.plus.create_workers()
 
@@ -48,6 +26,9 @@ scene.add_physic_plane(scn)
 
 width, height, length = 1, 1, 1
 
+node_list = []
+stream_list = []
+
 def make_solid_pos(x,y):
 	return gs.Vector3(x * 1.15, y + height * 0.5, cos(x * y + x) * 0.25)
 
@@ -55,34 +36,43 @@ for y in range(3):
 	for x in range(-2, 2):
 		world = gs.Matrix4.TransformationMatrix(make_solid_pos(x,y), gs.Vector3(0, pi * 0.25 * cos(x * y + x + y + 0.1) * 0.25, 0))
 		new_cube = scene.add_physic_cube(scn, world, width, height, length, 2)
+		node_list.append(new_cube[0])
 
 # fps = camera.fps_controller(0, 3.5, -12.5)
 
 thrown_bullet = False
 fixed_step = True
+record_motion = False
+record_done = False
 
 dt_sum = 0.0
 
-while not input.key_press(gs.InputDevice.KeyEscape):
+# Start simulation & record
+
+while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if fixed_step:
 		dt_sec = 1.0 / 120.0 
 	else:
 		dt_sec = clock.update()
 
 	dt_sum += dt_sec
+	print(dt_sum)
 
 	if not thrown_bullet and dt_sum > 1.0:
 		world = gs.Matrix4.TransformationMatrix(make_solid_pos(-0.25,40), gs.Vector3())
-		ball, rigid_body = scene.add_physic_cube(scn, world, width, height, length, 2)
+		new_cube, rigid_body = scene.add_physic_cube(scn, world, width, height, length, 2)
 		rigid_body.ApplyLinearImpulse(world.GetY() * -5)
+		node_list.append(new_cube)
 
 		world = gs.Matrix4.TransformationMatrix(make_solid_pos(-0.65,55), gs.Vector3())
-		ball, rigid_body = scene.add_physic_cube(scn, world, width, height, length, 2)
+		new_cube, rigid_body = scene.add_physic_cube(scn, world, width, height, length, 2)
 		rigid_body.ApplyLinearImpulse(world.GetY() * -5)
+		node_list.append(new_cube)
 
 		world = gs.Matrix4.TransformationMatrix(make_solid_pos(-1.25,58), gs.Vector3())
-		ball, rigid_body = scene.add_physic_cube(scn, world, width, height, length, 2)
-		rigid_body.ApplyLinearImpulse(world.GetY() * -5)		
+		new_cube, rigid_body = scene.add_physic_cube(scn, world, width, height, length, 2)
+		rigid_body.ApplyLinearImpulse(world.GetY() * -5)
+		node_list.append(new_cube)		
 
 		thrown_bullet = True
 
@@ -90,6 +80,53 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 
 	scene.update_scene(scn, dt_sec)
 
+	if not record_motion and dt_sum > 2.0:
+		record_motion = True
+	else:
+		if record_motion and dt_sum > 8.0:
+			record_motion = False
+			record_done = True
+
+	if record_motion:
+		new_frame = []
+		for current_node in node_list:
+			new_motion = {'position': current_node.transform.GetPosition(), 'rotation': current_node.transform.GetRotation()}
+			new_frame.append(new_motion)
+
+		stream_list.append(new_frame)
+
 	render.text2d(5, 25, "@%.2fFPS" % (1 / dt_sec))
 	render.text2d(5, 5, "Move around with QSZD, left mouse button to look around")
 	render.flip()
+
+# Dump record
+
+f = codecs.open(filename_out + '.h', 'w')
+
+f.write('#include "genesis.h"\n\n')
+f.write('#define SIMULATION_FRAME_LEN ' + str(len(stream_list)) + '\n')
+f.write('#define SIMULATION_NODE_LEN ' + str(len(node_list)) + '\n\n')
+
+f.write('const fix16 ' + 'physics_sim' + '[] =' + '\n')
+f.write('{\n')
+
+out_str = ''
+frame_idx = 0
+
+for frame_record in stream_list:
+	if frame_idx%10 == 0:
+		out_str = '\t/* Frame #' + str(frame_idx) + ' */\n\t'
+	else:
+		out_str = '\t'
+
+	for node_record in frame_record:
+		out_str += "FIX16({0:.4f}".format(node_record['position'].x) + '), ' + "FIX16({0:.4f}".format(node_record['position'].y) + '), ' + "FIX16({0:.4f}".format(node_record['position'].z) + '), '
+
+	out_str += '\n'
+	f.write(out_str)
+
+	frame_idx += 1
+
+f.write('};\n\n')
+
+f.close()
