@@ -9,6 +9,7 @@ from math import pi, cos, sin, asin
 import codecs
 
 filename_out			=	"../src/simulation"
+scale_factor			=	5.0
 
 gs.plus.create_workers()
 
@@ -90,7 +91,7 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if record_motion:
 		new_frame = []
 		for current_node in node_list:
-			new_motion = {'position': current_node.transform.GetPosition(), 'rotation': current_node.transform.GetRotation()}
+			new_motion = {'position': current_node.transform.GetPosition() * scale_factor, 'rotation': current_node.transform.GetRotation()}
 			new_frame.append(new_motion)
 
 		stream_list.append(new_frame)
