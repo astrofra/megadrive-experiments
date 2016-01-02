@@ -152,16 +152,18 @@ void RSE_Logo3DScreen(void)
 		}
 	}
 
-	camdist = FIX16(15);
+	camdist = FIX16(11);
 
 	M3D_reset();
 	M3D_setCamDistance(camdist);
 	M3D_setLightEnabled(1);
-	M3D_setLightXYZ(FIX16(0.9), FIX16(0.9), FIX16(-0.9));
+	M3D_setLightXYZ(FIX16(-0.5), FIX16(0.5), FIX16(-1.5));
 
 	// allocate translation and rotation structure
 	M3D_setTransform(&(transformation), &(translation), &(rotation));
-	M3D_setTranslation(&(transformation), FIX16(-8), FIX16(0), FIX16(20));
+	M3D_setTranslation(&(transformation), FIX16(-14), FIX16(0), FIX16(25));	// R
+	// M3D_setTranslation(&(transformation), FIX16(0), FIX16(0), FIX16(25));	// S
+	// M3D_setTranslation(&(transformation), FIX16(14), FIX16(0.0), FIX16(25));	// E
 	M3D_setRotation(&(transformation), FIX16(0.0), FIX16(0.0), FIX16(0.0));
 
 	rotation.x = FIX16(-4);
