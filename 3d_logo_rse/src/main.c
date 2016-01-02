@@ -8,6 +8,7 @@
 #include "RSE_logo_meshs.h"
 #include "quicksort.h"
 #include "RSE_Logo3DScreen.h"
+#include "RSE_easing_table.h"
 
 extern Mat3D_f16 MatInv;
 extern Mat3D_f16 Mat;
@@ -36,12 +37,13 @@ void RSE_Logo3DScreen(void)
 	u16 vtx_count;
 	u16 poly_count;
 
+	u16 easing_index;
+
 	struct  QSORT_ENTRY poly_zsort[RSE_LOGO_3D_MAX_POINTS];
 
     Rotation3D rotation;
 	Translation3D translation;
 	Transformation3D transformation;
-	Vect3D_f16 rotstep;
 
     fix16 camdist;
 
@@ -159,29 +161,31 @@ void RSE_Logo3DScreen(void)
 
 	// allocate translation and rotation structure
 	M3D_setTransform(&(transformation), &(translation), &(rotation));
-	M3D_setTranslation(&(transformation), FIX16(-10), FIX16(0), FIX16(20));
+	M3D_setTranslation(&(transformation), FIX16(-8), FIX16(0), FIX16(20));
 	M3D_setRotation(&(transformation), FIX16(0.0), FIX16(0.0), FIX16(0.0));
 
-	rotation.y = FIX16(-4.0);
-	rotstep.x = FIX16(0.00);
-	rotstep.y = FIX16(0.1);
+	rotation.x = FIX16(-4);
+	rotation.y = FIX16(-4);
 
 	// set the current mesh
-	RSE_LOGO_3D_LOAD_MESH(logo_e);
+	RSE_LOGO_3D_LOAD_MESH(logo_r);
 
 	zsort_switch = 0;
+	easing_index = 0;
 
-	while (1)
+	while (TRUE)
 	{
 		M3D_setCamDistance(camdist);
 
-		// do work here
-		rotation.x = FIX16(-4); // rotstep.x;
-		rotation.y += rotstep.y;
+		if (easing_index < EASING_TABLE_LEN)
+			/* Shift by >> 4 : rotation by 90°, >> 3 : 180°, >> 2 : 360° */
+			rotation.y = fix16Mul(FIX16(-4.0), easing_fix16[EASING_TABLE_LEN - easing_index - 1]) >> 4;
+
+		easing_index += 8;
 
 		transformation.rebuildMat = 1;
 
-		updatePointsPos(); // &(transformation), pts_3D, pts_2D);
+		updatePointsPos();
 
 		// ensure previous flip buffer request has been started
 		BMP_waitWhileFlipRequestPending();
@@ -189,7 +193,7 @@ void RSE_Logo3DScreen(void)
 
 		BMP_clear();
 
-		drawPoints(0xFF); // &(transformation), pts_3D, pts_2D);
+		drawPoints(0xFF);
 
 		// BMP_drawText("trans z:", 0, 2);
 		// fix16ToStr(translation.z, str, 2);
