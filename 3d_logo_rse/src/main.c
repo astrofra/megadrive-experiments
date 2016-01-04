@@ -5,6 +5,7 @@
 //-----------------------------------------------
 
 #include "genesis.h"
+#include <gfx.h>
 #include "RSE_logo_meshs.h"
 #include "quicksort.h"
 #include "RSE_Logo3DScreen.h"
@@ -268,7 +269,7 @@ void RSE_Logo3DScreen(void)
 		return j;
 	}
 
-	void drawCache(u16 cache_size, Vect2D_s16 *poly_cache_pt, u16 *poly_cache_vtx_count, u16 *poly_cache_col)
+	void inline drawCache(u16 cache_size, Vect2D_s16 *poly_cache_pt, u16 *poly_cache_vtx_count, u16 *poly_cache_col)
 	{
 		u16 i;
 		for(i = 0; i < cache_size; i++)
@@ -310,14 +311,7 @@ void RSE_Logo3DScreen(void)
 	M3D_setRotation(&(transformation), FIX16(-4.0), FIX16(-4.0), FIX16(0.0));
 	transformation.rebuildMat = 1;
 	updatePointsPos();
-	poly_cache_size[2] = cachePoints(0xFF, poly_cache_pt_e, poly_cache_is_quad_e, poly_cache_col_e);		
-
-	// allocate translation and rotation structure
-	// M3D_setTransform(&(transformation), &(translation), &(rotation));
-	// M3D_setTranslation(&(transformation), FIX16(-14), FIX16(0), FIX16(25));	// R
-	// M3D_setTranslation(&(transformation), FIX16(0), FIX16(0), FIX16(25));	// S
-	// M3D_setTranslation(&(transformation), FIX16(14), FIX16(0.0), FIX16(25));	// E
-	// M3D_setRotation(&(transformation), FIX16(0.0), FIX16(0.0), FIX16(0.0));
+	poly_cache_size[2] = cachePoints(0xFF, poly_cache_pt_e, poly_cache_is_quad_e, poly_cache_col_e);
 
 	rotation.x = FIX16(-4);
 	rotation.y = FIX16(-4);
@@ -329,7 +323,7 @@ void RSE_Logo3DScreen(void)
 	zsort_switch = 0;
 	easing_index = 0;
 
-	while (TRUE)
+	while (logo_state < 12)
 	{
 		// ensure previous flip buffer request has been started
 		BMP_waitWhileFlipRequestPending();
@@ -488,21 +482,32 @@ void RSE_Logo3DScreen(void)
 				drawCache(poly_cache_size[0], poly_cache_pt_r, poly_cache_is_quad_r, poly_cache_col_r);
 				drawCache(poly_cache_size[2], poly_cache_pt_e, poly_cache_is_quad_e, poly_cache_col_e);
 				drawCache(poly_cache_size[1], poly_cache_pt_s, poly_cache_is_quad_s, poly_cache_col_s);
-				// logo_state++;
-				break;								
-
+				logo_state++;
+				break;
 		}
 
 		// transformation.rebuildMat = 1;
 		// updatePointsPos();
 
 		// BMP_drawText("trans z:", 0, 2);
-		intToStr(logo_state, str, 2);
-		BMP_drawText(str, 10, 2);
+		// intToStr(logo_state, str, 2);
+		// BMP_drawText(str, 10, 2);
 		// BMP_drawText("cam dist:", 0, 3);
 		// fix16ToStr(camdist, str, 2);
 		// BMP_drawText(str, 11, 3);
 
 		BMP_flip(1);
-	}	
+	}
+
+	BMP_end();
+	SYS_disableInts();
+	VDP_setScreenWidth320();
+	VDP_setPlanSize(64, 32);
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);	
+	VDP_setPalette(PAL1, logo_rse_3d.palette->data);
+	VDP_drawImageEx(APLAN, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
+	SYS_enableInts();
+
+	while (TRUE);	
 }
