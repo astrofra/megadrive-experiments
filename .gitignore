@@ -75,3 +75,17 @@ spr_custom_engine/src/out/rom_head.bin
 spr_custom_engine/src/res/gfx.h
 
 spr_custom_engine/src/out/profiler.o
+
+plot/src/build_MD_NN.bat
+
+plot/src/out/main.o
+
+plot/src/out/rom_head.bin
+
+plot/src/out/rom_head.o
+
+plot/src/out/rom.bin
+
+plot/src/out/rom.out
+
+plot/src/out/sega.o
