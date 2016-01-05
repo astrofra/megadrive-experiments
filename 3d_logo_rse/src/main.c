@@ -323,7 +323,7 @@ void RSE_Logo3DScreen(void)
 	zsort_switch = 0;
 	easing_index = 0;
 
-	while (logo_state < 12)
+	while (logo_state < 14)
 	{
 		// ensure previous flip buffer request has been started
 		BMP_waitWhileFlipRequestPending();
@@ -483,6 +483,18 @@ void RSE_Logo3DScreen(void)
 				drawCache(poly_cache_size[2], poly_cache_pt_e, poly_cache_is_quad_e, poly_cache_col_e);
 				drawCache(poly_cache_size[1], poly_cache_pt_s, poly_cache_is_quad_s, poly_cache_col_s);
 				logo_state++;
+				break;
+
+			case 12:
+				// Start async fade now
+				// VDP_fadePalTo(PAL0, palette_white, 16, 1);
+				logo_state++;
+				break;
+			
+			case 13:
+				// Wait for the async fade to end
+				if (TRUE) // (!VDP_isDoingFade())
+					logo_state++;
 				break;
 		}
 
