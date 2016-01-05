@@ -40,12 +40,18 @@ void RSE_Logo3DScreen(void)
 
 	u16 logo_state;
 
+	/* Full white palette */
 	const u16 palette_white[] = {	0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
 									0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
 									0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
 									0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE	}; 
 
 	/*	2D poly caches */
+	/* 	The result of the 3D transformation
+		and 2D projection will be stored in an array
+		of 2D polygons, along with the color of each
+		polygon. Hence, we can display still letters
+		without harming the framerate that much. */
 	u16 poly_cache_size[3];
 
 	Vect2D_s16 poly_cache_pt_r[logo_r_FACE_COUNT << 2];
@@ -60,8 +66,10 @@ void RSE_Logo3DScreen(void)
 	u16 poly_cache_is_quad_e[logo_e_FACE_COUNT];
 	u16 poly_cache_col_e[logo_e_FACE_COUNT];
 
+	/* Rotation easing */
 	u16 easing_index;
 
+	/* Polygon zsort array */
 	struct  QSORT_ENTRY poly_zsort[RSE_LOGO_3D_MAX_POINTS];
 
     Rotation3D rotation;
@@ -75,6 +83,7 @@ void RSE_Logo3DScreen(void)
 	Vect3D_f16 pts_3D[RSE_LOGO_3D_MAX_POINTS];
 	Vect2D_s16 pts_2D[RSE_LOGO_3D_MAX_POINTS];
 
+	/* 3D Transformation */
 	void inline updatePointsPos()
 	{
 		// transform 3D point
@@ -83,6 +92,7 @@ void RSE_Logo3DScreen(void)
 		M3D_project_s16(pts_3D, pts_2D, vtx_count);
 	}
 
+	/* Polygon sort, 3D->2D projection, polygon drawing */
 	void inline drawPoints(u8 col)
 	{
 		Vect2D_s16 v[4];
@@ -175,6 +185,8 @@ void RSE_Logo3DScreen(void)
 		}
 	}
 
+	/*	Polygon sort, 3D->2D projection, storing the 2D polygon in a cache.
+		This is basically a copy-paste of drawPoints(), withou the drawing part. */
 	u16 cachePoints(u8 col, Vect2D_s16 *poly_cache_pt, u16 *poly_cache_vtx_count, u16 *poly_cache_col)
 	{
 		Vect2D_s16 v[4];
@@ -234,7 +246,8 @@ void RSE_Logo3DScreen(void)
 						fix16Mul(transformation.lightInv.z, norm->z);
 
 					if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
-					// BMP_drawPolygon(v, 4, col | (col << 4));
+
+					/* Store each vertex of the quad, and its color */
 					RSE_COPY_VECTOR2D(poly_cache_pt[j << 2], v[0]);
 					RSE_COPY_VECTOR2D(poly_cache_pt[(j << 2) + 1], v[1]);
 					RSE_COPY_VECTOR2D(poly_cache_pt[(j << 2) + 2], v[2]);
@@ -260,7 +273,7 @@ void RSE_Logo3DScreen(void)
 						fix16Mul(transformation.lightInv.z, norm->z);
 
 					if (dp > 0) col += (dp >> (FIX16_FRAC_BITS - 2));
-					// BMP_drawPolygon(v, 3, col | (col << 4));
+					/* Store each vertex of the triangle, and its color */
 					RSE_COPY_VECTOR2D(poly_cache_pt[j << 2], v[0]);
 					RSE_COPY_VECTOR2D(poly_cache_pt[(j << 2) + 1], v[1]);
 					RSE_COPY_VECTOR2D(poly_cache_pt[(j << 2) + 2], v[2]);
@@ -274,6 +287,7 @@ void RSE_Logo3DScreen(void)
 		return j;
 	}
 
+	/* Draws the 2D polygon cache */
 	void inline drawCache(u16 cache_size, Vect2D_s16 *poly_cache_pt, u16 *poly_cache_vtx_count, u16 *poly_cache_col)
 	{
 		u16 i;
@@ -281,6 +295,7 @@ void RSE_Logo3DScreen(void)
 			BMP_drawPolygon(&poly_cache_pt[i << 2], poly_cache_vtx_count[i], poly_cache_col[i]);
 	}
 
+	/* 3D render misc inits */
 	camdist = FIX16(11);
 
 	M3D_reset();
@@ -321,7 +336,7 @@ void RSE_Logo3DScreen(void)
 	rotation.x = FIX16(-4);
 	rotation.y = FIX16(-4);
 
-	// set the current mesh
+	/* set the current mesh for Letter R */
 	RSE_LOGO_3D_LOAD_MESH(logo_r);
 
 	logo_state = 0;
@@ -342,6 +357,8 @@ void RSE_Logo3DScreen(void)
 
 			/* R */
 			case 0:	
+				/* We draw 3 still letters and prepare the data for the rotation of the letter R */
+				/* /!\ 'S' is drawn last because it's nearest to the camera */
 				drawCache(poly_cache_size[0], poly_cache_pt_r, poly_cache_is_quad_r, poly_cache_col_r);
 				drawCache(poly_cache_size[2], poly_cache_pt_e, poly_cache_is_quad_e, poly_cache_col_e);
 				drawCache(poly_cache_size[1], poly_cache_pt_s, poly_cache_is_quad_s, poly_cache_col_s);
@@ -354,6 +371,7 @@ void RSE_Logo3DScreen(void)
 				break;
 
 			case 1:
+				/* Rotation of the letter R on the  y axis, using an easing table to have a smooth start & stop */
 				if (easing_index < EASING_TABLE_LEN)
 					rotation.y = fix16Mul(FIX16(-4.0), easing_fix16[EASING_TABLE_LEN - easing_index - 1]) >> 4; /* Shift by >> 4 : rotation by 90°, >> 3 : 180°, >> 2 : 360° */
 				else
@@ -364,7 +382,7 @@ void RSE_Logo3DScreen(void)
 
 				drawPoints(0xFF);
 				drawCache(poly_cache_size[2], poly_cache_pt_e, poly_cache_is_quad_e, poly_cache_col_e);
-				drawCache(poly_cache_size[1], poly_cache_pt_s, poly_cache_is_quad_s, poly_cache_col_s);				
+				drawCache(poly_cache_size[1], poly_cache_pt_s, poly_cache_is_quad_s, poly_cache_col_s);
 
 				easing_index += 8;
 				break;
@@ -378,6 +396,7 @@ void RSE_Logo3DScreen(void)
 				drawCache(poly_cache_size[2], poly_cache_pt_e, poly_cache_is_quad_e, poly_cache_col_e);
 				drawCache(poly_cache_size[1], poly_cache_pt_s, poly_cache_is_quad_s, poly_cache_col_s);
 
+				/* Prepare the cache for the new position of letter R */
 				poly_cache_size[0] = cachePoints(0xFF, poly_cache_pt_r, poly_cache_is_quad_r, poly_cache_col_r);
 				logo_state++;
 				break;
@@ -404,6 +423,7 @@ void RSE_Logo3DScreen(void)
 				break;
 
 			case 5:
+				/* Rotation of the letter S on the  y axis, using an easing table to have a smooth start & stop */
 				if (easing_index < EASING_TABLE_LEN)
 					rotation.y = fix16Mul(FIX16(-4.0), easing_fix16[EASING_TABLE_LEN - easing_index - 1]) >> 4; /* Shift by >> 4 : rotation by 90°, >> 3 : 180°, >> 2 : 360° */
 				else
@@ -455,6 +475,7 @@ void RSE_Logo3DScreen(void)
 				break;
 
 			case 9:
+				/* Rotation of the letter E on the  y axis, using an easing table to have a smooth start & stop */
 				if (easing_index < EASING_TABLE_LEN)
 					rotation.y = fix16Mul(FIX16(-4.0), easing_fix16[EASING_TABLE_LEN - easing_index - 1]) >> 4; /* Shift by >> 4 : rotation by 90°, >> 3 : 180°, >> 2 : 360° */
 				else
@@ -492,21 +513,17 @@ void RSE_Logo3DScreen(void)
 				break;
 
 			case 12:
-				// Start async fade now		
-				// VDP_fadePalTo(PAL0, palette_white, 32, TRUE);
-				// VDP_fadePalTo(PAL1, palette_white, 32, TRUE);
+				/* Start async fade to a completely white palette
+				aka 'white flash' */		
 				VDP_fadeTo(0, 63, palette_white, 32, TRUE);
 				logo_state++;
 				break;
 			
 			case 13:
-				// Wait for the async fade to end
+				/* Wait for the async fade to end */
 				VDP_waitVSync();
 				if (!VDP_isDoingFade())
-				{
-					// VDP_setPaletteColors()
 					logo_state++;
-				}
 				break;
 		}
 
@@ -514,6 +531,7 @@ void RSE_Logo3DScreen(void)
 			BMP_flip(1);
 	}
 
+	/* Reset the whole screen and draw the pixel logo */
 	BMP_end();
 	SYS_disableInts();
 	VDP_setScreenWidth320();
@@ -523,8 +541,10 @@ void RSE_Logo3DScreen(void)
 	VDP_drawImageEx(APLAN, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
 	SYS_enableInts();
 
+	/* Fade to the logo's palette */
 	VDP_fadePalTo(PAL1, logo_rse_3d.palette->data, 32, TRUE);
 
+	/* Complimentary fade for the #0 color */
 	{
 		u16 i,j;
 		for(i = 0; i < 15; i++)
