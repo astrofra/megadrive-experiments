@@ -40,7 +40,10 @@ void RSE_Logo3DScreen(void)
 
 	u16 logo_state;
 
-	const u16 palette_white[] = {0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE}; 
+	const u16 palette_white[] = {	0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
+									0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
+									0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
+									0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE	}; 
 
 	/*	2D poly caches */
 	u16 poly_cache_size[3];
@@ -490,7 +493,9 @@ void RSE_Logo3DScreen(void)
 
 			case 12:
 				// Start async fade now		
-				VDP_fadePalTo(PAL0, palette_white, 32, TRUE);
+				// VDP_fadePalTo(PAL0, palette_white, 32, TRUE);
+				// VDP_fadePalTo(PAL1, palette_white, 32, TRUE);
+				VDP_fadeTo(0, 63, palette_white, 32, TRUE);
 				logo_state++;
 				break;
 			
@@ -498,19 +503,12 @@ void RSE_Logo3DScreen(void)
 				// Wait for the async fade to end
 				VDP_waitVSync();
 				if (!VDP_isDoingFade())
+				{
+					// VDP_setPaletteColors()
 					logo_state++;
+				}
 				break;
 		}
-
-		// transformation.rebuildMat = 1;
-		// updatePointsPos();
-
-		// BMP_drawText("trans z:", 0, 2);
-		// intToStr(logo_state, str, 2);
-		// BMP_drawText(str, 10, 2);
-		// BMP_drawText("cam dist:", 0, 3);
-		// fix16ToStr(camdist, str, 2);
-		// BMP_drawText(str, 11, 3);
 
 		if (logo_state < 12)
 			BMP_flip(1);
@@ -522,11 +520,20 @@ void RSE_Logo3DScreen(void)
 	VDP_setPlanSize(64, 32);
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);	
-	// VDP_setPalette(PAL1, logo_rse_3d.palette->data);
 	VDP_drawImageEx(APLAN, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
 	SYS_enableInts();
 
 	VDP_fadePalTo(PAL1, logo_rse_3d.palette->data, 32, TRUE);
+
+	{
+		u16 i,j;
+		for(i = 0; i < 15; i++)
+		{
+			VDP_waitVSync();
+			j = 15 - i;
+			VDP_setPaletteColor(0, j | (j << 4) | (j << 8));
+		}
+	}
 
 	while (TRUE)
 		VDP_waitVSync();	
