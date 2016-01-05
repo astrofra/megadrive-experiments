@@ -1,48 +1,50 @@
 #include <genesis.h>
-void sinPlot();
-void testPlot();
+void testLine();
 
 int main(){
-	sinPlot();
-	//testPlot();
+	testLine();
 	return 0;
 }
-void testPlot(){
+void testLine(){
 	VDP_setScreenWidth256();
+	VDP_setPalette(0, palette_green);
 	BMP_init(TRUE, 0, FALSE);
-	fix16 x = 0;
-	fix16 y = 0;
 	u16 vblCount = 0;
-	while (1){
-		VDP_waitVSync();
-		vblCount++;
-		BMP_waitWhileFlipRequestPending();
-		x = cosFix16(vblCount << 2);
-		y = sinFix16(vblCount << 2);
-		x += 1;
-		BMP_setPixel(x, y, 0xFF);
-		BMP_flip(1);
-		BMP_waitWhileFlipRequestPending();
-		BMP_setPixel(x, y, 0xFF);
-		BMP_flip(1);
+	u16 i = 0;
+	fix16 x = 100;
+	fix16 y;
+	void draw(){
+		for (i = 0; i < 10; i++){
+			y = sinFix16( (vblCount + i) << 5);
+			fix16 yNext = sinFix16((vblCount + i + 1) << 6);
+
+			//line
+			Line l;
+			Vect2D_s16 start, end;
+			start.x = x + i;
+			start.y = y + 100;
+			end.x = x + 100;
+			end.y = yNext;
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = 0xFF;
+			BMP_drawLine(&l);
+		}
+
 	}
-}
-void sinPlot(){
-	VDP_setScreenWidth256();
-	BMP_init(TRUE, 0, FALSE);
-	fix16 x = 0;
-	fix16 y = 0;
-	u16 vblCount = 0;
 	while (1){
 		VDP_waitVSync();
 		vblCount++;
-		BMP_waitWhileFlipRequestPending();
-		y = cosFix16(vblCount << 5);
-		x += 1;
-		BMP_setPixel(x, (y + 100), 0xFF);
+		BMP_clear();
+		BMP_showFPS(1);
+		draw();
 		BMP_flip(1);
-		BMP_waitWhileFlipRequestPending();
-		BMP_setPixel(x, (y + 100), 0xFF);
+		BMP_waitFlipComplete();
+		BMP_clear();
+		vblCount++;
+		BMP_showFPS(1);
+		draw();
 		BMP_flip(1);
+		BMP_waitFlipComplete();
 	}
 }
