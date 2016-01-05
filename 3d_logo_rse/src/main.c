@@ -40,6 +40,8 @@ void RSE_Logo3DScreen(void)
 
 	u16 logo_state;
 
+	const u16 palette_white[] = {0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF,0xFFF}; 
+
 	/*	2D poly caches */
 	u16 poly_cache_size[3];
 
@@ -329,7 +331,8 @@ void RSE_Logo3DScreen(void)
 		BMP_waitWhileFlipRequestPending();
 		BMP_showFPS(1);
 
-		BMP_clear();
+		if (logo_state < 12)
+			BMP_clear();
 
 		switch(logo_state)
 		{
@@ -486,15 +489,21 @@ void RSE_Logo3DScreen(void)
 				break;
 
 			case 12:
-				// Start async fade now
-				// VDP_fadePalTo(PAL0, palette_white, 16, 1);
+				// Start async fade now		
+				VDP_fadePalTo(PAL0, palette_white, 32, TRUE);
 				logo_state++;
 				break;
 			
 			case 13:
 				// Wait for the async fade to end
-				if (TRUE) // (!VDP_isDoingFade())
+				VDP_waitVSync();
+				if (!VDP_isDoingFade())
+				{
+					u16 i;
+					for(i = 0; i < 32; i++)
+						VDP_setPaletteColor(i, 0xFFF);
 					logo_state++;
+				}
 				break;
 		}
 
@@ -508,7 +517,8 @@ void RSE_Logo3DScreen(void)
 		// fix16ToStr(camdist, str, 2);
 		// BMP_drawText(str, 11, 3);
 
-		BMP_flip(1);
+		if (logo_state < 12)
+			BMP_flip(1);
 	}
 
 	BMP_end();
@@ -517,9 +527,12 @@ void RSE_Logo3DScreen(void)
 	VDP_setPlanSize(64, 32);
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);	
-	VDP_setPalette(PAL1, logo_rse_3d.palette->data);
+	// VDP_setPalette(PAL1, logo_rse_3d.palette->data);
 	VDP_drawImageEx(APLAN, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
 	SYS_enableInts();
 
-	while (TRUE);	
+	VDP_fadePalTo(PAL1, logo_rse_3d.palette->data, 32, TRUE);
+
+	while (TRUE)
+		VDP_waitVSync();	
 }
