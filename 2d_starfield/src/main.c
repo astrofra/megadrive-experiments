@@ -1,14 +1,13 @@
 #include "genesis.h"
 
 
-#define MAX_STAR  999
-#define TAIL_LEN    2
-
+#define MAX_STAR  256
 
 typedef struct
 {
     Vect2D_u16 pos;
     Vect2D_u16 mov;
+    u16 col;
 } _star;
 
 _star stars[MAX_STAR];
@@ -38,7 +37,7 @@ int main()
     baseposx = BMP_WIDTH >> 1;
     baseposy = BMP_HEIGHT >> 1;
 
-    initStar(100);
+    initStar(MAX_STAR);
 
     while(TRUE)
     {
@@ -78,6 +77,7 @@ static void initStar(s16 num)
         p->pos.y = random() & 0xFF;
         p->mov.x = (random() & 0x3) + 1;
         p->mov.y = 0;
+        p->col = p->mov.x << 1;
         p++;
     }
 }
@@ -115,12 +115,14 @@ static void drawStar(_star *part, s16 num, u8 col)
     pos = part_pos;
     while(i--)
     {
-        pos->x = p->pos.x;
-        pos->y = p->pos.y;
+        // pos->x = p->pos.x;
+        // pos->y = p->pos.y;
+
+        BMP_setPixel(p->pos.x, p->pos.y, p->col);
 
         p++;
         pos++;
     }
 
-    BMP_setPixels_V2D(part_pos, col, num);
+    // BMP_setPixels_V2D(part_pos, col, num);
 }
