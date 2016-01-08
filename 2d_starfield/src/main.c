@@ -2,6 +2,11 @@
 
 
 #define MAX_STAR  256
+#define BMP_CELLWIDTH_SFT           5
+#define BMP_PITCH_SFT               (BMP_CELLWIDTH_SFT + 2)
+#define BMP_PITCH                   (1 << BMP_PITCH_SFT)
+
+#define STD_SETPIXEL
 
 typedef struct
 {
@@ -74,7 +79,11 @@ static void initStar(s16 num)
     while(i--)
     {
         p->pos.x = random() % 320;
+#ifdef STD_SETPIXEL
         p->pos.y = random() & 0xFF;
+#else        
+        p->pos.y = (random() & 0xFF) * BMP_PITCH;
+#endif
         p->mov.x = (random() & 0x3) + 1;
         p->mov.y = 0;
         p->col = p->mov.x << 1;
@@ -108,17 +117,26 @@ static void drawStar(_star *part, s16 num, u8 col)
     _star *p;
     Vect2D_u16 *pos;
     s16 i, maxy;
+    u16 off;
+    u8 *bmp_buffer_write;
 
     i = num;
     maxy = BMP_HEIGHT;
     p = part;
     pos = part_pos;
+    bmp_buffer_write = BMP_getWritePointer(0,0);
+
     while(i--)
     {
         // pos->x = p->pos.x;
         // pos->y = p->pos.y;
 
+#ifdef STD_SETPIXEL
         BMP_setPixel(p->pos.x, p->pos.y, p->col);
+#else
+        off = p->pos.y + (p->pos.x >> 1);
+        bmp_buffer_write[off] = p->col;
+#endif
 
         p++;
         pos++;
