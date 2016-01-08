@@ -1,7 +1,7 @@
 #include "genesis.h"
 
 
-#define MAX_STAR  256
+#define MAX_STAR  512
 #define BMP_CELLWIDTH_SFT           5
 #define BMP_PITCH_SFT               (BMP_CELLWIDTH_SFT + 2)
 #define BMP_PITCH                   (1 << BMP_PITCH_SFT)
@@ -33,6 +33,10 @@ void RSE_Starfield_2D(void)
 
 	fix16 baseposx;
 	fix16 baseposy;
+
+	u8 *bmp_buffer_write = NULL;
+
+	u8 buffer_flipped = FALSE;
 
 	/*	Initialize the list of stars */
 	static void initStar(s16 num)
@@ -71,7 +75,6 @@ void RSE_Starfield_2D(void)
 	    {
 
 	        p->pos.x += p->mov.x;
-	        p->pos.y += p->mov.y;
 
 	        if (p->pos.x >= BMP_WIDTH)
 	            p->pos.x -= BMP_WIDTH;
@@ -88,13 +91,11 @@ void RSE_Starfield_2D(void)
 	    Vect2D_u16 *pos;
 	    s16 i, maxy;
 	    u16 off;
-	    u8 *bmp_buffer_write;
 
 	    i = num;
 	    maxy = BMP_HEIGHT;
 	    p = part;
 	    pos = part_pos;
-	    bmp_buffer_write = BMP_getWritePointer(0,0);
 
 	    while(i--)
 	    {
@@ -124,11 +125,10 @@ void RSE_Starfield_2D(void)
     /* Main loop */
     while(TRUE)
     {
+		bmp_buffer_write = BMP_getWritePointer(0,0);
+
         // calculates stars position
         updateStar(stars, numstars);
-
-        // ensure previous flip buffer request has been started
-        BMP_waitWhileFlipRequestPending();
 
         // can now draw text
         BMP_showFPS(0);
@@ -136,10 +136,14 @@ void RSE_Starfield_2D(void)
         // clear bitmap
         BMP_clear();
 
+        // ensure previous flip buffer request has been started
+        BMP_waitWhileFlipRequestPending();
+
         // draw stars
-        drawStar(stars, numstars);
+		drawStar(stars, numstars);
 
         // swap buffer
         BMP_flip(1);
+        // buffer_flipped != buffer_flipped;
     }
 }
