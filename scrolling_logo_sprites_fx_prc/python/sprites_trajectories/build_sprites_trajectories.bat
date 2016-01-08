@@ -1,2 +1,0 @@
-build_sprites_trajectories.py
-pause

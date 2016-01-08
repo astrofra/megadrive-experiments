@@ -1,1 +1,0 @@
-#define RSE_VERSION_NUMBER "2015.24.12d"
