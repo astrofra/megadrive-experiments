@@ -67,7 +67,7 @@ static void rogMainScreen(){
 		VDP_setVerticalScroll(PLAN_B, y + 16);
 
 		// VDP_drawImageEx(APLAN, &fish, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (scroll_phase & 0x20) << 1, 20, FALSE, FALSE);
-		VDP_setTileMapXY(VDP_PLAN_A, 16 + (scroll_phase & 0x1), scroll_phase, 2); // (scroll_phase & 0x20) << 1, 2);
+		// VDP_setTileMapXY(VDP_PLAN_A, 16 + (scroll_phase & 0x1), scroll_phase, 2); // (scroll_phase & 0x20) << 1, 2);
 		// SPR_setPosition(&sprites[0], ((VDP_getScreenWidth() - 128) >> 1)						/* Horiz. center */
 		// 							+ (tcos[(vblCount << 2) & (COSINE_TABLE_LEN - 1)] >> 5), 	/* plus horiz. sine motion */
 		// 							(VDP_getScreenHeight() - 128) >> 1);						/* Vert. center */		

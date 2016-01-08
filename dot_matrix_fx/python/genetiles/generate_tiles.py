@@ -24,15 +24,15 @@ def main():
 			new_tile_pic.SetPenMode(gs.Picture.PenNone)
 			new_tile_pic.SetFillMode(gs.Picture.BrushSolid)
 
+			luma = float(i) / float(tile_steps)
+
 			x = float(w) / 2.0
 			y = (i * w) + (float(w) / 2.0)
-			luma = float(i) / float(tile_steps)
 			radius = (w / 2.0) * math.pow(luma, 0.5)
-			print("x = " + str(x) + ", y = " + str(y))
-			print("luma = " + str(luma) + ", radius = " + str(radius))
 
 			new_tile_pic.SetFillColorRGBA(luma, luma, luma, 1.0)
 			new_tile_pic.AddCircle(x, y, radius)
+			# print("luma = " + str(luma) + ", radius = " + str(radius))
 
 		new_tile_pic.DrawPath()
 

@@ -4,8 +4,8 @@
 #include "quicksort.h"
 
 #define	MAX_VECTOR_BALL 256
-#define BALL_COUNT grid_cube_small_VTX_COUNT
-#define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
+#define BALL_COUNT geosphere_VTX_COUNT
+#define VECTOR_BALL_ARRAY vb_geosphere_vertex_pos
 
 static void vectorBallFX();
 
@@ -33,7 +33,9 @@ static void vectorBallFX(){
 
 		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
+		x_screen += 0x80;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
+		y_screen += 0x80;
 
 		xc = cosFix32(rx << 4) >> 2;
 		yc = sinFix32(rx << 3) >> 2;
@@ -102,7 +104,9 @@ static void vectorBallFX(){
 			if (z > 7)
 				z = 7;
 
-			SPR_setPosition(&sprites[loop], x_screen + x, y_screen + y);
+	        sprites[loop].x = x_screen + x;
+	        sprites[loop].y = y_screen + y;
+			// SPR_setPosition(&sprites[loop], x_screen + x, y_screen + y);
 			SPR_setFrame(&sprites[loop], z);
 		}
 

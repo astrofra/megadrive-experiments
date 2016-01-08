@@ -36,12 +36,12 @@ static void axelayFX(){
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL0, clouds.palette->data);
-	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-	vramIndex += clouds.tileset->numTile;	
+	VDP_drawImageEx(APLAN, &clouds, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += clouds.tileset->numTile;
 
 	/* Draw the background */
 	VDP_setPalette(PAL1, sea.palette->data);
-	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	VDP_drawImageEx(BPLAN, &sea, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += sea.tileset->numTile;
 
 	SYS_enableInts();

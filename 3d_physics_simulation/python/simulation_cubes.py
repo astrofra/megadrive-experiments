@@ -31,13 +31,18 @@ node_list = []
 stream_list = []
 
 def make_solid_pos(x,y):
-	return gs.Vector3(x * 1.15, y + height * 0.5, cos(x * y + x) * 0.25)
+	return gs.Vector3(x * 1.15, y + height * 0.5, cos(x * y + x) * 0.15)
+
+cube_masks = [	[0,0,1,0],
+				[0,1,1,0],
+				[1,1,1,1]]
 
 for y in range(3):
 	for x in range(-2, 2):
-		world = gs.Matrix4.TransformationMatrix(make_solid_pos(x,y), gs.Vector3(0, pi * 0.25 * cos(x * y + x + y + 0.1) * 0.25, 0))
-		new_cube = scene.add_physic_cube(scn, world, width, height, length, 2)
-		node_list.append(new_cube[0])
+		if cube_masks[y][x + 2] == 1:
+			world = gs.Matrix4.TransformationMatrix(make_solid_pos(x,y), gs.Vector3(0, pi * 0.25 * cos(x * y + x + y + 0.1) * 0.25, 0))
+			new_cube = scene.add_physic_cube(scn, world, width, height, length, 2)
+			node_list.append(new_cube[0])
 
 # fps = camera.fps_controller(0, 3.5, -12.5)
 

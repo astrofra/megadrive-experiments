@@ -4,7 +4,7 @@
 
 #define	TABLE_LEN 160
 #define PERSPECTIVE_STEP 6
-#define BALL_COUNT 32
+#define BALL_COUNT 58
 
 static void beastScrollingFX();
 
@@ -55,7 +55,11 @@ static void beastScrollingFX(){
 		VDP_setHorizontalScroll(PLAN_A, sinFix16(vblCount << 2));
 
 		for(i = 0; i < BALL_COUNT; i++)
-			SPR_setPosition(&sprites[i], 160 + sinFix16((vblCount << 2) + (i << 5)), 100 + cosFix16((vblCount << 3) + (i << 3)));
+		{
+			// SPR_setPosition(&sprites[i], 160 + sinFix16((vblCount << 2) + (i << 5)), 100 + cosFix16((vblCount << 3) + (i << 3)));
+			sprites[i].x = (160 + 0x80) + sinFix16((vblCount << 2) + (i << 5));
+			sprites[i].y = (100 + 0x80) + cosFix16((vblCount << 3) + (i << 3));
+		}
 
 		SPR_update(sprites, BALL_COUNT);
 		vblCount += 1;
