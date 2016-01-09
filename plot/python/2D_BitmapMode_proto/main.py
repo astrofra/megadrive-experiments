@@ -3,7 +3,6 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
 
-
 class Vec2:
     def __init__(self, x, y):
         self.x = x
@@ -28,7 +27,7 @@ class VMD:
         self.mainc.write("#include <genesis.h>\n")
 
     def c(self, code):
-        self.mainc.write(code)
+        self.mainc.write(code + "\n")
 
     def reset_pixels(self):
         self.pixels = [Vec2(0, 0)]
@@ -104,16 +103,36 @@ def render():
 # -------------------------------------- SGDK ABSTRACT
 
 def VDP_setScreenWidth256():
-    VMD.c('   VDP_setScreenWidth256();\n')
+    VMD.c('   VDP_setScreenWidth256();')
 
 
 def VDP_setPalette(num, pal):
-    VMD.c('   VDP_setPalette(' + str(num) + ', ' + pal + ');\n')
+    VMD.c('   VDP_setPalette(' + str(num) + ', ' + pal + ');')
 
 
 def BMP_setPixel(x, y, col):
-    VMD.c('    BMP_setPixel(' + str(x) + ',' + str(y) + ',' + str(col) + ');\n')
+    VMD.c('    BMP_setPixel(' + str(x) + ',' + str(y) + ',' + str(col) + ');')
     VMD.add_pixel(x, y)
+
+class Line():
+    def __init__(self, x, y, w, z):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.z = z
+
+    def BMP_drawLine(self):
+        VMD.c('     Line l;')
+        VMD.c('     Vect2D_s16 start, end;')
+        VMD.c('     start.x = ' + str(self.x) + ';')
+        VMD.c('     start.y = ' + str(self.y) + ';')
+        VMD.c('     end.x = ' + str(self.w) + ';')
+        VMD.c('     end.y = ' + str(self.z) + ';')
+        VMD.c('     l.pt1 = start;')
+        VMD.c('     l.pt2 = end;')
+        VMD.c('     l.col = 0xFF;')
+        VMD.c('     BMP_drawLine(&l);')
+        VMD.add_line(self.x, self.y, self.w, self.z)
 
 
 # ------------------------------------------- MAIN
@@ -121,15 +140,23 @@ def BMP_setPixel(x, y, col):
 def main():
     palette_green = "palette_green"
 
-    VMD.c("int main(){\n")
+    VMD.c("int main(){")
     VDP_setScreenWidth256()
     VDP_setPalette(0, palette_green)
+    VMD.c("	BMP_init(TRUE, 0, FALSE);")
 
+
+    VMD.c("     while(1){")
     BMP_setPixel(10, 10, 0xFF)
     BMP_setPixel(20, 10, 0xFF)
     BMP_setPixel(30, 10, 0xFF)
 
-    VMD.add_line(50, 50, 100, 100)
+    l = Line(50, 50, 100, 100)
+    l.BMP_drawLine()
+    VMD.c("     		BMP_flip(1);")
+    VMD.c("             BMP_waitFlipComplete();")
+    VMD.c("         }")
+    VMD.c("     }")
     render()
 
 # ---------------------------ENTRY
