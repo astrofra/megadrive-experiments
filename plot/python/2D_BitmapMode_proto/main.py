@@ -47,6 +47,7 @@ class VMD:
     def get_yres():
         return 224
 
+# ---------------------------------GL
 
 def reshape(width, height):
     glViewport(0, 0, width, height)
@@ -116,6 +117,7 @@ def BMP_setPixel(x, y, col):
 
 
 # ------------------------------------------- MAIN
+
 def main():
     palette_green = "palette_green"
 
@@ -130,7 +132,7 @@ def main():
     VMD.add_line(50, 50, 100, 100)
     render()
 
+# ---------------------------ENTRY
 
-# task = DrawTask()
 VMD = VMD()
 main()
