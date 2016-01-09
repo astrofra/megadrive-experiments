@@ -9,6 +9,7 @@ class Vec2:
         self.x = x
         self.y = y
 
+
 class Vec4:
     def __init__(self, x, y, w, z):
         self.x = x
@@ -16,20 +17,18 @@ class Vec4:
         self.w = w
         self.z = z
 
+
+# ---------------------------------MEGADRIVE ABSTRACT
+
 class VMD:
-    @staticmethod
-    def get_xres():
-        return 320
-
-    @staticmethod
-    def get_yres():
-        return 224
-
-
-class DrawTask:
     def __init__(self):
         self.pixels = [Vec2(0, 0)]
         self.lines = [Vec4(0, 0, 0, 0)]
+        self.mainc = codecs.open("main.c", "w")
+        self.mainc.write("#include <genesis.h>\n")
+
+    def c(self, code):
+        self.mainc.write(code)
 
     def reset_pixels(self):
         self.pixels = [Vec2(0, 0)]
@@ -39,6 +38,14 @@ class DrawTask:
 
     def add_line(self, x, y, w, z):
         self.lines.append(Vec4(x, y, w, z))
+
+    @staticmethod
+    def get_xres():
+        return 320
+
+    @staticmethod
+    def get_yres():
+        return 224
 
 
 def reshape(width, height):
@@ -59,11 +66,11 @@ def draw():
     glLoadIdentity()
 
     # draw pixels
-    for pixel in task.pixels:
+    for pixel in VMD.pixels:
         draw_pixel(pixel.x, pixel.y)
 
     # draw lines
-    for line in task.lines:
+    for line in VMD.lines:
         draw_line(line.x, line.y, line.w, line.z)
 
     glutSwapBuffers()
@@ -82,6 +89,7 @@ def draw_line(x, y, w, z):
     glVertex2i(w, z)
     glEnd()
 
+
 def render():
     glutInit()
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
@@ -93,29 +101,25 @@ def render():
 
 
 # -------------------------------------- SGDK ABSTRACT
+
 def VDP_setScreenWidth256():
-    mainc = codecs.open('main.c', 'a')
-    mainc.write('   VDP_setScreenWidth256();\n')
-    mainc.close()
+    VMD.c('   VDP_setScreenWidth256();\n')
 
 
 def VDP_setPalette(num, pal):
-    mainc = codecs.open('main.c', 'a')
-    mainc.write('   VDP_setPalette(' + str(num) + ', ' + pal + ');\n')
-    mainc.close()
+    VMD.c('   VDP_setPalette(' + str(num) + ', ' + pal + ');\n')
 
 
 def BMP_setPixel(x, y, col):
-    task.add_pixel(x, y)
+    VMD.c('    BMP_setPixel(' + str(x) + ',' + str(y) + ',' + str(col) + ');\n')
+    VMD.add_pixel(x, y)
+
 
 # ------------------------------------------- MAIN
 def main():
     palette_green = "palette_green"
 
-    mainc = codecs.open("main.c", "w")
-    mainc.write("#include <genesis.h>\n")
-    mainc.write("int main(){\n\n")
-
+    VMD.c("int main(){\n")
     VDP_setScreenWidth256()
     VDP_setPalette(0, palette_green)
 
@@ -123,10 +127,10 @@ def main():
     BMP_setPixel(20, 10, 0xFF)
     BMP_setPixel(30, 10, 0xFF)
 
-    task.add_line(50, 50, 100, 100)
+    VMD.add_line(50, 50, 100, 100)
     render()
 
-task = DrawTask()
+
+# task = DrawTask()
+VMD = VMD()
 main()
-
-
