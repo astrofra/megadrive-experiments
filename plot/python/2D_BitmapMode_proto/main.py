@@ -23,11 +23,6 @@ class VMD:
     def __init__(self):
         self.pixels = [Vec2(0, 0)]
         self.lines = [Vec4(0, 0, 0, 0)]
-        self.mainc = codecs.open("main.c", "w")
-        self.mainc.write("#include <genesis.h>\n")
-
-    def c(self, code):
-        self.mainc.write(code + "\n")
 
     def reset_pixels(self):
         self.pixels = [Vec2(0, 0)]
@@ -102,64 +97,84 @@ def render():
 
 # -------------------------------------- SGDK ABSTRACT
 
-def VDP_setScreenWidth256():
-    VMD.c('   VDP_setScreenWidth256();')
+class SGDK():
+    def __init__(self):
+        self.mainc = codecs.open("main.c", "w")
+        self.mainc.write("#include <genesis.h>\n")
+        self.TRUE = 'TRUE'
+        self.FALSE = 'FALSE'
+
+    def c(self, code):
+        self.mainc.write(code + "\n")
+
+    def VDP_setScreenWidth256(self):
+        SGDK.c('VDP_setScreenWidth256();')
 
 
-def VDP_setPalette(num, pal):
-    VMD.c('   VDP_setPalette(' + str(num) + ', ' + pal + ');')
+    def VDP_setPalette(self, num, pal):
+        SGDK.c('VDP_setPalette(' + str(num) + ', ' + pal + ');')
 
 
-def BMP_setPixel(x, y, col):
-    VMD.c('    BMP_setPixel(' + str(x) + ',' + str(y) + ',' + str(col) + ');')
-    VMD.add_pixel(x, y)
+    def BMP_setPixel(self, x, y, col):
+        SGDK.c('BMP_setPixel(' + str(x) + ',' + str(y) + ',' + str(col) + ');')
+        VMD.add_pixel(x, y)
 
-class Line():
-    def __init__(self, x, y, w, z):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.z = z
+    def BMP_drawLine(self, line):
+        SGDK.c('Line l;')
+        SGDK.c('Vect2D_s16 start, end;')
+        SGDK.c('start.x = ' + str(line.x) + ';')
+        SGDK.c('start.y = ' + str(line.y) + ';')
+        SGDK.c('end.x = ' + str(line.w) + ';')
+        SGDK.c('end.y = ' + str(line.z) + ';')
+        SGDK.c('l.pt1 = start;')
+        SGDK.c('l.pt2 = end;')
+        SGDK.c('l.col = 0xFF;')
+        SGDK.c('BMP_drawLine(&l);')
+        VMD.add_line(line.x, line.y, line.w, line.z)
 
-    def BMP_drawLine(self):
-        VMD.c('     Line l;')
-        VMD.c('     Vect2D_s16 start, end;')
-        VMD.c('     start.x = ' + str(self.x) + ';')
-        VMD.c('     start.y = ' + str(self.y) + ';')
-        VMD.c('     end.x = ' + str(self.w) + ';')
-        VMD.c('     end.y = ' + str(self.z) + ';')
-        VMD.c('     l.pt1 = start;')
-        VMD.c('     l.pt2 = end;')
-        VMD.c('     l.col = 0xFF;')
-        VMD.c('     BMP_drawLine(&l);')
-        VMD.add_line(self.x, self.y, self.w, self.z)
+    def sinFix16(self, value):
+        SGDK.c('sinFix16(' + str(value) + ')')
+
+    def BMP_clear(self):
+        SGDK.c('BMP_clear();')
+
+    def BMP_init(self, double_buffer, palette, priority):
+        SGDK.c('BMP_init(' + str(double_buffer) + ',' + str(palette) + ',' + str(priority) + ');')
+
+    def BMP_flip(self, async):
+        SGDK.c('BMP_flip(' + str(async) + ');')
+
+    def BMP_waitFlipComplete(self):
+        SGDK.c('BMP_waitFlipComplete();')
 
 
 # ------------------------------------------- MAIN
 
 def main():
-    palette_green = "palette_green"
+    palette_green = 'palette_green'
 
-    VMD.c("int main(){")
-    VDP_setScreenWidth256()
-    VDP_setPalette(0, palette_green)
-    VMD.c("	BMP_init(TRUE, 0, FALSE);")
+    SGDK.c('int main(){')
+    SGDK.BMP_clear()
+    SGDK.VDP_setScreenWidth256()
+    SGDK.VDP_setPalette(0, palette_green)
+    SGDK.BMP_init(TRUE, 0, FALSE)
 
+    SGDK.c('while(1){')
+    SGDK.BMP_setPixel(10, 10, 0xFF)
+    SGDK.BMP_setPixel(20, 10, 0xFF)
+    SGDK.BMP_setPixel(30, 10, 0xFF)
 
-    VMD.c("     while(1){")
-    BMP_setPixel(10, 10, 0xFF)
-    BMP_setPixel(20, 10, 0xFF)
-    BMP_setPixel(30, 10, 0xFF)
-
-    l = Line(50, 50, 100, 100)
-    l.BMP_drawLine()
-    VMD.c("     		BMP_flip(1);")
-    VMD.c("             BMP_waitFlipComplete();")
-    VMD.c("         }")
-    VMD.c("     }")
+    l = Vec4(50, 50, 100, 100)
+    SGDK.BMP_drawLine(l)
+    SGDK.BMP_flip(1);
+    SGDK.BMP_waitFlipComplete()
+    SGDK.c('}')
+    SGDK.c('}')
     render()
-
 # ---------------------------ENTRY
 
 VMD = VMD()
+SGDK = SGDK()
+TRUE = SGDK.TRUE
+FALSE = SGDK.FALSE
 main()
