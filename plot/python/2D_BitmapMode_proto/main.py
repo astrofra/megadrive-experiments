@@ -1,9 +1,44 @@
-import os
 import codecs
-import OpenGL
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
+
+
+class Vec2:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class Vec4:
+    def __init__(self, x, y, w, z):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.z = z
+
+class VMD:
+    @staticmethod
+    def get_xres():
+        return 320
+
+    @staticmethod
+    def get_yres():
+        return 224
+
+
+class DrawTask:
+    def __init__(self):
+        self.pixels = [Vec2(0, 0)]
+        self.lines = [Vec4(0, 0, 0, 0)]
+
+    def reset_pixels(self):
+        self.pixels = [Vec2(0, 0)]
+
+    def add_pixel(self, x, y):
+        self.pixels.append(Vec2(x, y))
+
+    def add_line(self, x, y, w, z):
+        self.lines.append(Vec4(x, y, w, z))
 
 
 def reshape(width, height):
@@ -16,33 +51,53 @@ def reshape(width, height):
 
 def draw():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glViewport(0, 0, VMD.get_xres(), VMD.get_yres())
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluOrtho2D(0.0, VMD.get_xres(), VMD.get_yres(), 0.0)
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 0, -10, 0, 0, 0, 0, 1, 0)
-    glBegin(GL_TRIANGLES)
-    glVertex2i(0, 1)
-    glVertex2i(-1, 0)
-    glVertex2i(1, 0)
 
-    glEnd()
+    # draw pixels
+    for pixel in task.pixels:
+        draw_pixel(pixel.x, pixel.y)
+
+    # draw lines
+    for line in task.lines:
+        draw_line(line.x, line.y, line.w, line.z)
+
     glutSwapBuffers()
     glutPostRedisplay()
 
 
-def main():
+def draw_pixel(x, y):
+    glBegin(GL_POINTS)
+    glVertex2i(x, y)
+    glEnd()
+
+
+def draw_line(x, y, w, z):
+    glBegin(GL_LINES)
+    glVertex2i(x, y)
+    glVertex2i(w, z)
+    glEnd()
+
+def render():
     glutInit()
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-    glutInitWindowSize(640, 480)
-    windowname = glutCreateWindow("HELLO PY-GL")
+    glutInitWindowSize(VMD.get_xres(), VMD.get_yres())
+    windowname = glutCreateWindow("BITMAP MODE")
     glutReshapeFunc(reshape)
     glutDisplayFunc(draw)
     glutMainLoop()
 
-#-------------------------------------- SGDK ABSTRACT
+
+# -------------------------------------- SGDK ABSTRACT
 def VDP_setScreenWidth256():
     mainc = codecs.open('main.c', 'a')
     mainc.write('   VDP_setScreenWidth256();\n')
     mainc.close()
+
 
 def VDP_setPalette(num, pal):
     mainc = codecs.open('main.c', 'a')
@@ -50,17 +105,28 @@ def VDP_setPalette(num, pal):
     mainc.close()
 
 
-#------------------------------------------- MAIN
+def BMP_setPixel(x, y, col):
+    task.add_pixel(x, y)
 
-def write_mainc_file():
+# ------------------------------------------- MAIN
+def main():
     palette_green = "palette_green"
 
-    mainc = codecs.open('main.c','w')
-    mainc.write("#include <genesis.h>\n\n")
-    mainc.write("int main(){\n")
+    mainc = codecs.open("main.c", "w")
+    mainc.write("#include <genesis.h>\n")
+    mainc.write("int main(){\n\n")
 
     VDP_setScreenWidth256()
     VDP_setPalette(0, palette_green)
 
-#main()
-write_mainc_file()
+    BMP_setPixel(10, 10, 0xFF)
+    BMP_setPixel(20, 10, 0xFF)
+    BMP_setPixel(30, 10, 0xFF)
+
+    task.add_line(50, 50, 100, 100)
+    render()
+
+task = DrawTask()
+main()
+
+

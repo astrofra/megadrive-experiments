@@ -1,9 +1,21 @@
 #include <genesis.h>
 void testLine();
-
+void vmd();
 int main(){
-	testLine();
+	//testLine();
+	vmd();
 	return 0;
+}
+
+void vmd(){
+	BMP_init(TRUE, 0, FALSE);
+	
+	while(1){
+		BMP_setPixel(10, 10, 0xFF);
+		BMP_flip(1);
+		BMP_waitFlipComplete();
+	}
+	
 }
 void testLine(){
 	VDP_setScreenWidth256();
