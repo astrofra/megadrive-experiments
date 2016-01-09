@@ -1,10 +1,10 @@
 #include <genesis.h>
 int main(){
-BMP_clear();
 VDP_setScreenWidth256();
 VDP_setPalette(0, palette_green);
 BMP_init(TRUE,0,FALSE);
 while(1){
+BMP_clear();
 BMP_setPixel(10,10,255);
 BMP_setPixel(20,10,255);
 BMP_setPixel(30,10,255);
