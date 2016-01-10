@@ -10,6 +10,7 @@
 #include "quicksort.h"
 #include "RSE_Logo3DScreen.h"
 #include "RSE_easing_table.h"
+#include <music.h>
 
 extern Mat3D_f16 MatInv;
 extern Mat3D_f16 Mat;
@@ -29,6 +30,8 @@ int main()
 
 void RSE_Logo3DScreen(void)
 {
+	SND_startPlay_VGM(logo_boot_music);
+
 	u16 zsort_switch;
 
 	const Vect3D_f16 *mesh_coord;

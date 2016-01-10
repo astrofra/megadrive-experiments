@@ -13,7 +13,6 @@ raster/src/out/rom.out
 
 raster/src/out/sega.o
 
-
 raster/src/out/res/gfx.o
 
 asm/src/build_MD_NN.bat
@@ -117,3 +116,26 @@ plot/python/2D_BitmapMode_proto/out/sega.o
 plot/python/2D_BitmapMode_proto/src/boot/rom_head.c
 
 plot/python/2D_BitmapMode_proto/src/boot/sega.s
+
+3d_logo_rse/src/build_MD_NN.bat
+
+3d_logo_rse/src/out/main.o
+
+3d_logo_rse/src/out/quicksort.o
+
+3d_logo_rse/src/out/res/gfx.o
+
+3d_logo_rse/src/out/res/music.o
+
+3d_logo_rse/src/out/rom_head.bin
+
+3d_logo_rse/src/out/rom_head.o
+
+3d_logo_rse/src/out/rom.out
+
+3d_logo_rse/src/out/RSE_easing_table.o
+
+3d_logo_rse/src/out/RSE_logo_meshs.o
+
+3d_logo_rse/src/out/sega.o
+
