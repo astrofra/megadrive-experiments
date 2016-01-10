@@ -1,0 +1,1 @@
+SPRITE fast_cube_dot "fast_cube_dot.png" 1 1 -1
