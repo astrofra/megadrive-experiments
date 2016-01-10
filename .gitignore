@@ -13,7 +13,6 @@ raster/src/out/rom.out
 
 raster/src/out/sega.o
 
-
 raster/src/out/res/gfx.o
 
 asm/src/build_MD_NN.bat
