@@ -30,8 +30,6 @@ int main()
 
 void RSE_Logo3DScreen(void)
 {
-	SND_startPlay_VGM(logo_boot_music);
-
 	u16 zsort_switch;
 
 	const Vect3D_f16 *mesh_coord;
@@ -345,6 +343,9 @@ void RSE_Logo3DScreen(void)
 	logo_state = 0;
 	zsort_switch = 0;
 	easing_index = 0;
+
+	/* Play the boot screen sfx */
+	SND_startPlay_VGM(logo_boot_music);
 
 	while (logo_state < 14)
 	{
