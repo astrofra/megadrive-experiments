@@ -2,7 +2,7 @@
 #include <gfx.h>
 #include "edges.h"
 
-#define	MAX_VECTOR_BALL 64
+#define	MAX_VECTOR_BALL 80
 #define BALL_COUNT cube_VTX_COUNT
 #define VECTOR_BALL_ARRAY vb_cube_vertex_pos
 
@@ -15,7 +15,7 @@ int main(){
 
 #define DRAW_MIDDLE_SPRITE(idx, x1, y1, x2, y2) \
 {	\
-	u16 x3, y3;	\
+	u16 x3, y3; \
 	x3 = (x1 + x2) >> 1;	\
 	y3 = (y1 + y2) >> 1;	\
 	\
@@ -32,12 +32,53 @@ int main(){
     idx++;	\
 };
 
+#define DRAW_MIDDLE_SPRITE_HD(idx, x1, y1, x2, y2) \
+{	\
+	u16 x3, y3,	\
+		x4, y4,	\
+		x5, y5;	\
+	x3 = (x1 + x2) >> 1;	\
+	y3 = (y1 + y2) >> 1;	\
+	\
+    sprites[idx].x = x3;	\
+    sprites[idx].y = y3;	\
+    idx++;	\
+	\
+	x4 = (x1 + x3) >> 1;	\
+    y4 = (y1 + y3) >> 1;	\
+    sprites[idx].x = x4;	\
+    sprites[idx].y = y4;	\
+    idx++;	\
+	\
+    x5 = (x2 + x3) >> 1;	\
+    y5 = (y2 + y3) >> 1;	\
+    sprites[idx].x = x5;	\
+    sprites[idx].y = y5;	\
+    idx++;	\
+    \
+    sprites[idx].x = (x4 + x3) >> 1;	\
+    sprites[idx].y = (y4 + y3) >> 1;	\
+    idx++;	\    
+    \
+    sprites[idx].x = (x4 + x1) >> 1;	\
+    sprites[idx].y = (y4 + y1) >> 1;	\
+    idx++;	\
+    \
+    sprites[idx].x = (x5 + x3) >> 1;	\
+    sprites[idx].y = (y5 + y3) >> 1;	\
+    idx++;	\    
+    \
+    sprites[idx].x = (x5 + x2) >> 1;	\
+    sprites[idx].y = (y5 + y2) >> 1;	\
+    idx++;	\ 
+};
+
 static void fastCubeFX(){
-	u16 loop, j;
+	u16 loop;
 	Sprite sprites[MAX_VECTOR_BALL];
 	u16 angle = 0;
 
-	static void drawDots(Sprite *sprites, u16 rx, u16 ry)
+	static void inline drawDots(Sprite *sprites, u16 rx, u16 ry)
 	{
 		u16 loop;
 		short x, y, z, xc, yc, zc;
@@ -69,8 +110,6 @@ static void fastCubeFX(){
 		sc = fix32Mul(_sinx, _cosy);
 
 		/* rotate the vector balls */
-		u16 prev_x, prev_y;
-
 		for(loop = 0; loop < BALL_COUNT; loop++)
 		{
 			_vtx = VECTOR_BALL_ARRAY[loop];
@@ -88,12 +127,9 @@ static void fastCubeFX(){
 			//	Classic 3D -> 2D projection
 			t_vtx_2d[loop].x = x_screen + (((x << 10) / (z + distance)) >> 3);
 			t_vtx_2d[loop].y = y_screen + (((y << 10) / (z + distance)) >> 3);
-		}
 
-		for(loop = 0; loop < BALL_COUNT; loop++)
-		{
 	        sprites[loop].x = t_vtx_2d[loop].x;
-	        sprites[loop].y = t_vtx_2d[loop].y;			
+	        sprites[loop].y = t_vtx_2d[loop].y;				
 		}
 
 		/* Face #0 */
