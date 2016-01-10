@@ -132,10 +132,6 @@ plot/python/2D_BitmapMode_proto/src/boot/sega.s
 
 3d_logo_rse/src/out/rom_head.o
 
-3d_logo_rse/src/out/rom.bin
-
-3d_logo_rse/src/out/rom.bin
-
 3d_logo_rse/src/out/rom.out
 
 3d_logo_rse/src/out/RSE_easing_table.o
