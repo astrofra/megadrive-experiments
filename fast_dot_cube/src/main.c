@@ -41,7 +41,7 @@ static void fastCubeFX(){
 	{
 		u16 loop;
 		short x, y, z, xc, yc, zc;
-		Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
+		Vect3D_f16 _vtx;
 		Vect2D_s16 t_vtx_2d[BALL_COUNT];
 		;
 		fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
@@ -76,18 +76,18 @@ static void fastCubeFX(){
 			_vtx = VECTOR_BALL_ARRAY[loop];
 
 			//	2D rotation (on X and Y axis)
-		    t_vtx[loop].x = fix32Add(fix32Mul(_vtx.x, _sinx), fix32Mul(_vtx.y, _cosx));
-		    t_vtx[loop].y = fix32Sub(fix32Mul(_vtx.x, cs), fix32Add(fix32Mul(_vtx.y, ss), fix32Mul(_vtx.z, _cosy)));
-		    t_vtx[loop].z = fix32Sub(fix32Mul(_vtx.x, cc), fix32Mul(_vtx.y, sc) - fix32Mul(_vtx.z, _siny));
+		    x = fix32Add(fix32Mul(_vtx.x, _sinx), fix32Mul(_vtx.y, _cosx));
+		    y = fix32Sub(fix32Mul(_vtx.x, cs), fix32Add(fix32Mul(_vtx.y, ss), fix32Mul(_vtx.z, _cosy)));
+		    z = fix32Sub(fix32Mul(_vtx.x, cc), fix32Mul(_vtx.y, sc) - fix32Mul(_vtx.z, _siny));
 
-		    t_vtx[loop].x += xc;
-		    t_vtx[loop].y += yc;
-		    t_vtx[loop].z += zc;
+		    x += xc;
+		    y += yc;
+		    z += zc;
 
 			/* Display the vector balls using sprites */
 			//	Classic 3D -> 2D projection
-			t_vtx_2d[loop].x = x_screen + (((t_vtx[loop].x << 10) / (t_vtx[loop].z + distance)) >> 3);
-			t_vtx_2d[loop].y = y_screen + (((t_vtx[loop].y << 10) / (t_vtx[loop].z + distance)) >> 3);
+			t_vtx_2d[loop].x = x_screen + (((x << 10) / (z + distance)) >> 3);
+			t_vtx_2d[loop].y = y_screen + (((y << 10) / (z + distance)) >> 3);
 		}
 
 		for(loop = 0; loop < BALL_COUNT; loop++)
@@ -100,13 +100,13 @@ static void fastCubeFX(){
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[0].x, t_vtx_2d[0].y, t_vtx_2d[1].x, t_vtx_2d[1].y);
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[1].x, t_vtx_2d[1].y, t_vtx_2d[2].x, t_vtx_2d[2].y);
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[2].x, t_vtx_2d[2].y, t_vtx_2d[3].x, t_vtx_2d[3].y);
-		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[0].x, t_vtx_2d[0].y, t_vtx_2d[3].x, t_vtx_2d[3].y);
+		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[3].x, t_vtx_2d[3].y, t_vtx_2d[0].x, t_vtx_2d[0].y);
 
 		/* Face #1 */
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[4].x, t_vtx_2d[4].y, t_vtx_2d[5].x, t_vtx_2d[5].y);
-		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[6].x, t_vtx_2d[6].y, t_vtx_2d[5].x, t_vtx_2d[5].y);
+		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[5].x, t_vtx_2d[5].y, t_vtx_2d[6].x, t_vtx_2d[6].y);
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[6].x, t_vtx_2d[6].y, t_vtx_2d[7].x, t_vtx_2d[7].y);
-		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[4].x, t_vtx_2d[4].y, t_vtx_2d[7].x, t_vtx_2d[7].y);
+		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[7].x, t_vtx_2d[7].y, t_vtx_2d[4].x, t_vtx_2d[4].y);
 
 		/* Vertical edges */
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[0].x, t_vtx_2d[0].y, t_vtx_2d[4].x, t_vtx_2d[4].y);
