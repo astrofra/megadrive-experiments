@@ -101,3 +101,19 @@ plot/python/2D_BitmapMode_proto/.idea/misc.xml
 plot/python/2D_BitmapMode_proto/.idea/modules.xml
 
 plot/python/2D_BitmapMode_proto/.idea/workspace.xml
+
+plot/python/2D_BitmapMode_proto/out/main.o
+
+plot/python/2D_BitmapMode_proto/out/rom_head.bin
+
+plot/python/2D_BitmapMode_proto/out/rom_head.o
+
+plot/python/2D_BitmapMode_proto/out/rom.bin
+
+plot/python/2D_BitmapMode_proto/out/rom.out
+
+plot/python/2D_BitmapMode_proto/out/sega.o
+
+plot/python/2D_BitmapMode_proto/src/boot/rom_head.c
+
+plot/python/2D_BitmapMode_proto/src/boot/sega.s
