@@ -76,6 +76,7 @@ int main(){
 static void fastCubeFX(){
 	u16 loop;
 	Sprite sprites[MAX_VECTOR_BALL];
+	u16 vramIndex = TILE_USERINDEX;
 	u16 angle = 0;
 
 	static void inline drawDots(Sprite *sprites, u16 rx, u16 ry)
@@ -168,6 +169,14 @@ static void fastCubeFX(){
 	    SPR_initSprite(&sprites[loop], &fast_cube_dot, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 
     SPR_update(sprites, MAX_VECTOR_BALL);
+
+	VDP_setPalette(PAL0, marble_background.palette->data);
+	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 2, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 2, 128 >> 3, FALSE, FALSE);
 
 	SYS_enableInts();
 
