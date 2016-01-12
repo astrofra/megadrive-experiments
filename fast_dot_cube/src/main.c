@@ -78,6 +78,9 @@ static void fastCubeFX(){
 	Sprite sprites[MAX_VECTOR_BALL];
 	u16 vramIndex = TILE_USERINDEX;
 	u16 angle = 0;
+	Vect2D_s16	prev_pos = {0, 0},
+				cube_vel = {0, 0};
+	char str[16];
 
 	static void inline drawDots(Sprite *sprites, u16 rx, u16 ry)
 	{
@@ -85,7 +88,7 @@ static void fastCubeFX(){
 		short x, y, z, xc, yc, zc;
 		Vect3D_f16 _vtx;
 		Vect2D_s16 t_vtx_2d[BALL_COUNT];
-		;
+
 		fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
 		u16 distance = 1100;
 		short x_screen, y_screen;
@@ -96,9 +99,15 @@ static void fastCubeFX(){
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
 		y_screen += 0x80;
 
+		prev_pos.x = xc;
+		prev_pos.y = yc;
+
 		xc = cosFix32(rx << 4) >> 2;
 		yc = sinFix32(rx << 3) >> 2;
 		zc = sinFix32(rx << 2) >> 2;
+
+		cube_vel.x = (xc - prev_pos.x) >> 6;
+		cube_vel.y = (yc - prev_pos.y) >> 6;
 
 		/* precalculate the rotation */
 		_cosx = cosFix32(rx);
@@ -182,7 +191,13 @@ static void fastCubeFX(){
 
 	while (TRUE){
 		VDP_waitVSync();
-		BMP_showFPS(1);
+		// BMP_showFPS(0);
+
+		// intToStr(cube_vel.x, str, 0);
+		// BMP_drawText(str, 0, 1);
+		// intToStr(cube_vel.y, str, 0);
+		// BMP_drawText(str, 8, 1);
+
 		drawDots(sprites, angle, angle << 2);
 		angle++;
 	}
