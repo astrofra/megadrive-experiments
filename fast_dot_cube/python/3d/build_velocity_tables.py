@@ -7,6 +7,7 @@ from vector3 import Vector3
 
 filename_out			=	"../../src/velocity_table"
 max_ampl = 4
+angle_fuzziness = 15
 # table_size				=	512
 # fixed_point_precision 	=	512
 
@@ -25,20 +26,43 @@ max_ampl = 4
 
 # 	f.write('};' + '\n')
 
+def is_almost_equal(value, target, fuzzy):
+	if value > target - fuzzy and value < target + fuzzy:
+		return True
+	return False
+
 def find_closest_sprite(x,y):
-	# print(x,y)
-	if abs(x) == abs(y) and x < 0 and y < 0:
+	base_vector = Vector3(1,0,0)
+	sprite_vector = Vector3(x,y,0).normalise()
+	angle = (base_vector.dot(sprite_vector))
+	angle = math.acos(angle)
+	angle = angle * 360.0 / (2 * math.pi)
+	angle = int(angle)
+	print(angle)
+
+	if is_almost_equal(angle, 135, angle_fuzziness) or is_almost_equal(angle, 135 + 180, angle_fuzziness):
 		return 0
-	if abs(x) == abs(y) and x > 0 and y > 0:
-		return 0
-	if x == 0 and abs(y) == max_ampl:
+
+	if is_almost_equal(angle, 112, angle_fuzziness) or is_almost_equal(angle, 112 + 180, angle_fuzziness):
+		return 1	
+
+	if is_almost_equal(angle, 90, angle_fuzziness) or is_almost_equal(angle, 270, angle_fuzziness):
 		return 2
-	if abs(x) == abs(y) and x > 0 and y < 0:
+
+	if is_almost_equal(angle, 67, angle_fuzziness) or is_almost_equal(angle, 67 + 180, angle_fuzziness):
+		return 3
+
+	if is_almost_equal(angle, 45, angle_fuzziness) or is_almost_equal(angle, 45 + 180, angle_fuzziness):
 		return 4
-	if abs(x) == abs(y) and x < 0 and y > 0:
-		return 4
-	if abs(x) == max_ampl and y == 0:
+
+	if is_almost_equal(angle, 22, angle_fuzziness) or is_almost_equal(angle, 22 + 180, angle_fuzziness):
+		return 5		
+
+	if is_almost_equal(angle, 0, angle_fuzziness) or is_almost_equal(angle, 180, angle_fuzziness):
 		return 6
+
+	if is_almost_equal(angle, 180 - 22, angle_fuzziness) or is_almost_equal(angle, 360 - 22, angle_fuzziness):
+		return 6		
 
 	return -1
 
