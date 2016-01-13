@@ -1,23 +1,19 @@
 #include <genesis.h>
 int main(){
 VDP_setScreenWidth256();
-VDP_setPalette(0, palette_green);
 BMP_init(TRUE,0,FALSE);
+u16 vblCount = 0;
+fix16 plotX = 0;
+fix16 plotY = 0;
+u16 circleRes = 1;
 while(1){
 BMP_clear();
-BMP_setPixel(10,10,255);
-BMP_setPixel(20,10,255);
-BMP_setPixel(30,10,255);
-Line l;
-Vect2D_s16 start, end;
-start.x = 50;
-start.y = 50;
-end.x = 100;
-end.y = 100;
-l.pt1 = start;
-l.pt2 = end;
-l.col = 0xFF;
-BMP_drawLine(&l);
+u16 i = 0; for (i = 0; i < 1024; i += circleRes){
+BMP_setPixel(100 + sinFix16(i), 100 + cosFix16(i), 0xFF);
+}
+circleRes+=1;
+if (circleRes > 100){ circleRes = 1;}
+vblCount+=1;
 BMP_flip(1);
 BMP_waitFlipComplete();
 }
