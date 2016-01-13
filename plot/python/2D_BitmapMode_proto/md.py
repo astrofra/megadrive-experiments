@@ -73,7 +73,7 @@ class VMD():
         self.pixels = [Vec2(0, 0)]
         self.lines = [Vec4(0, 0, 0, 0)]
         self.timeStart = time.time()
-        self.timeDelta = 0.10 #0.20
+        self.timeDelta = 0.05 #0.20
 
     def clear_pixels(self):
         self.pixels = [Vec2(0, 0)]
