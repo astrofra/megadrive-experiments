@@ -68,21 +68,23 @@ def find_closest_sprite(x,y):
 
 
 def  main():
-	##	Creates the header
-	# f = codecs.open(filename_out + '.h', 'w')
+	#	Creates the header
+	f = codecs.open(filename_out + '.h', 'w')
 
-	# f.write('#define VEL_TABLE_LEN ' + str(table_size) + '\n')
-	# f.write('\n')
+	f.write('#include "genesis.h"\n')	
+	f.write('#define VEL_TABLE_LEN ' + str(max_ampl * 2) + '\n')
+	f.write('\n')
 
-	# f.write('extern const int tcos[COSINE_TABLE_LEN];' + '\n')
-	# f.write('extern const int tsin[COSINE_TABLE_LEN];' + '\n')
+	f.write('extern const s8 vel_table[VEL_TABLE_LEN][VEL_TABLE_LEN];' + '\n')
 
-	# f.close()
+	f.close()
 
 	##	Creates the C file
 	f = codecs.open(filename_out + '.c', 'w')
+	f.write('#include "genesis.h"\n')
+	f.write('#include "' + filename_out + '.h' + '"\n\n')
 
-	out_str = "{"
+	out_str = "const s8 vel_table[VEL_TABLE_LEN][VEL_TABLE_LEN] = {"
 
 	for y in range(-max_ampl,max_ampl):
 

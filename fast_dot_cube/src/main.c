@@ -1,8 +1,9 @@
 #include <genesis.h>
 #include <gfx.h>
 #include "edges.h"
+#include "velocity_table.h"
 
-#define	MAX_VECTOR_BALL 80
+#define	MAX_VECTOR_BALL (8 + (12 * 3))
 #define BALL_COUNT cube_VTX_COUNT
 #define VECTOR_BALL_ARRAY vb_cube_vertex_pos
 
@@ -85,7 +86,7 @@ static void fastCubeFX(){
 	static void inline drawDots(Sprite *sprites, u16 rx, u16 ry)
 	{
 		u16 loop;
-		short x, y, z, xc, yc, zc;
+		short x, y, z, xc = 0, yc = 0, zc, spr_frame;
 		Vect3D_f16 _vtx;
 		Vect2D_s16 t_vtx_2d[BALL_COUNT];
 
@@ -99,15 +100,15 @@ static void fastCubeFX(){
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
 		y_screen += 0x80;
 
-		prev_pos.x = xc;
-		prev_pos.y = yc;
-
 		xc = cosFix32(rx << 4) >> 2;
 		yc = sinFix32(rx << 3) >> 2;
 		zc = sinFix32(rx << 2) >> 2;
 
-		cube_vel.x = (xc - prev_pos.x) >> 6;
-		cube_vel.y = (yc - prev_pos.y) >> 6;
+		cube_vel.x = ((xc - prev_pos.x) >> 6) + 4;
+		cube_vel.y = ((yc - prev_pos.y) >> 6) + 4;
+
+		prev_pos.x = xc;
+		prev_pos.y = yc;
 
 		/* precalculate the rotation */
 		_cosx = cosFix32(rx);
@@ -159,6 +160,11 @@ static void fastCubeFX(){
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[1].x, t_vtx_2d[1].y, t_vtx_2d[5].x, t_vtx_2d[5].y);
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[2].x, t_vtx_2d[2].y, t_vtx_2d[6].x, t_vtx_2d[6].y);
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[3].x, t_vtx_2d[3].y, t_vtx_2d[7].x, t_vtx_2d[7].y);
+
+		spr_frame = vel_table[cube_vel.x][cube_vel.y] + 1;
+
+		for(loop = 0; loop < MAX_VECTOR_BALL; loop++)
+			SPR_setFrame(&sprites[loop], spr_frame);
 
 		/* Update the whole list of sprites */
 		SPR_update(sprites, loop);
