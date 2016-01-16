@@ -167,9 +167,9 @@ static void fastCubeFX(){
 
 		if (spr_sw)
 		{
-		spr_frame = vel_table[cube_vel.x][cube_vel.y];
-		for(loop = 0; loop < MAX_VECTOR_BALL; loop++)
-			SPR_setFrame(&sprites[loop], spr_frame);
+			spr_frame = vel_table[cube_vel.x][cube_vel.y];
+			for(loop = 0; loop < MAX_VECTOR_BALL; loop++)
+				SPR_setFrame(&sprites[loop], spr_frame);
 		}
 		spr_sw = !spr_sw;
 
@@ -192,13 +192,20 @@ static void fastCubeFX(){
 
     SPR_update(sprites, MAX_VECTOR_BALL);
 
-	VDP_setPalette(PAL0, marble_background.palette->data);
-	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 2, 0, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &marble_background, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 2, 128 >> 3, FALSE, FALSE);
+	VDP_setPalette(PAL1, marble_background.palette->data);
+	VDP_drawImageEx(BPLAN, &marble_background, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &marble_background, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &marble_background, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 128 >> 2, 0, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &marble_background, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &marble_background, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &marble_background, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 128 >> 2, 128 >> 3, FALSE, FALSE);
+
+	vramIndex += marble_background.tileset->numTile;
+
+	VDP_setPalette(PAL0, marble_foreground.palette->data);
+	VDP_drawImageEx(APLAN, &marble_foreground, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 7, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &marble_foreground, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 3, 7, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &marble_foreground, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 128 >> 2, 7, FALSE, FALSE);
 
 	SYS_enableInts();
 
@@ -211,6 +218,8 @@ static void fastCubeFX(){
 		// intToStr(cube_vel.y, str, 6);
 		// BMP_drawText(str, 8, 1);
 
+		VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
+		VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);
 		drawDots(sprites, angle, angle << 2);
 		angle++;
 	}
