@@ -1,12 +1,14 @@
 #include "genesis.h"
 
 
-#define MAX_STAR  128
+#define MAX_STAR  80
+#define STARFIELD_SIZE 0xFF
+#define STARFIELD_DIST -256
 
 typedef struct
 {
-    Vect2D_s16 pos;
-    Vect2D_s16 mov;
+    s16 x,y,z;
+    u16 mov;
     u16 col;
 } _star;
 
@@ -45,11 +47,11 @@ void RSE_Starfield_2D(void)
 	    p = stars;
 	    while(i--)
 	    {
-	        p->pos.x = random() % 320;
-	        p->pos.y = random() & 0xFF;
-	        p->mov.x = (p->pos.x - 128) / 20;
-	        p->mov.y = (p->pos.y - 100) / 20;
-	        p->col = 7;
+	        p->x = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2);
+	        p->y = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2);
+	        p->z = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2) + STARFIELD_DIST;
+	        p->mov = random() % 4 + 1;
+	        p->col = (random() % 4 + 1) << 2;
 	        p++;
 	    }
 	};
@@ -64,15 +66,9 @@ void RSE_Starfield_2D(void)
 	    p = part;
 	    while(i--)
 	    {
-
-	        p->pos.x += p->mov.x;
-	        p->pos.y += p->mov.y;
-
-	        if (p->pos.x >= BMP_WIDTH || p->pos.x < 0 || p->pos.y >= BMP_HEIGHT || p->pos.y < 0)
-	        {
-	            p->pos.x  = 128 + p->mov.x;
-	            p->pos.y  = 100 + p->mov.y;
-	        }
+	    	p->z += p->mov;
+	    	if (p->z > STARFIELD_SIZE + STARFIELD_DIST)
+	    		p->z -= (STARFIELD_SIZE - STARFIELD_DIST);
 
 	        p++;
 	    }
@@ -81,22 +77,23 @@ void RSE_Starfield_2D(void)
 	/*	Draw the stars */
 	static void inline drawStar(_star *part, s16 num)
 	{
-	    Vect2D_u16 part_pos[num];
 	    _star *p;
-	    Vect2D_u16 *pos;
 	    s16 i, maxy;
-	    u16 off;
+	    u16 off, x, y;
 
 	    i = num;
 	    maxy = BMP_HEIGHT;
 	    p = part;
-	    pos = part_pos;
 
 	    while(i--)
 	    {
-	        BMP_setPixel(p->pos.x, p->pos.y, p->col);
+	    	if (p->z != 0)
+	    	{
+		    	x = ((p->x  << 5) / p->z) + 128;
+		    	y = ((p->y  << 5) / p->z) + 80;
+		        BMP_setPixel(x, y, p->col);
+	        }
 	        p++;
-	        pos++;
 	    }
 	};
 
