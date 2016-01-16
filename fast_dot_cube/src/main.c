@@ -77,16 +77,16 @@ int main(){
 static void fastCubeFX(){
 	u16 loop;
 	Sprite sprites[MAX_VECTOR_BALL];
+	s16 xc = -512, yc = 0, zc = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	u16 angle = 0;
-	Vect2D_s16	prev_pos = {0, 0},
-				cube_vel = {0, 0};
+	Vect2D_s16	cube_vel = {0, 0};
 	char str[16];
 
 	static void inline drawDots(Sprite *sprites, u16 rx, u16 ry)
 	{
 		u16 loop;
-		short x, y, z, xc = 0, yc = 0, zc, spr_frame;
+		short x, y, z, spr_frame;
 		Vect3D_f16 _vtx;
 		Vect2D_s16 t_vtx_2d[BALL_COUNT];
 
@@ -104,11 +104,11 @@ static void fastCubeFX(){
 		yc = sinFix32(rx << 3) >> 2;
 		zc = sinFix32(rx << 2) >> 2;
 
-		cube_vel.x = ((xc - prev_pos.x) >> 6) + 4;
-		cube_vel.y = ((yc - prev_pos.y) >> 6) + 4;
+		// yc = sinFix32(rx << 3) >> 2;
+		// zc = sinFix32(rx << 2) >> 2;		
 
-		prev_pos.x = xc;
-		prev_pos.y = yc;
+		cube_vel.x = (xc >> 6) + 4;
+		cube_vel.y = (yc >> 6) + 4;
 
 		/* precalculate the rotation */
 		_cosx = cosFix32(rx);
@@ -161,7 +161,9 @@ static void fastCubeFX(){
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[2].x, t_vtx_2d[2].y, t_vtx_2d[6].x, t_vtx_2d[6].y);
 		DRAW_MIDDLE_SPRITE(loop, t_vtx_2d[3].x, t_vtx_2d[3].y, t_vtx_2d[7].x, t_vtx_2d[7].y);
 
-		spr_frame = vel_table[cube_vel.x][cube_vel.y] + 1;
+		spr_frame = vel_table[cube_vel.x][cube_vel.y];
+		// intToStr(spr_frame, str, 2);
+
 
 		for(loop = 0; loop < MAX_VECTOR_BALL; loop++)
 			SPR_setFrame(&sprites[loop], spr_frame);
@@ -199,9 +201,9 @@ static void fastCubeFX(){
 		VDP_waitVSync();
 		// BMP_showFPS(0);
 
-		// intToStr(cube_vel.x, str, 0);
+		// intToStr(cube_vel.x, str, 6);
 		// BMP_drawText(str, 0, 1);
-		// intToStr(cube_vel.y, str, 0);
+		// intToStr(cube_vel.y, str, 6);
 		// BMP_drawText(str, 8, 1);
 
 		drawDots(sprites, angle, angle << 2);
