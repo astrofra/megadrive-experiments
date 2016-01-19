@@ -1,0 +1,1 @@
+SPRITE sprite_stars "sprite_stars.png" 1 1 -1
