@@ -2,8 +2,8 @@
 
 
 #define MAX_STAR  80
-#define STARFIELD_SIZE 0xFF
-#define STARFIELD_DIST -256
+#define STARFIELD_SIZE (0xFF >> 1)
+#define STARFIELD_DIST -64
 
 typedef struct
 {
@@ -67,8 +67,8 @@ void RSE_Starfield_2D(void)
 	    while(i--)
 	    {
 	    	p->z += p->mov;
-	    	if (p->z > STARFIELD_SIZE + STARFIELD_DIST)
-	    		p->z -= (STARFIELD_SIZE - STARFIELD_DIST);
+	    	if (p->z > (STARFIELD_SIZE >> 1) + STARFIELD_DIST)
+	    		p->z -= ((STARFIELD_SIZE >> 1) - STARFIELD_DIST);
 
 	        p++;
 	    }
