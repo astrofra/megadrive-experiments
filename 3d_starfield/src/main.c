@@ -15,14 +15,14 @@ typedef struct
 // static void initStar(s16 num);
 // static void updateStar(_star *part_pos, s16 num);
 // static void drawStar(_star *part_pos, s16 num, u8 col);
-void RSE_Starfield_2D(void);
+void RSE_Starfield_3D_Bmp(void);
 
 int main()
 {
-	RSE_Starfield_2D();
+	RSE_Starfield_3D_Bmp();
 }
 
-void RSE_Starfield_2D(void)
+void RSE_Starfield_3D_Bmp(void)
 {
 	_star stars[MAX_STAR];
 
