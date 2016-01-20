@@ -7,9 +7,9 @@
 
 typedef struct
 {
-    s16 x,y,z;
-    u16 mov;
-    u16 col;
+	s16 x,y,z;
+	u16 mov;
+	u16 col;
 } _star;
 
 // static void initStar(s16 num);
@@ -41,57 +41,59 @@ void RSE_Starfield_3D_Spr(void)
 	/*	Initialize the list of stars */
 	static void initStar(s16 num)
 	{
-	    _star *p;
-	    s16 i;
+		_star *p;
+		s16 i;
 
-	    numstars = num;
+		numstars = num;
 
-	    i = num;
-	    p = stars;
-	    while(i--)
-	    {
-	        p->x = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2);
-	        p->y = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2);
-	        p->z = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2) + STARFIELD_DIST;
-	        p->mov = random() % 4 + 1;
-	        p->col = (random() % 4 + 1) << 2;
-	        p++;
-	    }
+		i = num;
+		p = stars;
+		while(i--)
+		{
+			p->x = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2);
+			p->y = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2);
+			p->z = (random() % STARFIELD_SIZE) - (STARFIELD_SIZE / 2) + STARFIELD_DIST;
+			p->mov = random() % 4 + 1;
+			p->col = (random() % 4 + 1) << 2;
+			p++;
+		}
 	};
 
 	/*	Draw the stars */
 	static void inline updateAndDrawStar(_star *part, s16 num)
 	{
-	    _star *p;
-	    s16 i, maxy;
-	    u16 off, x, y;
+		_star *p;
+		s16 i, maxy;
+		u16 off, x, y;
 
-	    i = num;
-	    maxy = BMP_HEIGHT;
-	    p = part;
+		i = num;
+		maxy = BMP_HEIGHT;
+		p = part;
 
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
 		x_screen += 0x80;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
-		y_screen += 0x80;	    
+		y_screen += 0x80;		
 
-	    while(i--)
-	    {
-	    	p->z += p->mov;
-	    	if (p->z > (STARFIELD_SIZE >> 1) + STARFIELD_DIST)
-	    		p->z -= ((STARFIELD_SIZE >> 1) - STARFIELD_DIST);
+		while(i--)
+		{
+			p->z += p->mov;
+			if (p->z > (STARFIELD_SIZE >> 1) + STARFIELD_DIST)
+				p->z -= ((STARFIELD_SIZE >> 1) - STARFIELD_DIST);
 
-	    	if (p->z != 0)
-	    	{
-		    	x = ((p->x << 5) / p->z);
-		    	y = ((p->y << 5) / p->z);
-		        sprites[i].x = x_screen + x;
-		        sprites[i].y = y_screen + y;
-	        }
-	        p++;
-	    }
+			if (p->z != 0)
+			{
 
-	    SPR_update(sprites, MAX_STAR);
+				x = (p->x << 5) / p->z;
+				y = (p->y << 5) / p->z;
+
+				sprites[i].x = x_screen + x;
+				sprites[i].y = y_screen + y;
+			}
+			p++;
+		}
+
+		SPR_update(sprites, MAX_STAR);
 	};
 
 	SYS_disableInts();
@@ -105,30 +107,30 @@ void RSE_Starfield_3D_Spr(void)
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < MAX_STAR; loop++)
 	{
-	    SPR_initSprite(&sprites[loop], &sprite_stars, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	    SPR_setFrame(&sprites[loop], loop % 3);
+		SPR_initSprite(&sprites[loop], &sprite_stars, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+		SPR_setFrame(&sprites[loop], loop % 3);
 	}
 
-    SPR_update(sprites, MAX_STAR);
+	SPR_update(sprites, MAX_STAR);
 
 	SYS_enableInts();	
 
-    /* Initialise stars */
-    baseposx = BMP_WIDTH >> 1;
-    baseposy = BMP_HEIGHT >> 1;
+	/* Initialise stars */
+	baseposx = BMP_WIDTH >> 1;
+	baseposy = BMP_HEIGHT >> 1;
 
-    initStar(MAX_STAR);
+	initStar(MAX_STAR);
 
-    /* Main loop */
-    while(TRUE)
-    {
+	/* Main loop */
+	while(TRUE)
+	{
 		VDP_waitVSync();
 
-        // can now draw text
-        BMP_showFPS(0);
+		// can now draw text
+		BMP_showFPS(0);
 
-        // calculates stars position
-        // draw stars
+		// calculates stars position
+		// draw stars
 		updateAndDrawStar(stars, numstars);
-    }
+	}
 }
