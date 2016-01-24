@@ -2,7 +2,7 @@
 #include <gfx.h>
 
 #define	TABLE_LEN 220
-#define PERSPECTIVE_STEP 32
+#define PERSPECTIVE_STEP 64
 
 static void beastScrollingFX();
 
@@ -37,15 +37,15 @@ static void beastScrollingFX(){
 	for(j = 0; j < PERSPECTIVE_STEP; j++)
 		for(i = 0; i < TABLE_LEN; i++)
 		{
-			k = ((j - (PERSPECTIVE_STEP >> 1)) * i) >> 5;
+			k = ((j - (PERSPECTIVE_STEP >> 1)) * i) >> 6;
 			scroll_PLAN_B[j][i] = k;
 		}
 
-	hscrollInc = 1;
+	hscrollInc = -1;
 	while (1){
 		VDP_waitVSync();
-		VDP_setHorizontalScrollLine(PLAN_B, 2, scroll_PLAN_B[vblCount], TABLE_LEN, TRUE);
 		vblCount += hscrollInc;
+
 		if (vblCount >= PERSPECTIVE_STEP)
 		{
 			vblCount = PERSPECTIVE_STEP - 1;
@@ -57,5 +57,6 @@ static void beastScrollingFX(){
 			vblCount = 0;
 			hscrollInc = 1;
 		}
+		VDP_setHorizontalScrollLine(PLAN_B, 2, scroll_PLAN_B[vblCount], TABLE_LEN, TRUE);
 	}
 }
