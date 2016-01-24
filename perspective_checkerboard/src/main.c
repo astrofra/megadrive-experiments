@@ -23,7 +23,7 @@ static void beastScrollingFX(){
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
 	/* Set a larger tileplan to be able to scroll */
-	VDP_setPlanSize(64, 32);
+	VDP_setPlanSize(128, 32);
 
 	/* Draw the foreground */
 	VDP_setPalette(PAL1, checkboard.palette->data);
@@ -38,7 +38,7 @@ static void beastScrollingFX(){
 		for(i = 0; i < TABLE_LEN; i++)
 		{
 			k = ((j - (PERSPECTIVE_STEP >> 1)) * i) >> 6;
-			scroll_PLAN_B[j][i] = k;
+			scroll_PLAN_B[j][i] = k - (640 >> 2);
 		}
 
 	hscrollInc = -1;
