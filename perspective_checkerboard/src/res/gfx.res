@@ -1,0 +1,1 @@
+IMAGE checkboard "checkboard.png" 0
