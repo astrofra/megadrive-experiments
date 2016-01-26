@@ -57,7 +57,7 @@ def draw_line(x, y, w, z):
 
 
 def render():
-    from circles import draw
+    from circles3 import draw
     glutInit()
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowSize(VMD.get_xres(), VMD.get_yres())
