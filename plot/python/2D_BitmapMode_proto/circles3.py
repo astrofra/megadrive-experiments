@@ -1,4 +1,5 @@
 from md import *
+from numpy import *
 
 # ---------------------------------------------------------------------------------------
 #                                        OPENGL DRAW
@@ -24,17 +25,46 @@ class circle():
     size = 0
 
 def circleDraw(circle, res):
-    for i in range(0, 1024, res):
+    for i in range(1, 1024, res):
         SGDK.BMP_setPixel(circle.x + (SGDK.sinFix32(i) / circle.size), (circle.y + SGDK.cosFix32(i) / circle.size), 0xFF)
-        print(str(SGDK.sinFix32(i)) + "/" + str(circle.size))
 
-def circleDrawPreca():
-    print("Preca")
+def circlePrecaMake(idCircle, size, res):
+    circPlotIndex = 0
+    for i in range(1, 1024, res):
+        x = SGDK.sinFix32(i) / size
+        y = SGDK.cosFix32(i) / size
+        circleTab_x[idCircle][circPlotIndex] = x
+        circleTab_y[idCircle][circPlotIndex] = y
+        circPlotIndex += 1
 
-def circleMakePreca(circle, res, circleTab_x, circleTab_y):
-    for i in range(0, 1024, res):
-        circleTab_x.append(circle.x + (SGDK.sinFix32(i) / circle.size))
-        circleTab_y.append(circle.y + (SGDK.cosFix32(i) / circle.size))
+def circlesPrecaMake(res):
+    for i in range(2, 81, 1):
+        circlePrecaMake(i - 2, i, res)
+
+    SGDK.writing = 1
+    SGDK.c("const s16 circleTab_x[79][21] = { ")
+    for j in range(2, 81, 1):
+        for i in range(0, 21, 1):
+            if j == 80 and i == 20:
+                SGDK.c(str(circleTab_x[j - 2][i]) + "};")
+            else:
+                SGDK.c(str(circleTab_x[j - 2][i]) + ",")
+
+    SGDK.c("const s16 circleTab_y[79][21] = { ")
+    for j in range(2, 81, 1):
+        for i in range(0, 21, 1):
+            if j == 80 and i == 20:
+                SGDK.c(str(circleTab_y[j - 2][i]) + "};")
+            else:
+                SGDK.c(str(circleTab_y[j - 2][i]) + ",")
+    SGDK.writing = 0
+
+def circlesPrecaDraw(circle):
+    for j in range(2, 81, 1):
+        for i in range(0, 20, 1):
+            x = circleTab_x[j - 2][i]
+            y = circleTab_y[j - 2][i]
+            SGDK.BMP_setPixel(circle.x + x, circle.y + y, 0xFF)
 
 
 def circleXoffsetAdd():
@@ -93,6 +123,7 @@ def circlesSizeSub():
     circle08.size -= 1
 
 def circlesDraw():
+    """
     circleDraw(circle00, 50)
     circleDraw(circle01, 50)
     circleDraw(circle02, 50)
@@ -102,6 +133,7 @@ def circlesDraw():
     circleDraw(circle06, 50)
     circleDraw(circle07, 50)
     circleDraw(circle08, 50)
+    """
 
 def loop():
     global circle00
@@ -116,15 +148,14 @@ def loop():
     global vblCount
     global seq
 
-    global circleTab_x
-    global circleTab_y
 
     SGDK.BMP_clear()
 
-    circlesDraw()
-    circlesSizeSub()
-    #circleMakePreca(circle00, 50, circleTab_x, circleTab_y)
+    #circlesDraw()
+    circlesPrecaDraw(circle00)
 
+    #circlesSizeSub()
+    """
     if circle00.size == 0:
         circle00.size = 100
         circle00.xOffset = 20
@@ -169,7 +200,7 @@ def loop():
         circle08.size = 100
         circle08.xOffset = 20
         circle08.yOffset = 20
-
+    """
     SGDK.BMP_flip(1)
     SGDK.BMP_waitFlipComplete()
 
@@ -204,9 +235,11 @@ circle06.size = 21
 circle07.size = 11
 circle08.size = 1
 
-circleTab_x = [0, 0]
-circleTab_y = [0, 0]
 
+circleTab_x = zeros( (79, 21), dtype = int )
+circleTab_y = zeros( (79, 21), dtype = int )
+#circlePrecaMake(21, 50)
+circlesPrecaMake(50)
 
 vblCount = 0
 seq = 0
