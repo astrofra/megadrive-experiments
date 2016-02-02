@@ -8,22 +8,31 @@ int main(){
 	return 0;
 }
 
+typedef struct
+{
+	u16 x,y,c;
+} rse_vertex;
+
+u16 v_cache_index = 0;
+rse_vertex v_cache[1024];
+
+#define RSE_recordPixel(A,B,C) v_cache[v_cache_index].x = A; v_cache[v_cache_index].y = B; v_cache[v_cache_index].c = C; v_cache_index++;
+
 //	-------------------------------------------------------------------
 //			TUNNEL A
 // --------------------------------------------------------------------
 #define CIRCLE_RES	55 //50
 
-#define CIRCLES_SETPIX 		BMP_setPixel(circle00.x + circle00.xOffset + (sinFix32(i) / circle00.size), (circle00.y + circle00.yOffset + cosFix32(i) / circle00.size), circle00.color); \
-							BMP_setPixel(circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size), (circle01.y + circle01.yOffset + cosFix32(i) / circle01.size), circle01.color); \
-							BMP_setPixel(circle02.x + circle02.xOffset + (sinFix32(i) / circle02.size), (circle02.y + circle02.yOffset + cosFix32(i) / circle02.size), circle02.color); \
-							BMP_setPixel(circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size), (circle03.y + circle03.yOffset + cosFix32(i) / circle03.size), circle03.color); \
-							BMP_setPixel(circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size), (circle04.y + circle04.yOffset + cosFix32(i) / circle04.size), circle04.color); \
-							BMP_setPixel(circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size), (circle05.y + circle05.yOffset + cosFix32(i) / circle05.size), circle05.color); \
-							BMP_setPixel(circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size), (circle06.y + circle06.yOffset + cosFix32(i) / circle06.size), circle06.color); \
-							BMP_setPixel(circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size), (circle07.y + circle07.yOffset + cosFix32(i) / circle07.size), circle07.color); \
-							BMP_setPixel(circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size), (circle08.y + circle08.yOffset + cosFix32(i) / circle08.size), circle08.color); \
-							BMP_setPixel(circle09.x + circle09.xOffset + (sinFix32(i) / circle09.size), (circle09.y + circle09.yOffset + cosFix32(i) / circle09.size), circle09.color); \
-
+#define CIRCLES_SETPIX 		RSE_recordPixel(circle00.x + circle00.xOffset + (sinFix32(i) / circle00.size), (circle00.y + circle00.yOffset + cosFix32(i) / circle00.size), circle00.color); \
+							RSE_recordPixel(circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size), (circle01.y + circle01.yOffset + cosFix32(i) / circle01.size), circle01.color); \
+							RSE_recordPixel(circle02.x + circle02.xOffset + (sinFix32(i) / circle02.size), (circle02.y + circle02.yOffset + cosFix32(i) / circle02.size), circle02.color); \
+							RSE_recordPixel(circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size), (circle03.y + circle03.yOffset + cosFix32(i) / circle03.size), circle03.color); \
+							RSE_recordPixel(circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size), (circle04.y + circle04.yOffset + cosFix32(i) / circle04.size), circle04.color); \
+							RSE_recordPixel(circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size), (circle05.y + circle05.yOffset + cosFix32(i) / circle05.size), circle05.color); \
+							RSE_recordPixel(circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size), (circle06.y + circle06.yOffset + cosFix32(i) / circle06.size), circle06.color); \
+							RSE_recordPixel(circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size), (circle07.y + circle07.yOffset + cosFix32(i) / circle07.size), circle07.color); \
+							RSE_recordPixel(circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size), (circle08.y + circle08.yOffset + cosFix32(i) / circle08.size), circle08.color); \
+							RSE_recordPixel(circle09.x + circle09.xOffset + (sinFix32(i) / circle09.size), (circle09.y + circle09.yOffset + cosFix32(i) / circle09.size), circle09.color);
 
 void tunnelA(){
 	typedef struct circle circle;
@@ -35,95 +44,6 @@ void tunnelA(){
 		u16 size;
 		u16 color;
 	};
-
-	static inline void LINES_SET(circle circle00, circle circle01, circle circle02, circle circle03, circle circle04, circle circle05, circle circle06, circle circle07, circle circle08, circle circle09){
-		u16 i = 0;
-		for (i = 1; i < 1024; i += CIRCLE_RES){
-			Line l;
-			Vect2D_s16 start, end;
-			start.x = circle00.x + circle00.xOffset + (sinFix32(i) / circle00.size);
-			start.y = circle00.y + circle00.yOffset + (cosFix32(i) / circle00.size);
-			end.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size);
-			end.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle00.color;
-			BMP_drawLine(&l);
-
-			start.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size);
-			start.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size);
-			end.x = circle02.x + circle01.xOffset + (sinFix32(i) / circle02.size);
-			end.y = circle02.y + circle01.yOffset + (cosFix32(i) / circle02.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle01.color;
-			BMP_drawLine(&l);
-
-			start.x = circle02.x + circle02.xOffset + (sinFix32(i) / circle02.size);
-			start.y = circle02.y + circle02.yOffset + (cosFix32(i) / circle02.size);
-			end.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size);
-			end.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle02.color;
-			BMP_drawLine(&l);
-
-			start.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size);
-			start.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size);
-			end.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size);
-			end.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle03.color;
-			BMP_drawLine(&l);
-
-			start.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size);
-			start.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size);
-			end.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size);
-			end.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle04.color;
-			BMP_drawLine(&l);
-
-			start.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size);
-			start.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size);
-			end.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size);
-			end.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle05.color;
-			BMP_drawLine(&l);
-
-			start.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size);
-			start.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size);
-			end.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size);
-			end.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle06.color;
-			BMP_drawLine(&l);
-
-			start.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size);
-			start.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size);
-			end.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size);
-			end.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle07.color;
-			BMP_drawLine(&l);
-
-			start.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size);
-			start.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size);
-			end.x = circle09.x + circle09.xOffset + (sinFix32(i) / circle09.size);
-			end.y = circle09.y + circle09.yOffset + (cosFix32(i) / circle09.size);
-			l.pt1 = start;
-			l.pt2 = end;
-			l.col = circle08.color;
-			BMP_drawLine(&l);
-
-		}
-	}
 
 
 	// make circles structures
@@ -149,10 +69,35 @@ void tunnelA(){
 	VDP_setScreenWidth256();
 	BMP_init(TRUE, 0, FALSE);
 
-	#define circlesDraw		u16 i = 0; \
-							for (i = 1; i < 1024; i += CIRCLE_RES){ \
-								CIRCLES_SETPIX \
-							} \
+	#define circlesPrecaclc		u16 i = 0; v_cache_index = 0;\
+								for (i = 1; i < 1024; i += CIRCLE_RES){ \
+									CIRCLES_SETPIX \
+								} \
+
+	#define circlesDraw			i = 0; v_cache_index = 0;\
+								for (i = 1; i < 1024; i += CIRCLE_RES)\
+								{\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\
+									BMP_setPixel(v_cache[v_cache_index].x, v_cache[v_cache_index].y, v_cache[v_cache_index].c);\
+									v_cache_index++;\								
+								}
 
 
 	#define circlesXoffsetAdd	circle00.xOffset++;circle01.xOffset++;circle02.xOffset++;circle03.xOffset++;circle04.xOffset++;circle05.xOffset++;circle06.xOffset++;circle07.xOffset++;circle08.xOffset++;circle09.xOffset++;
@@ -164,12 +109,16 @@ void tunnelA(){
 	u16 vblCount = 0;
 	u16 seq = 0;
 
-	while (1){		
+	while (1){	
+		circlesPrecaclc
+		BMP_waitFlipComplete();
+
 		BMP_clear();
 		BMP_showFPS(1);
 
-		circlesDraw
+		circlesDraw	
 
+		BMP_flip(1);
 		//WIREFRAME
 		//LINES_SET(circle00, circle01, circle02, circle03, circle04, circle05, circle06, circle07, circle08, circle09);
 
@@ -288,7 +237,5 @@ void tunnelA(){
 
 		vblCount++;
 		//seq = 0;
-		BMP_flip(1);
-		BMP_waitFlipComplete();
 	}
 }
