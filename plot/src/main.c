@@ -45,6 +45,95 @@ void tunnelA(){
 		u16 color;
 	};
 
+	static inline void LINES_SET(circle circle00, circle circle01, circle circle02, circle circle03, circle circle04, circle circle05, circle circle06, circle circle07, circle circle08, circle circle09){
+		u16 i = 0;
+		for (i = 1; i < 1024; i += CIRCLE_RES){
+			Line l;
+			Vect2D_s16 start, end;
+			start.x = circle00.x + circle00.xOffset + (sinFix32(i) / circle00.size);
+			start.y = circle00.y + circle00.yOffset + (cosFix32(i) / circle00.size);
+			end.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size);
+			end.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle00.color;
+			BMP_drawLine(&l);
+
+			start.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size);
+			start.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size);
+			end.x = circle02.x + circle01.xOffset + (sinFix32(i) / circle02.size);
+			end.y = circle02.y + circle01.yOffset + (cosFix32(i) / circle02.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle01.color;
+			BMP_drawLine(&l);
+
+			start.x = circle02.x + circle02.xOffset + (sinFix32(i) / circle02.size);
+			start.y = circle02.y + circle02.yOffset + (cosFix32(i) / circle02.size);
+			end.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size);
+			end.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle02.color;
+			BMP_drawLine(&l);
+
+			start.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size);
+			start.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size);
+			end.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size);
+			end.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle03.color;
+			BMP_drawLine(&l);
+
+			start.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size);
+			start.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size);
+			end.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size);
+			end.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle04.color;
+			BMP_drawLine(&l);
+
+			start.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size);
+			start.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size);
+			end.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size);
+			end.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle05.color;
+			BMP_drawLine(&l);
+
+			start.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size);
+			start.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size);
+			end.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size);
+			end.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle06.color;
+			BMP_drawLine(&l);
+
+			start.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size);
+			start.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size);
+			end.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size);
+			end.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle07.color;
+			BMP_drawLine(&l);
+
+			start.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size);
+			start.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size);
+			end.x = circle09.x + circle09.xOffset + (sinFix32(i) / circle09.size);
+			end.y = circle09.y + circle09.yOffset + (cosFix32(i) / circle09.size);
+			l.pt1 = start;
+			l.pt2 = end;
+			l.col = circle08.color;
+			BMP_drawLine(&l);
+
+		}
+	}	
+
 
 	// make circles structures
 	circle circle00, circle01, circle02, circle03, circle04, circle05, circle06, circle07, circle08, circle09;
