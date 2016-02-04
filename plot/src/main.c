@@ -214,18 +214,24 @@ void tunnelA(){
 
 		circlesSizeSub
 
-		switch (seq)
-		{
+		switch (seq){	
+		case 0:
+			if (vblCount > 20) seq++;
+			break;
+
 		case 1:
+			if (vblCount > 100) seq++;
 			circlesXoffsetSub
 			break;
 
 		case 2:
+			if (vblCount > 200) seq++;
 			circlesXoffsetSub
 			circlesYoffsetSub
 			break;
 
 		case 3:
+			if (vblCount > 220) seq++;
 			circlesXoffsetAdd
 			break;
 
@@ -318,11 +324,6 @@ void tunnelA(){
 		if (circle09.size > 50 && circle09.size < 60) { circle09.color = 3; }
 		if (circle09.size > 40 && circle09.size < 50) { circle09.color = 4; }
 		if (circle09.size > 30 && circle09.size < 40) { circle09.color = 5; }
-
-		if (vblCount > 20 && seq == 0) seq++; 
-		if (vblCount > 100 && seq == 1) seq++;
-		if (vblCount > 200 && seq == 2) seq++;
-		if (vblCount > 220 && seq == 3) seq++;
 
 		vblCount++;
 		//seq = 0;
