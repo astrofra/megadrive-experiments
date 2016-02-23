@@ -191,3 +191,21 @@ tunnel_bitmap/src/out/rom_head.o
 tunnel_bitmap/src/out/rom.out
 
 tunnel_bitmap/src/out/sega.o
+
+tunnel_bitmap/python/tunnel_make_macro/__pycache__/vmd.cpython-34.pyc
+
+tunnel_bitmap/python/tunnel_make_macro/.idea/.name
+
+tunnel_bitmap/python/tunnel_make_macro/.idea/encodings.xml
+
+tunnel_bitmap/python/tunnel_make_macro/.idea/misc.xml
+
+tunnel_bitmap/python/tunnel_make_macro/.idea/modules.xml
+
+tunnel_bitmap/python/tunnel_make_macro/.idea/tunnel_make_macro.iml
+
+tunnel_bitmap/python/tunnel_make_macro/.idea/workspace.xml
+
+tunnel_bitmap/python/tunnel_make_macro/sgdk_trigo.pyc
+
+tunnel_bitmap/src/out/rom.bin

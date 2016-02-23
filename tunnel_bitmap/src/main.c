@@ -1,4 +1,10 @@
 #include <genesis.h>
+
+
+//#define DOT_TUNNEL_ON
+#define WIRE_TUNNEL_ON
+#include "tunnel_macro.h"
+
 static void tunnelA();
 
 int main(){
@@ -6,39 +12,23 @@ int main(){
 	return 0;
 }
 
-//#define DOT_TUNNEL_ON
-#define WIRE_TUNNEL_ON
-
-
 //	-------------------------------------------------------------------
 //			TUNNEL A
 // --------------------------------------------------------------------
 
-#define CIRCLE_RES	55 //50
 
 #ifdef DOT_TUNNEL_ON
-#define RSE_recordPixel(A,B,C) v_cache[v_cache_index].pt.x = A; v_cache[v_cache_index].pt.y = B; v_cache[v_cache_index].col = C; v_cache_index++;
-
-#define CIRCLES_SETPIX		\
-							RSE_recordPixel(circle00.x + circle00.xOffset + (sinFix32(i) / circle00.size), (circle00.y + circle00.yOffset + cosFix32(i) / circle00.size), circle00.color); \
-							RSE_recordPixel(circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size), (circle01.y + circle01.yOffset + cosFix32(i) / circle01.size), circle01.color); \
-							RSE_recordPixel(circle02.x + circle02.xOffset + (sinFix32(i) / circle02.size), (circle02.y + circle02.yOffset + cosFix32(i) / circle02.size), circle02.color); \
-							RSE_recordPixel(circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size), (circle03.y + circle03.yOffset + cosFix32(i) / circle03.size), circle03.color); \
-							RSE_recordPixel(circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size), (circle04.y + circle04.yOffset + cosFix32(i) / circle04.size), circle04.color); \
-							RSE_recordPixel(circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size), (circle05.y + circle05.yOffset + cosFix32(i) / circle05.size), circle05.color); \
-							RSE_recordPixel(circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size), (circle06.y + circle06.yOffset + cosFix32(i) / circle06.size), circle06.color); \
-							RSE_recordPixel(circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size), (circle07.y + circle07.yOffset + cosFix32(i) / circle07.size), circle07.color); \
-							RSE_recordPixel(circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size), (circle08.y + circle08.yOffset + cosFix32(i) / circle08.size), circle08.color); \
-							RSE_recordPixel(circle09.x + circle09.xOffset + (sinFix32(i) / circle09.size), (circle09.y + circle09.yOffset + cosFix32(i) / circle09.size), circle09.color);
+	#define PIXELS_MAX	256 
 #endif
+
 
 void tunnelA(){
 	#ifdef DOT_TUNNEL_ON
 	u16 v_cache_index = 0;
-	Pixel v_cache[1024];
+	Pixel v_cache[PIXELS_MAX];
 	#endif
 	#ifdef WIRE_TUNNEL_ON
-	Line l_cache[9];
+	Line l_cache[LINES_MAX];
 	#endif
 
 	typedef struct circle circle;
@@ -78,12 +68,6 @@ void tunnelA(){
 	VDP_setScreenWidth256();
 	BMP_init(TRUE, 0, FALSE);
 
-	#ifdef DOT_TUNNEL_ON
-	#define circlesPrecalc		u16 i = 0; v_cache_index = 0;\
-								for (i = 0; i < 1024; i += CIRCLE_RES){ \
-									CIRCLES_SETPIX \
-								} 
-	#endif
 	#define circlesXoffsetAdd	circle00.xOffset++;circle01.xOffset++;circle02.xOffset++;circle03.xOffset++;circle04.xOffset++;circle05.xOffset++;circle06.xOffset++;circle07.xOffset++;circle08.xOffset++;circle09.xOffset++;
 	#define circlesXoffsetSub	circle00.xOffset--;circle01.xOffset--;circle02.xOffset--;circle03.xOffset--;circle04.xOffset--;circle05.xOffset--;circle06.xOffset--;circle07.xOffset--;circle08.xOffset--;circle09.xOffset--;
 	#define circlesYoffsetAdd	circle00.yOffset++;circle01.yOffset++;circle02.yOffset++;circle03.yOffset++;circle04.yOffset++;circle05.yOffset++;circle06.yOffset++;circle07.yOffset++;circle08.yOffset++;circle09.yOffset++;
@@ -91,217 +75,43 @@ void tunnelA(){
 	#define circlesSizeSub		circle00.size--;circle01.size--;circle02.size--;circle03.size--;circle04.size--;circle05.size--;circle06.size--;circle07.size--;circle08.size--;circle09.size--;
 	
 	#ifdef WIRE_TUNNEL_ON
-	static inline void lineTest(){
-		Line l;
-		Vect2D_s16 start, end;
+	static inline void linesDrawFunc(){
+		u16 i = 0;
+		for (i = 0; i < LINES_MAX; i++){
+			BMP_drawLine(&l_cache[i]);
+		}
+	}
+
+		#define linesDraw \
+		u16 i = 0; \
+		for (i = 0; i < LINES_MAX; i++){	\
+			BMP_drawLine(&l_cache[i]);		\
+		}
+
+
+	static inline void linePrecalcFunc(){
 		u16 i = 0;
 		u16 j = 0;
+		u16 l_cache_index = 0;
 		for (i = 0; i <= 8; i++){
 			for (j = 0; j < 1024; j += CIRCLE_RES){
-				start.x = circlesSort[i]->x + circlesSort[i]->xOffset + (sinFix32(j) / circlesSort[i]->size);
-				start.y = circlesSort[i]->y + circlesSort[i]->yOffset + (cosFix32(j) / circlesSort[i]->size);
-				end.x = circlesSort[i + 1]->x + circlesSort[i + 1]->xOffset + (sinFix32(j) / circlesSort[i + 1]->size);
-				end.y = circlesSort[i + 1]->y + circlesSort[i + 1]->yOffset + (cosFix32(j) / circlesSort[i + 1]->size);
-				l.pt1 = start;
-				l.pt2 = end;
-				l.col = circlesSort[i]->color;
-				BMP_drawLine(&l);
+				l_cache[l_cache_index].col = 0xFF;
+				l_cache[l_cache_index].pt1.x = l_cache[l_cache_index + 1].pt1.x = circlesSort[i]->x + circlesSort[i]->xOffset + (sinFix32(j) / circlesSort[i]->size);
+				l_cache[l_cache_index].pt1.y = l_cache[l_cache_index + 1].pt1.y = circlesSort[i]->y + circlesSort[i]->yOffset + (cosFix32(j) / circlesSort[i]->size);
+				l_cache[l_cache_index].pt2.x = circlesSort[i + 1]->x + circlesSort[i + 1]->xOffset + (sinFix32(j) / circlesSort[i + 1]->size);
+				l_cache[l_cache_index].pt2.y = circlesSort[i + 1]->y + circlesSort[i + 1]->yOffset + (cosFix32(j) / circlesSort[i + 1]->size);
+				l_cache_index++;
 
-				end.x = circlesSort[i]->x + circlesSort[i]->xOffset + (sinFix32(j + CIRCLE_RES) / circlesSort[i]->size);
-				end.y = circlesSort[i]->y + circlesSort[i]->yOffset + (cosFix32(j + CIRCLE_RES) / circlesSort[i]->size);
-				l.pt2 = end;
-				BMP_drawLine(&l);
+
+				l_cache[l_cache_index].pt2.x = circlesSort[i]->x + circlesSort[i]->xOffset + (sinFix32(j + CIRCLE_RES) / circlesSort[i]->size);
+				l_cache[l_cache_index].pt2.y = circlesSort[i]->y + circlesSort[i]->yOffset + (cosFix32(j + CIRCLE_RES) / circlesSort[i]->size);
+				l_cache[l_cache_index].col = 0xFF;
+				l_cache_index++;
 			}
 		}
 	}
 	#endif
 
-	#ifdef WIRE_TUNNEL_ON
-	static inline void linePrecalcFunc(){
-		u16 i = 0; 
-			u16 l_cache_index = 0; 
-			for (i = 1; i < 1024; i += CIRCLE_RES){				
-					Vect2D_s16 start, end; 
-					start.x = circle00.x + circle00.xOffset + (sinFix32(i) / circle00.size); 
-					start.y = circle00.y + circle00.yOffset + (cosFix32(i) / circle00.size); 
-					end.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size); 
-					end.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle00.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size); 
-					start.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size); 
-					end.x = circle02.x + circle01.xOffset + (sinFix32(i) / circle02.size); 
-					end.y = circle02.y + circle01.yOffset + (cosFix32(i) / circle02.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle01.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle02.x + circle02.xOffset + (sinFix32(i) / circle02.size); 
-					start.y = circle02.y + circle02.yOffset + (cosFix32(i) / circle02.size); 
-					end.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size); 
-					end.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle02.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size); 
-					start.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size); 
-					end.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size); 
-					end.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle03.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size); 
-					start.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size); 
-					end.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size); 
-					end.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle04.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size); 
-					start.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size); 
-					end.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size); 
-					end.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle05.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size); 
-					start.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size); 
-					end.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size); 
-					end.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle06.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size); 
-					start.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size); 
-					end.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size); 
-					end.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle07.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-					l_cache_index++; 
-
-					start.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size); 
-					start.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size); 
-					end.x = circle09.x + circle09.xOffset + (sinFix32(i) / circle09.size); 
-					end.y = circle09.y + circle09.yOffset + (cosFix32(i) / circle09.size); 
-					l_cache[l_cache_index].pt1 = start; 
-					l_cache[l_cache_index].pt2 = end; 
-					l_cache[l_cache_index].col = circle08.color; 
-					BMP_drawLine(&l_cache[l_cache_index]); 
-			}
-	}
-	#endif
-
-	#ifdef WIRE_TUNNEL_ON
-	#define linePrecalc \
-						u16 i = 0;\
-						u16 l_cache_index = 0;\
-						for (i = 1; i < 1024; i += CIRCLE_RES){\
-							Vect2D_s16 start, end;\
-							start.x = circle00.x + circle00.xOffset + (sinFix32(i) / circle00.size);\
-							start.y = circle00.y + circle00.yOffset + (cosFix32(i) / circle00.size);\
-							end.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size);\
-							end.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle00.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle01.x + circle01.xOffset + (sinFix32(i) / circle01.size);\
-							start.y = circle01.y + circle01.yOffset + (cosFix32(i) / circle01.size);\
-							end.x = circle02.x + circle01.xOffset + (sinFix32(i) / circle02.size);\
-							end.y = circle02.y + circle01.yOffset + (cosFix32(i) / circle02.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle01.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle02.x + circle02.xOffset + (sinFix32(i) / circle02.size);\
-							start.y = circle02.y + circle02.yOffset + (cosFix32(i) / circle02.size);\
-							end.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size);\
-							end.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle02.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle03.x + circle03.xOffset + (sinFix32(i) / circle03.size);\
-							start.y = circle03.y + circle03.yOffset + (cosFix32(i) / circle03.size);\
-							end.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size);\
-							end.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle03.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle04.x + circle04.xOffset + (sinFix32(i) / circle04.size);\
-							start.y = circle04.y + circle04.yOffset + (cosFix32(i) / circle04.size);\
-							end.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size);\
-							end.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle04.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle05.x + circle05.xOffset + (sinFix32(i) / circle05.size);\
-							start.y = circle05.y + circle05.yOffset + (cosFix32(i) / circle05.size);\
-							end.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size);\
-							end.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle05.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle06.x + circle06.xOffset + (sinFix32(i) / circle06.size);\
-							start.y = circle06.y + circle06.yOffset + (cosFix32(i) / circle06.size);\
-							end.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size);\
-							end.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle06.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle07.x + circle07.xOffset + (sinFix32(i) / circle07.size);\
-							start.y = circle07.y + circle07.yOffset + (cosFix32(i) / circle07.size);\
-							end.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size);\
-							end.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle07.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-							l_cache_index++;\
-							start.x = circle08.x + circle08.xOffset + (sinFix32(i) / circle08.size);\
-							start.y = circle08.y + circle08.yOffset + (cosFix32(i) / circle08.size);\
-							end.x = circle09.x + circle09.xOffset + (sinFix32(i) / circle09.size);\
-							end.y = circle09.y + circle09.yOffset + (cosFix32(i) / circle09.size);\
-							l_cache[l_cache_index].pt1 = start;\
-							l_cache[l_cache_index].pt2 = end;\
-							l_cache[l_cache_index].col = circle08.color;\
-							BMP_drawLine(&l_cache[l_cache_index]);\
-						}
-	#endif
 	u16 vblCount = 0;
 	u16 seq = 0;
 
@@ -309,24 +119,26 @@ void tunnelA(){
 		#ifdef DOT_TUNNEL_ON
 		circlesPrecalc
 		#endif
-		// ALL PRECA BEFORE WAITFLIPCOMPLETE
 		#ifdef WIRE_TUNNEL_ON
-		//linePrecalc
+		//linePrecalcFunc();
+		linePrecalc
 		#endif
+		// ALL PRECA BEFORE WAITFLIPCOMPLETE
 		BMP_waitFlipComplete();
 		BMP_clear();
 		BMP_showFPS(1);
+		// DRAW
 		#ifdef WIRE_TUNNEL_ON
-		lineTest(); //no coord preca yet
+		linesDraw
+
 		#endif
 		#ifdef DOT_TUNNEL_ON
 		//Draw the pixel buffer
 		BMP_setPixels(v_cache, 256); 
 		#endif
 
+
 		BMP_flip(1);
-		//WIREFRAME
-		//LINES_SET(circle00, circle01, circle02, circle03, circle04, circle05, circle06, circle07, circle08, circle09);
 
 		circlesSizeSub
 
