@@ -1,5 +1,6 @@
 #include <genesis.h>
 #include <gfx.h>
+#include "resources.h"
 
 #define SCR_H ((224 >> 3) << 3)
 #define BOARD_Y (((SCR_H - 120) >> 3) - 1)
@@ -21,6 +22,11 @@ static void beastScrollingFX(){
 	s16 i, j, k, l;
 	s16 scroll_PLAN_B[PERSPECTIVE_STEP][TABLE_LEN];
 
+	void playBoingSFX(void)
+	{
+		SND_startPlay_PCM(boing_impact, sizeof(boing_impact), SOUND_RATE_8000, SOUND_PAN_CENTER, FALSE);
+	}
+
 	SYS_disableInts();
 
 	VDP_clearPlan(APLAN, 0);
@@ -33,7 +39,14 @@ static void beastScrollingFX(){
 	VDP_drawImageEx(BPLAN, &checkboard, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, BOARD_Y, FALSE, FALSE);
 	vramIndex += checkboard.tileset->numTile;
 	for(i = 0; i < 6; i++)
+	{
 		VDP_drawImageEx(BPLAN, &checkback, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, i << 1, FALSE, FALSE);
+		vramIndex += checkback.tileset->numTile;
+	}
+
+	VDP_setPalette(PAL2, boingball.palette->data);
+	VDP_drawImageEx(APLAN, &boingball, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	// vramIndex += boingball.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 
@@ -50,6 +63,8 @@ static void beastScrollingFX(){
 			k = ((j - (PERSPECTIVE_STEP >> 1)) * l) >> 6;
 			scroll_PLAN_B[j][i] = k - (640 >> 2);
 		}
+
+	// playBoingSFX();	
 
 	hscrollInc = -1;
 	while (1){
