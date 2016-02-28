@@ -19,8 +19,10 @@ static void beastScrollingFX(){
 	s16 hscrollInc = 1;
 	s16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
-	s16 i, j, k, l;
+	s16 i, j, k, l, bnc_count;
 	s16 scroll_PLAN_B[PERSPECTIVE_STEP][TABLE_LEN];
+	s16 ball_x, ball_y;
+	u8 boing_sfx_timer;
 
 	void playBoingSFX(void)
 	{
@@ -45,7 +47,7 @@ static void beastScrollingFX(){
 	}
 
 	VDP_setPalette(PAL2, boingball.palette->data);
-	VDP_drawImageEx(APLAN, &boingball, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &boingball, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, vramIndex), 12, 9, FALSE, FALSE);
 	// vramIndex += boingball.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
@@ -67,10 +69,29 @@ static void beastScrollingFX(){
 	// playBoingSFX();	
 
 	hscrollInc = -1;
+	ball_x = 0;
+	ball_y = 0;
+	bnc_count = 0;
+	boing_sfx_timer = 0;
+
 	while (1){
 		VDP_waitVSync();
-		vblCount += hscrollInc;
 
+		/* Boing ball animation */
+		bnc_count++;
+		if (boing_sfx_timer < 128)
+			boing_sfx_timer++;
+		ball_y = abs(sinFix16(bnc_count << 3));
+		VDP_setVerticalScroll(PLAN_A, ball_y);
+
+		if (ball_y == 0 && boing_sfx_timer > 16)
+		{
+			boing_sfx_timer = 0;
+			playBoingSFX();
+		}
+
+		/* Background scrolling */
+		vblCount += hscrollInc;
 		if (vblCount >= PERSPECTIVE_STEP)
 		{
 			vblCount = PERSPECTIVE_STEP - 1;
