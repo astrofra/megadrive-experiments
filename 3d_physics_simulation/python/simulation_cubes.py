@@ -12,12 +12,13 @@ filename_out			=	"../src/simulation"
 scale_factor			=	5.0
 
 gs.plus.create_workers()
+gs.LoadPlugins(gs.get_default_plugins_path())
 
 render.init(1280, 720, "../pkg.core")
 
 scn = scene.new_scene()
 cam = scene.add_camera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 3.5, -12.5)))
-cam.transform.SetRotation(gs.Vector3(pi * 5.0 / 180.0, pi * -5.0 / 180.0,0))
+cam.GetTransform().SetRotation(gs.Vector3(pi * 5.0 / 180.0, pi * -5.0 / 180.0,0))
 
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.65, -0.45, 0)), gs.Light.Model_Linear, 150)
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.55, pi, 0.2)), gs.Light.Model_Linear, diffuse=gs.Color(0.3, 0.3, 0.4))
@@ -96,7 +97,7 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if record_motion:
 		new_frame = []
 		for current_node in node_list:
-			new_motion = {'position': current_node.transform.GetPosition() * scale_factor, 'rotation': current_node.transform.GetRotation()}
+			new_motion = {'position': current_node.GetTransform().GetPosition() * scale_factor, 'rotation': current_node.GetTransform().GetRotation()}
 			new_frame.append(new_motion)
 
 		stream_list.append(new_frame)
