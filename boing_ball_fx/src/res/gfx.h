@@ -3,6 +3,6 @@
 
 extern const Image checkboard;
 extern const Image checkback;
-extern const Image boingball;
+extern const SpriteDefinition boingball_sprite;
 
 #endif // _GFX_H_
