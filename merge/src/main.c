@@ -1,14 +1,14 @@
 #include "genesis.h"
 
-#define NEXTSEQPREPA							\
-				SYS_disableInts();				\
-				VDP_clearPlan(APLAN, 1);		\
-				VDP_clearPlan(BPLAN, 1);		\
-				/*MEM_init();*/						\
-				VDP_init();						\
-				VDP_setHInterrupt(0);			\
-				SYS_enableInts();				\
-												\
+#define NEXTSEQPREPA                            \
+				SYS_disableInts();              \
+				VDP_clearPlan(APLAN, 1);        \
+				VDP_clearPlan(BPLAN, 1);        \
+				/*MEM_init();*/                 \
+				VDP_init();                     \
+				VDP_setHInterrupt(0);           \
+				SYS_enableInts();               \
+                                                \
 
 
 void main_starfield_2d(u16 vbl_to_exit);
