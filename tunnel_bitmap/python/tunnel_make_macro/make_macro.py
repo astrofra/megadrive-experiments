@@ -49,7 +49,7 @@ macro_file.write("#define linePrecalc \\\n")
 i = 0
 j = 0
 l_cache_index = 0
-for i in range(8):
+for i in range(9): #9
     for j in range(0, 1024, circle_res):
         macro_file.write("                  l_cache[" + str(l_cache_index) + "].col = circlesSort[" + str(i) + "]->color;\\\n")
         macro_file.write("                  l_cache[" + str(l_cache_index) + "].pt1.x = l_cache[" + str(l_cache_index + 1) + "].pt1.x = circlesSort[" + str(i) + "]->x + circlesSort[" + str(i) + "]->xOffset + (" + str(sinFix32(j)) + " / circlesSort[" + str(i) + "]->size);\\\n")
@@ -66,8 +66,15 @@ for i in range(8):
 macro_file.write("\n")
 macro_file.write("#endif\n\n")
 
+macro_file.write("#ifdef WIRE_TUNNEL_ON\n")
+macro_file.write("#define linesDraw\\\n")
+for i in range(lines_max):
+    macro_file.write("      BMP_drawLine(&l_cache[" + str(i) + "]);\\\n")
+macro_file.write("                  \\\n")
+macro_file.write("\n")
 macro_file.write("#endif\n")
 
+macro_file.write("#endif\n")
 
 
 

@@ -33,11 +33,11 @@ void tunnelA(){
 
 	typedef struct circle circle;
 	struct circle{
-		u16 x;
-		u16 y;
+		s16 x;
+		s16 y;
 		u16 xOffset;
 		u16 yOffset;
-		u16 size;
+		s16 size;
 		u16 color;
 	};
 
@@ -81,13 +81,6 @@ void tunnelA(){
 			BMP_drawLine(&l_cache[i]);
 		}
 	}
-
-		#define linesDraw \
-		u16 i = 0; \
-		for (i = 0; i < LINES_MAX; i++){	\
-			BMP_drawLine(&l_cache[i]);		\
-		}
-
 
 	static inline void linePrecalcFunc(){
 		u16 i = 0;
@@ -174,16 +167,27 @@ void tunnelA(){
 
 		//seq = 0;
 
-		if (circle00.size == 0) { goto circle00_reset; }
-		else if (circle01.size == 0) { goto circle01_reset; }
-		else if (circle02.size == 0) { goto circle02_reset; }
-		else if (circle03.size == 0) { goto circle03_reset; }
-		else if (circle04.size == 0) { goto circle04_reset; }
-		else if (circle05.size == 0) { goto circle05_reset; }
-		else if (circle06.size == 0) { goto circle06_reset; }
-		else if (circle07.size == 0) { goto circle07_reset; }
-		else if (circle08.size == 0) { goto circle08_reset; }
-		else if (circle09.size == 0) { goto circle09_reset; }
+		if		(circle00.size == 0) { circle00.size = -1; }
+		else if (circle01.size == 0) { circle01.size = -1; }
+		else if (circle02.size == 0) { circle02.size = -1; }
+		else if (circle03.size == 0) { circle03.size = -1; }
+		else if (circle04.size == 0) { circle04.size = -1; }
+		else if (circle05.size == 0) { circle05.size = -1; }
+		else if (circle06.size == 0) { circle06.size = -1; }
+		else if (circle07.size == 0) { circle07.size = -1; }
+		else if (circle08.size == 0) { circle08.size = -1; }
+		else if (circle09.size == 0) { circle09.size = -1; }
+
+		if		(circle00.size == -15) { goto circle00_reset; }
+		else if (circle01.size == -15) { goto circle01_reset; }
+		else if (circle02.size == -15) { goto circle02_reset; }
+		else if (circle03.size == -15) { goto circle03_reset; }
+		else if (circle04.size == -15) { goto circle04_reset; }
+		else if (circle05.size == -15) { goto circle05_reset; }
+		else if (circle06.size == -15) { goto circle06_reset; }
+		else if (circle07.size == -15) { goto circle07_reset; }
+		else if (circle08.size == -15) { goto circle08_reset; }
+		else if (circle09.size == -15) { goto circle09_reset; }
 		goto circle_reset_end;
 
 	circle00_reset:
