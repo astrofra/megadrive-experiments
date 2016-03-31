@@ -1,0 +1,85 @@
+#include <genesis.h>
+#define DOT_TUNNEL_ON
+
+#include "tunnel_macro.h"
+
+static void tunnelA();
+
+int main(){
+	tunnelA();
+	return 0;
+}
+
+static void tunnelA(){
+	u16 vblCount = 0;
+	u16 seq = 0;
+
+	u16 v_cache_index = 0;
+	u16 l_cache_index = 0;
+	Pixel v_cache[PIXELS_MAX];
+	Line l_cache[LINES_MAX];
+	
+	typedef struct circle circle;
+	struct circle{
+		s16 x;
+		s16 y;
+		u16 xOffset;
+		u16 yOffset;
+		s16 size;
+		u16 color;
+	};
+
+
+	circlesMake
+	circle00.size = 40;
+	
+	static inline void RSE_recordLine(s16 A, s16 B, s16 C, s16 D){
+		l_cache[l_cache_index].col = 0xFF;
+		l_cache[l_cache_index].pt1.x = A;
+		l_cache[l_cache_index].pt1.y = B;
+		l_cache[l_cache_index].pt2.x = C;
+		l_cache[l_cache_index].pt2.y = D;
+		l_cache_index++;
+	}
+	
+	static inline void linesDraw(){
+		BMP_drawLine(&l_cache[0]);
+	}
+	
+	VDP_setScreenWidth256();
+	BMP_init(TRUE, 0, FALSE);
+
+	while(1){
+		
+		//______________________________________________
+		//		PRECA HERE
+		//______________________________________________
+		circlesDotPrecalc
+		//______________________________________________
+		//		PRECA END
+		//______________________________________________
+		BMP_waitFlipComplete();
+		BMP_clear();
+		BMP_showFPS(1);
+		
+		//______________________________________________
+		//		DRAW HERE
+		//______________________________________________
+		#ifdef DOT_TUNNEL_ON
+		//Draw the pixel buffer
+		BMP_setPixels(v_cache, 256);
+		#endif
+		RSE_recordLine(10, 10, 20, 20);
+		linesDraw();
+		//______________________________________________
+		//		DRAW END
+		//______________________________________________
+		
+		
+		
+		BMP_flip(1);
+
+	}
+	
+
+}
