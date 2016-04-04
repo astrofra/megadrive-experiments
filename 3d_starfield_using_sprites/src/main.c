@@ -1,7 +1,7 @@
 #include "genesis.h"
 #include <gfx.h>
 
-#define MAX_STAR  80
+#define MAX_STAR  48
 #define STARFIELD_SIZE (0xFF >> 1)
 #define STARFIELD_DIST -64
 
@@ -62,9 +62,13 @@ void RSE_Starfield_3D_Spr(void)
 	/*	Draw the stars */
 	static void inline updateAndDrawStar(_star *part, s16 num)
 	{
+		char str[32];
+
 		_star *p;
 		s16 i, maxy;
 		u16 off, x, y;
+		// int div_a_min, div_a_max;
+		// int div_b_min, div_b_max;
 
 		i = num;
 		maxy = BMP_HEIGHT;
@@ -73,7 +77,12 @@ void RSE_Starfield_3D_Spr(void)
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
 		x_screen += 0x80;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
-		y_screen += 0x80;		
+		y_screen += 0x80;	
+
+		// div_a_min = 0;
+		// div_a_max = 0;
+		// div_b_min = 0;
+		// div_b_max = 0;			
 
 		while(i--)
 		{
@@ -87,6 +96,19 @@ void RSE_Starfield_3D_Spr(void)
 				x = (p->x << 5) / p->z;
 				y = (p->y << 5) / p->z;
 
+				// if (div_a_min < p->x << 5)
+				// 	div_a_min = p->x << 5;
+				// else
+				// if (div_a_max >= p->x << 5)
+				// 	div_a_max = p->x << 5;
+
+				// if (div_b_min < p->z)
+				// 	div_b_min = p->z;
+				// else
+				// if (div_b_max >= p->z)
+				// 	div_b_max = p->z;
+
+
 				sprites[i].x = x_screen + x;
 				sprites[i].y = y_screen + y;
 			}
@@ -94,6 +116,16 @@ void RSE_Starfield_3D_Spr(void)
 		}
 
 		SPR_update(sprites, MAX_STAR);
+
+		// intToStr(div_a_min, str, 4);
+		// BMP_drawText(str, 0, 0);
+		// intToStr(div_a_max, str, 4);
+		// BMP_drawText(str, 12, 0);
+
+		// intToStr(div_b_min, str, 4);
+		// BMP_drawText(str, 0, 1);
+		// intToStr(div_b_max, str, 4);
+		// BMP_drawText(str, 12, 1);		
 	};
 
 	SYS_disableInts();

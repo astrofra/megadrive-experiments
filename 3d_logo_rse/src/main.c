@@ -542,7 +542,7 @@ void RSE_Logo3DScreen(void)
 	VDP_setPlanSize(64, 32);
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);	
-	VDP_drawImageEx(APLAN, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 80) >> 4) - 1, FALSE, TRUE);
 	SYS_enableInts();
 
 	/* Fade to the logo's palette */

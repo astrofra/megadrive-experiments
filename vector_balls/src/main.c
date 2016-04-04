@@ -133,7 +133,7 @@ static void vectorBallFX(){
 
 	while (TRUE){
 		VDP_waitVSync();
-		BMP_showFPS(1);
+		// BMP_showFPS(1);
 		drawVectorBalls(sprites, angle, angle << 1);
 		angle++;
 	}
