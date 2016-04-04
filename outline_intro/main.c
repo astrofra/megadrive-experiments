@@ -1,7 +1,7 @@
 #include "genesis.h"
 #include <gfx.h>
 
-#define NUM_COLUMNS     	40
+#define NUM_COLUMNS     	64
 #define NUM_ROWS        	28
 #define NUM_LINES       	NUM_ROWS * 8
 #define SPOTLIGHT_WIDTH		1
@@ -45,6 +45,9 @@ void RSE_pause(u16 frames)
 
 void RSE_LogoScreen(void)
 {
+	u16 vblCount = 0, i;
+	s16 tile_scroll_h[1024];
+
 	void inline DrawSpotlights(void)
 	{
 	    u16 row, column;
@@ -60,6 +63,7 @@ void RSE_LogoScreen(void)
 	}
 
 	SYS_disableInts();
+	VDP_setPlanSize(64, 32);
 	RSE_turn_screen_to_black();
 	VDP_setScreenWidth320();
 	VDP_clearPlan(APLAN, 0);
@@ -67,14 +71,22 @@ void RSE_LogoScreen(void)
 	VDP_setHilightShadow(1); 
 	VDP_drawImageEx(BPLAN, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 80) >> 4) - 1, FALSE, TRUE);
 	DrawSpotlights();
+	// VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	SYS_enableInts();
 
 	RSE_pause(15);
 
+	for(i = 0; i < 1024; i++)
+		tile_scroll_h[i] = sinFix16(i << 2) / 2;
+
 	/* Fade to the logo's palette */
 	VDP_fadePalTo(PAL1, logo_rse_3d.palette->data, 32, TRUE);
 
 	while (TRUE)
-		VDP_waitVSync();	
+	{
+		VDP_waitVSync();
+		VDP_setHorizontalScrollLine(PLAN_A, 0, tile_scroll_h + (vblCount & 511), 256, TRUE);		
+		vblCount++;
+	}
 }
