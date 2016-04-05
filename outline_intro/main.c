@@ -86,7 +86,7 @@ void RSE_LogoScreen(void)
 	while (TRUE)
 	{
 		VDP_waitVSync();
-		VDP_setHorizontalScrollLine(PLAN_A, 0, tile_scroll_h + (vblCount & 511), 256, TRUE);		
+		VDP_setHorizontalScrollLine(PLAN_A, (240 - 80) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);		
 		vblCount++;
 	}
 }
