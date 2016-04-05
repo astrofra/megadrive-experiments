@@ -1,1 +1,2 @@
-IMAGE logo_rse_3d "logo_rse_3d.png" 0
+IMAGE logo_rse_bottom_9bits "logo_rse_bottom_9bits.png" 0
+SPRITE logo_rse_top_9bits "logo_rse_top_9bits.png" 32 7 0
