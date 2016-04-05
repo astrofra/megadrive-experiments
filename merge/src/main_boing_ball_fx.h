@@ -1,3 +1,4 @@
+#include <genesis.h>
 #ifndef MAIN_BOING_BALL_FX_H
 #define MAIN_BOING_BALL_FX_H
 
