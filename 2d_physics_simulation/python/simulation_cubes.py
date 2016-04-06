@@ -29,13 +29,8 @@ scene.add_physic_plane(scn)
 width = 0.5
 
 node_list = []
+rb_list = []
 stream_list = []
-
-
-def make_plane_constraint():
-	plane_joint = gs.MakeD6Joint()
-	plane_joint.SetAxisLock(gs.D6Joint.LockY)
-	return plane_joint
 
 
 def make_solid_pos(x,y):
@@ -49,9 +44,9 @@ for y in range(3):
 	for x in range(-2, 2):
 		if cube_masks[y][x + 2] == 1:
 			world = gs.Matrix4.TransformationMatrix(make_solid_pos(x,y), gs.Vector3(0, pi * 0.25 * cos(x * y + x + y + 0.1) * 0.25, 0))
-			new_cube = scene.add_physic_sphere(scn, world, width)
-			make_plane_constraint().SetOtherBody(new_cube[0])
-			node_list.append(new_cube[0])
+			new_cube, rigid_body = scene.add_physic_sphere(scn, world, width)
+			node_list.append(new_cube)
+			rb_list.append(rigid_body)
 
 # fps = camera.fps_controller(0, 3.5, -12.5)
 
@@ -78,20 +73,28 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 		new_cube, rigid_body = scene.add_physic_sphere(scn, world, width)
 		rigid_body.ApplyLinearImpulse(world.GetY() * -5)
 		node_list.append(new_cube)
+		rb_list.append(rigid_body)
 
 		world = gs.Matrix4.TransformationMatrix(make_solid_pos(-0.65,55), gs.Vector3())
 		new_cube, rigid_body = scene.add_physic_sphere(scn, world, width)
 		rigid_body.ApplyLinearImpulse(world.GetY() * -5)
 		node_list.append(new_cube)
+		rb_list.append(rigid_body)
 
 		world = gs.Matrix4.TransformationMatrix(make_solid_pos(-1.25,58), gs.Vector3())
 		new_cube, rigid_body = scene.add_physic_sphere(scn, world, width)
 		rigid_body.ApplyLinearImpulse(world.GetY() * -5)
-		node_list.append(new_cube)		
+		node_list.append(new_cube)
+		rb_list.append(rigid_body)
 
 		thrown_bullet = True
 
 	# fps.update_and_apply_to_node(cam, dt_sec)
+
+	for rb in rb_list:
+		vel = rb.GetLinearVelocity()
+		vel *= gs.Vector3(0, 0, -1)
+		rb.ApplyLinearImpulse(vel)
 
 	scene.update_scene(scn, dt_sec)
 
