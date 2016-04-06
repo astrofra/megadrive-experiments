@@ -47,7 +47,7 @@ void RSE_pause(u16 frames)
 
 void RSE_LogoScreen(void)
 {
-	u16 vblCount = 0, i;
+	u16 vblCount = 0, i, j;
 	u16 vramIndex = TILE_USERINDEX;
 	s16 tile_scroll_h[1024];
 	Sprite sprites[16];
@@ -74,8 +74,8 @@ void RSE_LogoScreen(void)
 	VDP_clearPlan(BPLAN, 0);	
 	SPR_init(257);
     SPR_initSprite(&sprites[0], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(&sprites[0], (VDP_getScreenWidth() - LOGO_W) >> 1, (VDP_getScreenHeight() - LOGO_H) >> 1);
-    SPR_update(sprites, 1);		
+	SPR_setPosition(&sprites[0], (VDP_getScreenWidth() - LOGO_W) >> 1, ((VDP_getScreenHeight() - LOGO_H) >> 1) - 4 + 64);
+    SPR_update(sprites, 1);
 	VDP_setHilightShadow(1); 
 	VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), ((VDP_getScreenWidth() - LOGO_W) >> 4), (VDP_getScreenHeight() - LOGO_H) >> 4, FALSE, TRUE);
 	DrawSpotlights();
@@ -89,9 +89,17 @@ void RSE_LogoScreen(void)
 		tile_scroll_h[i] = sinFix16(i << 2) / 2;
 
 	/* Fade to the logo's palette */
-	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, 32, FALSE);
+	VDP_fadePalTo(PAL2, logo_rse_top_9bits.palette->data, 32, TRUE);
+	
+	for(i = 32; i > 0; i--)
+	{
+		VDP_waitVSync();
+		j = (i * i) >> 5;
+		SPR_setPosition(&sprites[0], (VDP_getScreenWidth() - LOGO_W) >> 1, ((VDP_getScreenHeight() - LOGO_H) >> 1) - 4 + j);
+		SPR_update(sprites, 1);
+	}
 
-	VDP_setPalette(PAL2, logo_rse_top_9bits.palette->data);
+	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, 64, TRUE);
 
 	while (TRUE)
 	{
