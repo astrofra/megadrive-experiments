@@ -5,11 +5,14 @@ import gs.plus.camera as camera
 import gs.plus.input as input
 import gs.plus.scene as scene
 import gs.plus.clock as clock
-from math import pi, cos, sin, asin
+from math import pi, cos, sin, asin, radians
 import codecs
 
 filename_out			=	"../src/simulation"
 scale_factor			=	5.0
+
+md_screen_w             =   320/10.0
+md_screen_h             =   220/10.0
 
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
@@ -17,12 +20,16 @@ gs.LoadPlugins(gs.get_default_plugins_path())
 render.init(1280, 720, "../pkg.core")
 
 scn = scene.new_scene()
-cam = scene.add_camera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 3.5, -12.5)))
-cam.GetTransform().SetRotation(gs.Vector3(pi * 5.0 / 180.0, pi * -5.0 / 180.0,0))
+cam = scene.add_camera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 0.0, -50.0)))
+
+screen = scene.add_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,0,0), gs.Vector3(radians(-90),0,0)), width=md_screen_w, depth=md_screen_h)
 
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.65, -0.45, 0)), gs.Light.Model_Linear, 150)
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.55, pi, 0.2)), gs.Light.Model_Linear, diffuse=gs.Color(0.3, 0.3, 0.4))
-scene.add_physic_plane(scn)
+scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 2,0), gs.Vector3(0,0,0)))
+
+scn.GetPhysicSystem().SetDefaultRigidBodyAxisLock(gs.LockZ)
+scn.GetPhysicSystem().SetDebugVisuals(True)
 
 # nodes = add_kapla_tower(scn, 0.5, 2, 2, 6, 16)
 
@@ -48,8 +55,6 @@ for y in range(3):
 			node_list.append(new_cube)
 			rb_list.append(rigid_body)
 
-# fps = camera.fps_controller(0, 3.5, -12.5)
-
 thrown_bullet = False
 fixed_step = True
 record_motion = False
@@ -61,7 +66,7 @@ dt_sum = 0.0
 
 while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if fixed_step:
-		dt_sec = 1.0 / 120.0 
+		dt_sec = 1.0 / 120.0
 	else:
 		dt_sec = clock.update()
 
@@ -91,11 +96,6 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 
 	# fps.update_and_apply_to_node(cam, dt_sec)
 
-	for rb in rb_list:
-		vel = rb.GetLinearVelocity()
-		vel *= gs.Vector3(0, 0, -1)
-		rb.ApplyLinearImpulse(vel)
-
 	scene.update_scene(scn, dt_sec)
 
 	if not record_motion and dt_sum > 2.0:
@@ -114,7 +114,6 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 		stream_list.append(new_frame)
 
 	render.text2d(5, 25, "@%.2fFPS" % (1 / dt_sec))
-	render.text2d(5, 5, "Move around with QSZD, left mouse button to look around")
 	render.flip()
 
 # Dump record
