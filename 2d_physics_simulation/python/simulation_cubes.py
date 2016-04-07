@@ -17,19 +17,19 @@ md_screen_h             =   220/10.0
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
 
-render.init(1280, 720, "../pkg.core")
+render.init(1024, int(1024 * md_screen_h / md_screen_w), "../pkg.core")
 
 scn = scene.new_scene()
-cam = scene.add_camera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 0.0, -50.0)))
+scn.GetPhysicSystem().SetDefaultRigidBodyAxisLock(gs.LockZ)
+scn.GetPhysicSystem().SetDebugVisuals(True)
 
-screen = scene.add_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,0,0), gs.Vector3(radians(-90),0,0)), width=md_screen_w, depth=md_screen_h)
+cam = scene.add_camera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 0.0, -10.0)))
+
+# screen = scene.add_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,0,0), gs.Vector3(radians(-90),0,0)), width=md_screen_w, depth=md_screen_h)
 
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.65, -0.45, 0)), gs.Light.Model_Linear, 150)
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.55, pi, 0.2)), gs.Light.Model_Linear, diffuse=gs.Color(0.3, 0.3, 0.4))
-scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 2,0), gs.Vector3(0,0,0)))
-
-scn.GetPhysicSystem().SetDefaultRigidBodyAxisLock(gs.LockZ)
-scn.GetPhysicSystem().SetDebugVisuals(True)
+scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 30,0), gs.Vector3(0,0,0)))
 
 # nodes = add_kapla_tower(scn, 0.5, 2, 2, 6, 16)
 
