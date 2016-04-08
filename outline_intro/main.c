@@ -27,10 +27,11 @@ void RSE_physics_simulation(void)
 	Sprite sprites[SIMULATION_NODE_LEN];
 
 	SYS_disableInts();
-	VDP_setPlanSize(64, 32);
+	MEM_init();
+	VDP_setPlanSize(32, 32);
 	VDP_setScreenWidth320();
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);	
+	VDP_clearPlan(APLAN, 1);
+	VDP_clearPlan(BPLAN, 1);	
 	SPR_init(257);
 	for(i = 0; i < SIMULATION_NODE_LEN;i++)
 	{
@@ -46,7 +47,7 @@ void RSE_physics_simulation(void)
 	while (TRUE)
 	{
 		VDP_waitVSync();
-		// BMP_showFPS(1);
+		BMP_showFPS(1);
 	
 		j = vblCount * SIMULATION_NODE_LEN;
 		for(i = 0; i < SIMULATION_NODE_LEN;i++)
