@@ -9,13 +9,13 @@ from math import pi, cos, sin, asin, radians
 import codecs
 from random import uniform
 
-filename_out = "../src/simulation"
+filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
 md_screen_w = 320/scale_factor
 md_screen_h = 220/scale_factor
-sphere_radius = md_screen_w / 40.0
-max_bullet = 40
-framerate = 50
+sphere_radius = (md_screen_w / 40.0) / 2.0
+max_bullet = 30
+framerate = 60
 
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
@@ -33,9 +33,11 @@ screen = scene.add_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,0
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.65, -0.45, 0)), gs.Light.Model_Linear, 150)
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.55, pi, 0.2)), gs.Light.Model_Linear, diffuse=gs.Color(0.3, 0.3, 0.4))
 scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 2,0), gs.Vector3(0,0,0)))
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * -0.2, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+
+# walls
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * -0.1, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
                       width=sphere_radius, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * 0.2, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * 0.1, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
                       width=sphere_radius, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
 
 
@@ -86,7 +88,7 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if not record_motion and dt_sum > 0.0:
 		record_motion = True
 	else:
-		if record_motion and dt_sum > 16.0:
+		if record_motion and dt_sum > 25.0:
 			record_motion = False
 			record_done = True
 
@@ -132,7 +134,7 @@ if len(stream_list) > 0:
 			out_str = '\t'
 
 		for node_record in frame_record:
-			out_str += str(int(node_record['position'].x * scale_factor)) + ', ' + str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor)) + ', '
+			out_str += str(int((node_record['position'].x + (md_screen_w * 0.5)) * scale_factor) + 0x80) + ', ' + str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80) + ', '
 
 		out_str += '\n'
 		f.write(out_str)
