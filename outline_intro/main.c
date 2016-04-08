@@ -1,5 +1,6 @@
 #include "genesis.h"
 #include <gfx.h>
+#include "simulation.h"
 
 #define NUM_COLUMNS     	64
 #define NUM_ROWS        	28
@@ -11,12 +12,62 @@
 #define LOGO_H				56
 
 void RSE_LogoScreen(void);
+void RSE_physics_simulation(void);
 
 int main()
 {
 	RSE_LogoScreen();
+	RSE_physics_simulation();
 }
 
+void RSE_physics_simulation(void)
+{
+	u16 vblCount = 0, i, j;
+	u16 vramIndex = TILE_USERINDEX;
+	Sprite sprites[SIMULATION_NODE_LEN];
+
+	SYS_disableInts();
+	VDP_setPlanSize(64, 32);
+	VDP_setScreenWidth320();
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);	
+	SPR_init(257);
+	for(i = 0; i < SIMULATION_NODE_LEN;i++)
+	{
+	    SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+		SPR_setPosition(&sprites[i], 0, 0);
+	}
+    SPR_update(sprites, SIMULATION_NODE_LEN);
+	VDP_setHilightShadow(0); 
+	SYS_enableInts();
+
+	VDP_fadePalTo(PAL2, ball_metal.palette->data, 64, TRUE);
+
+	while (TRUE)
+	{
+		VDP_waitVSync();
+		// BMP_showFPS(1);
+	
+		j = vblCount * SIMULATION_NODE_LEN;
+		for(i = 0; i < SIMULATION_NODE_LEN;i++)
+		{
+			sprites[i].x = physics_sim[j];
+			sprites[i].y = physics_sim[j + 1];
+			// SPR_setPosition(&sprites[i], physics_sim[j], physics_sim[j + 1]);
+			j += 2;
+		}
+
+		SPR_update(sprites, SIMULATION_NODE_LEN);
+
+		vblCount++;
+		if (vblCount > SIMULATION_FRAME_LEN)
+			vblCount = 0;
+	}
+}
+
+/*
+	Boot Screen
+*/
 void RSE_turn_screen_to_white(void)
 {
 	/* Turn whole palette to white */
@@ -101,7 +152,8 @@ void RSE_LogoScreen(void)
 
 	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, 64, TRUE);
 
-	while (TRUE)
+	vblCount = 0;
+	while (vblCount < 60 * 5)
 	{
 		VDP_waitVSync();
 		VDP_setHorizontalScrollLine(PLAN_A, (VDP_getScreenHeight() - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);		
