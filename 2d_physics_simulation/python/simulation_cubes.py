@@ -9,15 +9,13 @@ from math import pi, cos, sin, asin, radians
 import codecs
 from random import uniform
 
-filename_out    		=	"../src/simulation"
-scale_factor			=	10.0
-
-md_screen_w             =   320/scale_factor
-md_screen_h             =   220/scale_factor
-
+filename_out = "../src/simulation"
+scale_factor = 10.0
+md_screen_w = 320/scale_factor
+md_screen_h = 220/scale_factor
 sphere_radius = md_screen_w / 40.0
-
 max_bullet = 40
+framerate = 50
 
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
@@ -47,8 +45,9 @@ def make_solid_pos(x,y):
 
 def throw_bullet():
 	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01, md_screen_w * 0.01), md_screen_h / 2), gs.Vector3())
-	new_cube, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius)
+	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius)
 	rigid_body.ApplyLinearImpulse(world.GetY() * -5)
+	new_bullet.SetName("bullet")
 
 
 def throw_bullets_at_interval(dt, interval=1.0):
@@ -60,13 +59,14 @@ def throw_bullets_at_interval(dt, interval=1.0):
 		throw_bullet()
 		bullet_count += 1
 
-
+null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3()}
 throw_bullet_timeout = 0.0
 fixed_step = True
 record_motion = False
 record_done = False
 bullet_count = 0
 stream_list = []
+node_list = []
 
 dt_sum = 0.0
 
@@ -74,7 +74,7 @@ dt_sum = 0.0
 
 while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if fixed_step:
-		dt_sec = 1.0 / 60.0
+		dt_sec = 1.0 / float(framerate)
 	else:
 		dt_sec = clock.update()
 
@@ -83,20 +83,29 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 
 	scene.update_scene(scn, dt_sec)
 
-	if not record_motion and dt_sum > 2.0:
+	if not record_motion and dt_sum > 0.0:
 		record_motion = True
 	else:
 		if record_motion and dt_sum > 16.0:
 			record_motion = False
 			record_done = True
 
-	# if record_motion:
-	# 	new_frame = []
-	# 	for current_node in node_list:
-	# 		new_motion = {'position': current_node.GetTransform().GetPosition() * scale_factor, 'rotation': current_node.GetTransform().GetRotation()}
-	# 		new_frame.append(new_motion)
-	#
-	# 	stream_list.append(new_frame)
+	node_list = []
+	for _node in scn.GetNodes():
+		if _node.GetName() == "bullet":
+			node_list.append(_node)
+
+	if record_motion:
+		new_frame = []
+		for current_node in node_list:
+			new_motion = {'position': current_node.GetTransform().GetPosition(), 'rotation': current_node.GetTransform().GetRotation()}
+			new_frame.append(new_motion)
+
+		if len(new_frame) < max_bullet:
+			for i in range(max_bullet - len(new_frame)):
+				new_frame.append(null_bullet)
+
+		stream_list.append(new_frame)
 
 	render.text2d(5, 25, "@%.2fFPS" % (1 / dt_sec))
 	render.flip()
@@ -108,7 +117,7 @@ if len(stream_list) > 0:
 
 	f.write('#include "genesis.h"\n\n')
 	f.write('#define SIMULATION_FRAME_LEN ' + str(len(stream_list)) + '\n')
-	f.write('#define SIMULATION_NODE_LEN ' + str(len(node_list)) + '\n\n')
+	f.write('#define SIMULATION_NODE_LEN ' + str(max_bullet) + '\n\n')
 
 	f.write('const s16 ' + 'physics_sim' + '[] =' + '\n')
 	f.write('{\n')
@@ -123,7 +132,7 @@ if len(stream_list) > 0:
 			out_str = '\t'
 
 		for node_record in frame_record:
-			out_str += str(int(node_record['position'].x * scale_factor)) + ', ' + str(int((md_screen_h - node_record['position'].y) * scale_factor)) + ', '
+			out_str += str(int(node_record['position'].x * scale_factor)) + ', ' + str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor)) + ', '
 
 		out_str += '\n'
 		f.write(out_str)
