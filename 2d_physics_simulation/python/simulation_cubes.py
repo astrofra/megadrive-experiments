@@ -13,9 +13,9 @@ filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
 md_screen_w = 320/scale_factor
 md_screen_h = 220/scale_factor
-sphere_radius = (md_screen_w / 40.0) / 2.0
-max_bullet = 30
-framerate = 60
+sphere_radius = (md_screen_w / 40.0) # / 2.0
+max_bullet = 40
+framerate = 30
 
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
@@ -35,9 +35,9 @@ scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.55, pi, 0.2)), gs.Li
 scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 2,0), gs.Vector3(0,0,0)))
 
 # walls
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * -0.1, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * -0.2, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
                       width=sphere_radius, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * 0.1, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * 0.2, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
                       width=sphere_radius, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
 
 
