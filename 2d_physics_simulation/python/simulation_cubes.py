@@ -5,17 +5,17 @@ import gs.plus.camera as camera
 import gs.plus.input as input
 import gs.plus.scene as scene
 import gs.plus.clock as clock
-from math import pi, cos, sin, asin, radians
+from math import pi, cos, sin, asin, radians, degrees
 import codecs
 from random import uniform
 
 filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
 md_screen_w = 320/scale_factor
-md_screen_h = 220/scale_factor
+md_screen_h = 200/scale_factor
 sphere_radius = (md_screen_w / 40.0) # / 2.0
 max_bullet = 40
-framerate = 30
+framerate = 50
 
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
@@ -23,7 +23,7 @@ gs.LoadPlugins(gs.get_default_plugins_path())
 render.init(1024, int(1024 * md_screen_h / md_screen_w), "../pkg.core")
 
 scn = scene.new_scene()
-scn.GetPhysicSystem().SetDefaultRigidBodyAxisLock(gs.LockZ)
+scn.GetPhysicSystem().SetDefaultRigidBodyAxisLock(gs.LockZ + gs.LockRotX + gs.LockRotY)
 scn.GetPhysicSystem().SetDebugVisuals(True)
 
 cam = scene.add_camera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, 0.0, -md_screen_w * 1.15)))
@@ -48,7 +48,7 @@ def make_solid_pos(x,y):
 def throw_bullet():
 	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01, md_screen_w * 0.01), md_screen_h / 2), gs.Vector3())
 	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius)
-	rigid_body.ApplyLinearImpulse(world.GetY() * -5)
+	rigid_body.ApplyLinearImpulse(world.GetY() * (-50 / scale_factor))
 	new_bullet.SetName("bullet")
 
 
@@ -61,7 +61,17 @@ def throw_bullets_at_interval(dt, interval=1.0):
 		throw_bullet()
 		bullet_count += 1
 
-null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3()}
+
+def angle_to_image_index(angle):
+	angle = -degrees(angle)
+	print(angle)
+	angle = angle%45
+	angle *= (4/45)
+	angle = int(angle)
+	return angle
+
+
+null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3(0,0,0)}
 throw_bullet_timeout = 0.0
 fixed_step = True
 record_motion = False
@@ -100,8 +110,11 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if record_motion:
 		new_frame = []
 		for current_node in node_list:
-			new_motion = {'position': current_node.GetTransform().GetPosition(), 'rotation': current_node.GetTransform().GetRotation()}
-			new_frame.append(new_motion)
+			_pos = current_node.GetTransform().GetPosition()
+			if md_screen_w * -0.5 < _pos.x < md_screen_w * 0.5:
+				if md_screen_h * -0.5 < _pos.y < md_screen_h * 0.5:
+					new_motion = {'position': _pos, 'rotation': current_node.GetTransform().GetRotation()}
+					new_frame.append(new_motion)
 
 		if len(new_frame) < max_bullet:
 			for i in range(max_bullet - len(new_frame)):
@@ -134,7 +147,11 @@ if len(stream_list) > 0:
 			out_str = '\t'
 
 		for node_record in frame_record:
-			out_str += str(int((node_record['position'].x + (md_screen_w * 0.5)) * scale_factor) + 0x80) + ', ' + str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80) + ', '
+			tmp_str = str(int((node_record['position'].x + (md_screen_w * 0.5)) * scale_factor) + 0x80) + ', '
+			tmp_str += str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80) + ', '
+			tmp_str += str(angle_to_image_index(node_record['rotation'].z))
+			tmp_str += ', '
+			out_str += tmp_str
 
 		out_str += '\n'
 		f.write(out_str)
