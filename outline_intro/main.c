@@ -13,6 +13,8 @@
 
 void RSE_LogoScreen(void);
 void RSE_physics_simulation(void);
+void RSE_turn_screen_to_white(void);
+void RSE_turn_screen_to_black(void);
 
 int main()
 {
@@ -22,9 +24,11 @@ int main()
 
 void RSE_physics_simulation(void)
 {
-	u16 vblCount = 0, i, j;
+	u32 vblCount = 0, i, j;
 	u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[SIMULATION_NODE_LEN];
+
+	RSE_turn_screen_to_black();
 
 	SYS_disableInts();
 	MEM_init();
@@ -47,21 +51,20 @@ void RSE_physics_simulation(void)
 	while (TRUE)
 	{
 		VDP_waitVSync();
-		BMP_showFPS(1);
+		// BMP_showFPS(1);
 	
-		j = vblCount * SIMULATION_NODE_LEN;
+		j = vblCount * SIMULATION_NODE_LEN * 3;
 		for(i = 0; i < SIMULATION_NODE_LEN;i++)
 		{
-			sprites[i].x = physics_sim[j];
-			sprites[i].y = physics_sim[j + 1];
-			// SPR_setPosition(&sprites[i], physics_sim[j], physics_sim[j + 1]);
-			j += 2;
+			sprites[i].x = physics_sim[j++];
+			sprites[i].y = physics_sim[j++];
+			SPR_setFrame(&sprites[i], physics_sim[j++]);
 		}
 
 		SPR_update(sprites, SIMULATION_NODE_LEN);
 
 		vblCount++;
-		if (vblCount > SIMULATION_FRAME_LEN)
+		if (vblCount >= SIMULATION_FRAME_LEN)
 			vblCount = 0;
 	}
 }
