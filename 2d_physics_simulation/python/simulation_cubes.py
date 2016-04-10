@@ -14,8 +14,9 @@ scale_factor = 10.0
 md_screen_w = 320/scale_factor
 md_screen_h = 200/scale_factor
 sphere_radius = (md_screen_w / 40.0) # / 2.0
-max_bullet = 40
+max_bullet = 30
 framerate = 50
+sim_index = 0
 
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
@@ -128,13 +129,13 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 # Dump record
 
 if len(stream_list) > 0:
-	f = codecs.open(filename_out + '.h', 'w')
+	f = codecs.open(filename_out + '_' + str(sim_index) + '.h', 'w')
 
 	f.write('#include "genesis.h"\n\n')
-	f.write('#define SIMULATION_FRAME_LEN ' + str(len(stream_list)) + '\n')
-	f.write('#define SIMULATION_NODE_LEN ' + str(max_bullet) + '\n\n')
+	f.write('#define SIMULATION_' + str(sim_index) + '_FRAME_LEN ' + str(len(stream_list)) + '\n')
+	f.write('#define SIMULATION_' + str(sim_index) + '_NODE_LEN ' + str(max_bullet) + '\n\n')
 
-	f.write('const s16 ' + 'physics_sim' + '[] =' + '\n')
+	f.write('const s16 ' + 'physics_sim_' + str(sim_index) + '[] =' + '\n')
 	f.write('{\n')
 
 	out_str = ''
