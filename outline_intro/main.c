@@ -6,6 +6,9 @@ void RSE_physics_simulation(void);
 
 int main()
 {
+	/* RSE Logo */
 	RSE_LogoScreen();
+
+	/* Demo !!! */
 	RSE_physics_simulation();
 }

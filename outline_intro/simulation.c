@@ -1,13 +1,13 @@
 #include "genesis.h"
 #include <gfx.h>
-#include "simulation.h"
+#include "simulation_0.h"
 #include "transition_helper.h"
 
 void RSE_physics_simulation(void)
 {
 	u32 vblCount = 0, i, j;
 	u16 vramIndex = TILE_USERINDEX;
-	Sprite sprites[SIMULATION_NODE_LEN];
+	Sprite sprites[80];
 
 	RSE_turn_screen_to_black();
 
@@ -18,12 +18,12 @@ void RSE_physics_simulation(void)
 	VDP_clearPlan(APLAN, 1);
 	VDP_clearPlan(BPLAN, 1);	
 	SPR_init(257);
-	for(i = 0; i < SIMULATION_NODE_LEN;i++)
+	for(i = 0; i < SIMULATION_0_NODE_LEN;i++)
 	{
 	    SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 		SPR_setPosition(&sprites[i], 0, 0);
 	}
-    SPR_update(sprites, SIMULATION_NODE_LEN);
+    SPR_update(sprites, SIMULATION_0_NODE_LEN);
 	VDP_setHilightShadow(0); 
 	SYS_enableInts();
 
@@ -34,18 +34,18 @@ void RSE_physics_simulation(void)
 		VDP_waitVSync();
 		// BMP_showFPS(1);
 	
-		j = vblCount * SIMULATION_NODE_LEN * 3;
-		for(i = 0; i < SIMULATION_NODE_LEN;i++)
+		j = vblCount * SIMULATION_0_NODE_LEN * 3;
+		for(i = 0; i < SIMULATION_0_NODE_LEN;i++)
 		{
-			sprites[i].x = physics_sim[j++];
-			sprites[i].y = physics_sim[j++];
-			SPR_setFrame(&sprites[i], physics_sim[j++]);
+			sprites[i].x = physics_sim_0[j++];
+			sprites[i].y = physics_sim_0[j++];
+			SPR_setFrame(&sprites[i], physics_sim_0[j++]);
 		}
 
-		SPR_update(sprites, SIMULATION_NODE_LEN);
+		SPR_update(sprites, SIMULATION_0_NODE_LEN);
 
 		vblCount++;
-		if (vblCount >= SIMULATION_FRAME_LEN)
+		if (vblCount >= SIMULATION_0_FRAME_LEN)
 			vblCount = 0;
 	}
 }
