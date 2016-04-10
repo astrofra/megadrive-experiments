@@ -15,4 +15,7 @@
 #define LOGO_DEMO_W			320
 #define LOGO_DEMO_H			80
 
+#define LOGO_CHAR_W			128
+#define LOGO_CHAR_H			96
+
 #endif LOGO_SCREEN

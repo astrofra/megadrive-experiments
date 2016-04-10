@@ -30,7 +30,7 @@ void RSE_LogoScreen(void)
 		Screen init 
 	*/
 	SYS_disableInts();
-	VDP_setPlanSize(64, 32);
+	VDP_setPlanSize(64, 64);
 	RSE_turn_screen_to_black();
 	VDP_setScreenWidth320();
 	VDP_clearPlan(APLAN, 0);
@@ -40,6 +40,12 @@ void RSE_LogoScreen(void)
 	/* 
 		Group logo 
 	*/
+	VDP_setHilightShadow(1); 
+	VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
+	DrawSpotlights();
+
+    vramIndex += logo_rse_bottom_9bits.tileset->numTile;
+
 	for(i = 0; i < 16; i++)
 	{
 	    SPR_initSprite(&sprites[i], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
@@ -48,9 +54,6 @@ void RSE_LogoScreen(void)
 	}
     SPR_update(sprites, 1);
 
-	VDP_setHilightShadow(1); 
-	VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
-	DrawSpotlights();
 	// VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	SYS_enableInts();
@@ -89,6 +92,14 @@ void RSE_LogoScreen(void)
 		vblCount++;
 	}
 
+	VDP_fadePalTo(PAL1, palette_black, 32, TRUE);
+	while (vblCount < (60 * 5) + 32)
+	{
+		VDP_waitVSync();
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);		
+		vblCount++;
+	}
+
 	VDP_fadeOut(1, 63, 32, TRUE);
 
 	for(i = 0; i < 32; i++)
@@ -108,15 +119,35 @@ void RSE_LogoScreen(void)
 	/* 
 		Demo logo 
 	*/
+	SYS_disableInts();
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setHilightShadow(0);
 	SPR_end();
+	vramIndex = TILE_USERINDEX;
 
-	VDP_drawImageEx(BPLAN, &logo_demo, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 0), ((SCR_W - LOGO_DEMO_W) >> 4), (SCR_H - LOGO_DEMO_H) >> 4, FALSE, TRUE);
+	VDP_drawImageEx(BPLAN, &logo_demo, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_DEMO_W) >> 4), ((SCR_H - LOGO_DEMO_H) >> 4) - 2, FALSE, TRUE);
+	vramIndex += logo_demo.tileset->numTile;
+
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_CHAR_W) >> 4), ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
+	VDP_setVerticalScroll(PLAN_A, 64 - 8);
+	// VDP_setPalette(PAL0, the_red_bot.palette->data);
+	SYS_enableInts();
 
 	VDP_fadePalTo(PAL1, logo_demo.palette->data, 32, TRUE);
-	RSE_pause(60 * 3);
+
+	for(i = 0; i < 32; i++)
+	{
+		VDP_waitVSync();
+		j = (i * i) >> 5;
+		VDP_setVerticalScroll(PLAN_B, j);
+		VDP_setVerticalScroll(PLAN_A, ((32 - j) << 1) - 8);
+	}
+
+	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
+
+	RSE_pause(60 * 5);
 
 	VDP_fadeOut(1, 63, 32, TRUE);
 	RSE_pause(60);
