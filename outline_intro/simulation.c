@@ -24,10 +24,19 @@ void RSE_physics_simulation(void)
 		SPR_setPosition(&sprites[i], 0, 0);
 	}
     SPR_update(sprites, SIMULATION_0_NODE_LEN);
-	VDP_setHilightShadow(0); 
+	VDP_setHilightShadow(0);
+
+	vramIndex = TILE_USERINDEX;
+
+	VDP_drawImageEx(APLAN, &level_0, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += level_0.tileset->numTile;
+
+	VDP_setPalette(PAL0, level_0.palette->data);
+	VDP_setPalette(PAL2, ball_metal.palette->data);
+
 	SYS_enableInts();
 
-	VDP_fadePalTo(PAL2, ball_metal.palette->data, 64, TRUE);
+	// VDP_fadePalTo(PAL2, ball_metal.palette->data, 64, TRUE);
 
 	while (TRUE)
 	{
