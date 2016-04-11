@@ -6,5 +6,6 @@ extern const Image logo_demo;
 extern const Image outline_logo;
 extern const SpriteDefinition logo_rse_top_9bits;
 extern const SpriteDefinition ball_metal;
+extern const Image level_0;
 
 #endif // _GFX_H_
