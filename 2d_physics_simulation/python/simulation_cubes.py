@@ -12,11 +12,17 @@ from random import uniform
 filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
 md_screen_w = 320/scale_factor
-md_screen_h = 200/scale_factor
+md_screen_h = 224/scale_factor
 sphere_radius = (md_screen_w / 40.0) # / 2.0
-max_bullet = 30
+max_bullet = 40
 framerate = 50
 sim_index = 0
+
+def tile_quantizer(x):
+	x /= sphere_radius
+	x = int(x)
+	x *= sphere_radius
+	return x
 
 gs.plus.create_workers()
 gs.LoadPlugins(gs.get_default_plugins_path())
@@ -36,19 +42,24 @@ scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.55, pi, 0.2)), gs.Li
 scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 2,0), gs.Vector3(0,0,0)))
 
 # walls
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * -0.2, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-                      width=sphere_radius, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(md_screen_h * 0.2, -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-                      width=sphere_radius, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+                      width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+                      width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+                      width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+                      width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
 
 
 def make_solid_pos(x,y):
 	return gs.Vector3(x, y, 0.0)
 
 
-def throw_bullet():
-	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01, md_screen_w * 0.01), md_screen_h / 2), gs.Vector3())
-	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius)
+def throw_bullet(size=1.0):
+	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01 * size, md_screen_w * 0.01 * size), md_screen_h / 2), gs.Vector3())
+	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius * size, mass=size)
 	rigid_body.ApplyLinearImpulse(world.GetY() * (-50 / scale_factor))
 	new_bullet.SetName("bullet")
 
@@ -148,8 +159,8 @@ if len(stream_list) > 0:
 			out_str = '\t'
 
 		for node_record in frame_record:
-			tmp_str = str(int((node_record['position'].x + (md_screen_w * 0.5)) * scale_factor) + 0x80) + ', '
-			tmp_str += str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80) + ', '
+			tmp_str = str(int((node_record['position'].x + (md_screen_w * 0.5)) * scale_factor) + 0x80 - 8) + ', '
+			tmp_str += str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80 - 8) + ', '
 			tmp_str += str(angle_to_image_index(node_record['rotation'].z))
 			tmp_str += ', '
 			out_str += tmp_str
