@@ -105,29 +105,46 @@ void main_tunnel(u16 vbl_to_exit){
 			}
 		}
 	}
-    
-	static inline void circle_line_update(){
-		u16 k = 0;
-		for(k = 0; k < CIRCLE_MAX; k++){
-			u16 j = 1024 / c_cache[k].res;
-			u16 i;
-			for(i = j; i <= 1024; i+=j){
-				line_record(
-					c_cache[k].xOffset + c_cache[k].x +(sinFix32(i) / c_cache[k].size),
-					c_cache[k].yOffset + c_cache[k].y +(cosFix32(i) / c_cache[k].size),
-					c_cache[k].xOffset + c_cache[k].x +(sinFix32(i + j) / c_cache[k].size),
-					c_cache[k].yOffset + c_cache[k].y +(cosFix32(i + j) / c_cache[k].size),
-					c_cache[k].col
-					);
-			}			
-		}		
-	}
+    static inline void circle_line_update(){
+        u16 k = 0;
+        for(k = 0; k < CIRCLE_MAX; k++){
+            u16 j = 1024 / c_cache[k].res;
+            u16 i;
+            for(i = j; i <= 1024; i+=j){
+                line_record(
+                            c_cache[k].xOffset + c_cache[k].x +(sinFix32(i) / c_cache[k].size),
+                            c_cache[k].yOffset + c_cache[k].y +(cosFix32(i) / c_cache[k].size),
+                            c_cache[k].xOffset + c_cache[k].x +(sinFix32(i + j) / c_cache[k].size),
+                            c_cache[k].yOffset + c_cache[k].y +(cosFix32(i + j) / c_cache[k].size),
+                            c_cache[k].col
+                            );
+            }			
+        }		
+    }
+/*
+    static inline void circle_line_update(){
+        u16 k = CIRCLE_MAX;
+        for(k = CIRCLE_MAX; k > 0; k--){
+            u16 j = 1024 / c_cache[k].res;
+            u16 i;
+            for(i = j; i <= 1024; i+=j){
+                line_record(
+                            c_cache[k].xOffset + c_cache[k].x +(sinFix32(i) / c_cache[k].size),
+                            c_cache[k].yOffset + c_cache[k].y +(cosFix32(i) / c_cache[k].size),
+                            c_cache[k].xOffset + c_cache[k].x +(sinFix32(i + j) / c_cache[k].size),
+                            c_cache[k].yOffset + c_cache[k].y +(cosFix32(i + j) / c_cache[k].size),
+                            c_cache[k].col
+                            );
+            }			
+        }		
+    }
+*/
 
     static inline void circle_size_update(){
         u16 i = 0;
         for(i = 0; i < CIRCLE_MAX; i++){
             c_cache[i].size -= size_inc;
-            if(c_cache[i].size <= 0){ c_cache[i].size = 100;  c_cache[i].xOffset = CIRCLE_XOFFSET; c_cache[i].yOffset = CIRCLE_YOFFSET; }
+            if(c_cache[i].size <= 0){ c_cache[i].size = 120;  c_cache[i].xOffset = CIRCLE_XOFFSET; c_cache[i].yOffset = CIRCLE_YOFFSET; }
         }
     }
     
@@ -189,7 +206,7 @@ void main_tunnel(u16 vbl_to_exit){
         }
     }
     
-    static void circle_debug(u16 x, u16 y){
+    static void circle_debug_xy(u16 x, u16 y){
         s16 xc, yc;
         char xcStr[3], ycStr[3];
         u16 i = 0, j = 1;
@@ -205,25 +222,37 @@ void main_tunnel(u16 vbl_to_exit){
         }
     }
     
+    static void circle_debug_size(u16 x, u16 y){
+        s16 size;
+        char sizeStr[3];
+        u16 i = 0, j = 1;
+        for (i = 0; i < CIRCLE_MAX; i++){
+            size = c_cache[i].size;
+            intToStr(size, sizeStr, 3);
+            VDP_drawText(sizeStr, x, y+j);
+            j += 2;
+        }
+    }
+    
 	//_____________________________________________________
 	//		PRE LOOP
     #define CIRCLE_X    100
     #define CIRCLE_Y    50
 	if(line_on == 1){
+		circle_line_record(CIRCLE_X, CIRCLE_Y, 121, 0xFF, CIRCLE_RES);
 		circle_line_record(CIRCLE_X, CIRCLE_Y, 101, 0xFF, CIRCLE_RES);
 		circle_line_record(CIRCLE_X, CIRCLE_Y,  81, 0xFF, CIRCLE_RES);
 		circle_line_record(CIRCLE_X, CIRCLE_Y,  61, 0xFF, CIRCLE_RES);
-		circle_line_record(CIRCLE_X, CIRCLE_Y,  41, 0xFF, CIRCLE_RES);
+        circle_line_record(CIRCLE_X, CIRCLE_Y,  41, 0xFF, CIRCLE_RES);
         circle_line_record(CIRCLE_X, CIRCLE_Y,  21, 0xFF, CIRCLE_RES);
-        circle_line_record(CIRCLE_X, CIRCLE_Y,   1, 0xFF, CIRCLE_RES);
 	}
 	if(pixel_on == 1){
+		circle_pixel_record(CIRCLE_X, CIRCLE_Y, 121, 0xFF, CIRCLE_RES);
 		circle_pixel_record(CIRCLE_X, CIRCLE_Y, 101, 0xFF, CIRCLE_RES);
 		circle_pixel_record(CIRCLE_X, CIRCLE_Y,  81, 0xFF, CIRCLE_RES);
 		circle_pixel_record(CIRCLE_X, CIRCLE_Y,  61, 0xFF, CIRCLE_RES);
-		circle_pixel_record(CIRCLE_X, CIRCLE_Y,  41, 0xFF, CIRCLE_RES);
+        circle_pixel_record(CIRCLE_X, CIRCLE_Y,  41, 0xFF, CIRCLE_RES);
         circle_pixel_record(CIRCLE_X, CIRCLE_Y,  21, 0xFF, CIRCLE_RES);
-        circle_pixel_record(CIRCLE_X, CIRCLE_Y,   1, 0xFF, CIRCLE_RES);
 	}
     
 	while(1){
@@ -241,8 +270,8 @@ void main_tunnel(u16 vbl_to_exit){
 		BMP_waitFlipComplete();
 		BMP_clear();
 		BMP_showFPS(1);
-		
-		//______________________________________________
+
+        //______________________________________________
 		//		DRAW HERE
 		if(pixel_on ==1 ) pixel_draw
 		if(line_on == 1) line_draw
@@ -254,7 +283,8 @@ void main_tunnel(u16 vbl_to_exit){
         circle_size_update();
         circle_color_update();
         circle_move_update();
-        //circle_debug(20,3);
+        //circle_debug_xy(20, 3);
+        //circle_debug_size(20, 3);
         BMP_flip(1);
         vblCount++;
 	}
