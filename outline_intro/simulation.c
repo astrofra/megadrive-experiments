@@ -13,7 +13,7 @@ void RSE_physics_simulation(void)
 
 	SYS_disableInts();
 	MEM_init();
-	VDP_setPlanSize(32, 32);
+	VDP_setPlanSize(64, 32);
 	VDP_setScreenWidth320();
 	VDP_clearPlan(APLAN, 1);
 	VDP_clearPlan(BPLAN, 1);	
