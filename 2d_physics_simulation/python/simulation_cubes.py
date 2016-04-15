@@ -8,6 +8,7 @@ import gs.plus.clock as clock
 from math import pi, cos, sin, asin, radians, degrees
 import codecs
 from random import uniform
+from utils import *
 
 filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
@@ -17,6 +18,7 @@ sphere_radius = (md_screen_w / 40.0) # / 2.0
 max_bullet = 40
 framerate = 50
 sim_index = 0
+g_dict = {}
 
 def tile_quantizer(x):
 	x /= sphere_radius
@@ -43,25 +45,49 @@ scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md
 
 # walls
 scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-                      width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+					  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
 scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-                      width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+					  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
 
 scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-                      width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+					  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
 scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-                      width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+					  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
 
+
+def node_is_bullet(node):
+	if node.GetName().find('type;') > -1:
+		return True
+	return False
+
+
+def node_get_type(node):
+	n = node.GetName()
+	n = n.split(';')
+	for i in range(len(n)):
+		if n[i] == 'type':
+			return n[i + 1]
+	return None
+
+
+def node_get_size(node):
+	n = node.GetName()
+	n = n.split(';')
+	for i in range(len(n)):
+		if n[i] == 'size':
+			return int(n[i + 1])
+	return 1
 
 def make_solid_pos(x,y):
 	return gs.Vector3(x, y, 0.0)
 
 
-def throw_bullet(size=1.0):
-	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01 * size, md_screen_w * 0.01 * size), md_screen_h / 2), gs.Vector3())
-	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius * size, mass=size)
+def throw_bullet(size=1.0, mass=1.0):
+	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01 * size, md_screen_w * 0.01 * size), md_screen_h / 2 + (sphere_radius * size)), gs.Vector3())
+	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius * size, mass=mass)
 	rigid_body.ApplyLinearImpulse(world.GetY() * (-50 / scale_factor))
-	new_bullet.SetName("bullet")
+	type = 'sphere'
+	new_bullet.SetName('type;' + type + ';size;' + str(int(size)) + ';mass;' + str(int(mass)))
 
 
 def throw_bullets_at_interval(dt, interval=1.0):
@@ -81,6 +107,38 @@ def angle_to_image_index(angle):
 	angle *= (4/45)
 	angle = int(angle)
 	return angle
+
+
+# Scenario 0
+def execute_scenario_0(dt, dt_sum):
+	if not ('state' in g_dict):
+		g_dict['state'] = 0
+
+	if g_dict['state'] == 0:
+		if dt_sum < 10.0:
+			interval = RangeAdjust(dt_sum, 0.0, 5.0, 3.0, 0.25)
+			interval = Clamp(interval, 0.25, 3.0)
+			throw_bullets_at_interval(dt, interval)
+		else:
+			g_dict['state'] = 1
+
+	if g_dict['state'] == 1:
+		if dt_sum > 12.0:
+			throw_bullet(2.0, 25.0)
+			g_dict['state'] = 2
+
+	if g_dict['state'] == 2:
+		if dt_sum > 16.0:
+			throw_bullet(2.0, 25.0)
+			g_dict['state'] = 3
+
+	if g_dict['state'] == 3:
+		if dt_sum > 18.0:
+			throw_bullet(2.0, 35.0)
+			g_dict['state'] = 4
+
+
+# Scenario 1
 
 
 null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3(0,0,0)}
@@ -103,7 +161,7 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 		dt_sec = clock.update()
 
 	dt_sum += dt_sec
-	throw_bullets_at_interval(dt_sec, 0.25)
+	execute_scenario_0(dt_sec, dt_sum)
 
 	scene.update_scene(scn, dt_sec)
 
@@ -116,7 +174,7 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 
 	node_list = []
 	for _node in scn.GetNodes():
-		if _node.GetName() == "bullet":
+		if node_is_bullet(_node):
 			node_list.append(_node)
 
 	if record_motion:
@@ -125,7 +183,8 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 			_pos = current_node.GetTransform().GetPosition()
 			if md_screen_w * -0.5 < _pos.x < md_screen_w * 0.5:
 				if md_screen_h * -0.5 < _pos.y < md_screen_h * 0.5:
-					new_motion = {'position': _pos, 'rotation': current_node.GetTransform().GetRotation()}
+					new_motion = {'type': node_get_type(current_node), 'size': node_get_size(current_node),
+									'position': _pos, 'rotation': current_node.GetTransform().GetRotation()}
 					new_frame.append(new_motion)
 
 		if len(new_frame) < max_bullet:
@@ -134,7 +193,8 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 
 		stream_list.append(new_frame)
 
-	render.text2d(5, 25, "@%.2fFPS" % (1 / dt_sec))
+	render.text2d(5, 25, "@%.2f FPS" % (1 / dt_sec))
+	render.text2d(5, 40, "@%.2f sec" % (dt_sum))
 	render.flip()
 
 # Dump record
