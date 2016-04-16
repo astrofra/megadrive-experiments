@@ -100,7 +100,7 @@ def throw_bullets_at_interval(dt, interval=1.0):
 		bullet_count += 1
 
 
-def angle_to_image_index(angle):
+def angle_to_image_index(angle=0.0, type='sphere', size=1.0):
 	angle = -degrees(angle)
 	print(angle)
 	angle = angle%45
@@ -124,24 +124,24 @@ def execute_scenario_0(dt, dt_sum):
 
 	if g_dict['state'] == 1:
 		if dt_sum > 12.0:
-			throw_bullet(2.0, 25.0)
+			throw_bullet(1.0, 25.0)
 			g_dict['state'] = 2
 
 	if g_dict['state'] == 2:
 		if dt_sum > 16.0:
-			throw_bullet(2.0, 25.0)
+			throw_bullet(1.0, 25.0)
 			g_dict['state'] = 3
 
 	if g_dict['state'] == 3:
 		if dt_sum > 18.0:
-			throw_bullet(2.0, 35.0)
+			throw_bullet(1.0, 35.0)
 			g_dict['state'] = 4
 
 
 # Scenario 1
 
 
-null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3(0,0,0)}
+null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3(0,0,0), 'type': 'sphere', 'size': 1.0}
 throw_bullet_timeout = 0.0
 fixed_step = True
 record_motion = False
@@ -221,7 +221,7 @@ if len(stream_list) > 0:
 		for node_record in frame_record:
 			tmp_str = str(int((node_record['position'].x + (md_screen_w * 0.5)) * scale_factor) + 0x80 - 8) + ', '
 			tmp_str += str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80 - 8) + ', '
-			tmp_str += str(angle_to_image_index(node_record['rotation'].z))
+			tmp_str += str(angle_to_image_index(node_record['rotation'].z, node_record['type'], node_record['size']))
 			tmp_str += ', '
 			out_str += tmp_str
 
