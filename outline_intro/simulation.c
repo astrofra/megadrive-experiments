@@ -23,6 +23,7 @@ void RSE_physics_simulation(void)
 	    SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 		SPR_setPosition(&sprites[i], 0, 0);
 	}
+
     SPR_update(sprites, SIMULATION_0_NODE_LEN);
 	VDP_setHilightShadow(0);
 
