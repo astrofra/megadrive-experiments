@@ -19,6 +19,11 @@ max_bullet = 40
 framerate = 50
 sim_index = 0
 g_dict = {}
+ground = None
+
+sprite_specs = {'sphere': {'offset': 4, 'length': 4},
+                'sphere_black': {'offset': 0, 'length': 4},
+                'sphere_red': {'offset': 8, 'length': 4}}
 
 def tile_quantizer(x):
 	x /= sphere_radius
@@ -41,18 +46,12 @@ screen = scene.add_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,0
 
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.65, -0.45, 0)), gs.Light.Model_Linear, 150)
 scene.add_light(scn, gs.Matrix4.RotationMatrix(gs.Vector3(0.55, pi, 0.2)), gs.Light.Model_Linear, diffuse=gs.Color(0.3, 0.3, 0.4))
-scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 2,0), gs.Vector3(0,0,0)))
+ground = scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h / 2,0), gs.Vector3(0,0,0)))
 
-# walls
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-					  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-					  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
 
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-					  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
-scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-					  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+def enable_ground(flag):
+	global ground
+	ground[1].SetEnabled(flag)
 
 
 def node_is_bullet(node):
@@ -78,15 +77,15 @@ def node_get_size(node):
 			return int(n[i + 1])
 	return 1
 
+
 def make_solid_pos(x,y):
 	return gs.Vector3(x, y, 0.0)
 
 
-def throw_bullet(size=1.0, mass=1.0):
+def throw_bullet(size=1.0, mass=1.0, type='sphere'):
 	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01 * size, md_screen_w * 0.01 * size), md_screen_h / 2 + (sphere_radius * size)), gs.Vector3())
 	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius * size, mass=mass)
 	rigid_body.ApplyLinearImpulse(world.GetY() * (-50 / scale_factor))
-	type = 'sphere'
 	new_bullet.SetName('type;' + type + ';size;' + str(int(size)) + ';mass;' + str(int(mass)))
 
 
@@ -103,16 +102,30 @@ def throw_bullets_at_interval(dt, interval=1.0):
 def angle_to_image_index(angle=0.0, type='sphere', size=1.0):
 	angle = -degrees(angle)
 	print(angle)
-	angle = angle%45
-	angle *= (4/45)
+	angle %= 45
+	angle *= (sprite_specs[type]['length']/45)
 	angle = int(angle)
+	angle += sprite_specs[type]['offset']
 	return angle
 
+
+def setup_scenario_0():
+	# walls
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
 
 # Scenario 0
 def execute_scenario_0(dt, dt_sum):
 	if not ('state' in g_dict):
 		g_dict['state'] = 0
+		enable_ground(True)
 
 	if g_dict['state'] == 0:
 		if dt_sum < 10.0:
@@ -124,18 +137,23 @@ def execute_scenario_0(dt, dt_sum):
 
 	if g_dict['state'] == 1:
 		if dt_sum > 12.0:
-			throw_bullet(1.0, 25.0)
+			throw_bullet(1.0, 35.0, type='sphere_black')
 			g_dict['state'] = 2
 
 	if g_dict['state'] == 2:
 		if dt_sum > 16.0:
-			throw_bullet(1.0, 25.0)
+			throw_bullet(1.0, 30.0, type='sphere_black')
 			g_dict['state'] = 3
 
 	if g_dict['state'] == 3:
 		if dt_sum > 18.0:
-			throw_bullet(1.0, 35.0)
+			throw_bullet(1.0, 25.0, type='sphere_black')
 			g_dict['state'] = 4
+
+	if g_dict['state'] == 4:
+		if dt_sum > 20.0:
+			enable_ground(False)
+			g_dict['state'] = 5
 
 
 # Scenario 1
@@ -153,6 +171,7 @@ node_list = []
 dt_sum = 0.0
 
 # Start simulation & record
+setup_scenario_0()
 
 while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if fixed_step:
@@ -220,7 +239,7 @@ if len(stream_list) > 0:
 
 		for node_record in frame_record:
 			tmp_str = str(int((node_record['position'].x + (md_screen_w * 0.5)) * scale_factor) + 0x80 - 8) + ', '
-			tmp_str += str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80 - 8) + ', '
+			tmp_str += str(int(((md_screen_h * 0.5) - node_record['position'].y) * scale_factor) + 0x80 - 6) + ', '
 			tmp_str += str(angle_to_image_index(node_record['rotation'].z, node_record['type'], node_record['size']))
 			tmp_str += ', '
 			out_str += tmp_str
