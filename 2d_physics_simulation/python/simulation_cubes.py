@@ -10,6 +10,8 @@ import codecs
 from random import uniform
 from utils import *
 
+current_scenario = 1  # <------- SET ME TO 0, 1, ...
+
 filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
 md_screen_w = 320/scale_factor
@@ -17,13 +19,13 @@ md_screen_h = 224/scale_factor
 sphere_radius = (md_screen_w / 40.0) # / 2.0
 max_bullet = 40
 framerate = 50
-sim_index = 0
 g_dict = {}
 ground = None
 
 sprite_specs = {'sphere': {'offset': 4, 'length': 4},
                 'sphere_black': {'offset': 0, 'length': 4},
                 'sphere_red': {'offset': 8, 'length': 4}}
+
 
 def tile_quantizer(x):
 	x /= sphere_radius
@@ -121,7 +123,9 @@ def setup_scenario_0():
 	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
 						  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
 
-# Scenario 0
+
+# Scenario 0 ###########################################################################################################
+
 def execute_scenario_0(dt, dt_sum):
 	if not ('state' in g_dict):
 		g_dict['state'] = 0
@@ -155,9 +159,51 @@ def execute_scenario_0(dt, dt_sum):
 			enable_ground(False)
 			g_dict['state'] = 5
 
+	if g_dict['state'] == 5:
+		if dt_sum > 25.0:
+			return False
 
-# Scenario 1
+	return True
 
+
+# Scenario 1 ###########################################################################################################
+
+def setup_scenario_1():
+	# walls
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+
+
+def execute_scenario_1(dt, dt_sum):
+	if not ('state' in g_dict):
+		g_dict['state'] = 0
+		enable_ground(True)
+
+	if g_dict['state'] == 0:
+		if dt_sum < 10.0:
+			interval = RangeAdjust(dt_sum, 0.0, 5.0, 3.0, 0.25)
+			interval = Clamp(interval, 0.25, 3.0)
+			throw_bullets_at_interval(dt, interval)
+		else:
+			g_dict['state'] = 1
+
+	if g_dict['state'] == 1:
+		if dt_sum > 12.0:
+			enable_ground(False)
+			g_dict['state'] = 2
+
+	if g_dict['state'] == 2:
+		if dt_sum > 15.0:
+			return False
+
+	return True
 
 null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3(0,0,0), 'type': 'sphere', 'size': 1.0}
 throw_bullet_timeout = 0.0
@@ -170,8 +216,10 @@ node_list = []
 
 dt_sum = 0.0
 
+scenario_list = [[setup_scenario_0, execute_scenario_0], [setup_scenario_1, execute_scenario_1]]
+
 # Start simulation & record
-setup_scenario_0()
+scenario_list[current_scenario][0]()
 
 while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	if fixed_step:
@@ -180,16 +228,16 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 		dt_sec = clock.update()
 
 	dt_sum += dt_sec
-	execute_scenario_0(dt_sec, dt_sum)
-
-	scene.update_scene(scn, dt_sec)
 
 	if not record_motion and dt_sum > 0.0:
 		record_motion = True
-	else:
-		if record_motion and dt_sum > 25.0:
-			record_motion = False
-			record_done = True
+
+	if not scenario_list[current_scenario][1](dt_sec, dt_sum):
+		record_motion = False
+		record_done = True
+
+	scene.update_scene(scn, dt_sec)
+
 
 	node_list = []
 	for _node in scn.GetNodes():
@@ -219,13 +267,13 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 # Dump record
 
 if len(stream_list) > 0:
-	f = codecs.open(filename_out + '_' + str(sim_index) + '.h', 'w')
+	f = codecs.open(filename_out + '_' + str(current_scenario) + '.h', 'w')
 
 	f.write('#include "genesis.h"\n\n')
-	f.write('#define SIMULATION_' + str(sim_index) + '_FRAME_LEN ' + str(len(stream_list)) + '\n')
-	f.write('#define SIMULATION_' + str(sim_index) + '_NODE_LEN ' + str(max_bullet) + '\n\n')
+	f.write('#define SIMULATION_' + str(current_scenario) + '_FRAME_LEN ' + str(len(stream_list)) + '\n')
+	f.write('#define SIMULATION_' + str(current_scenario) + '_NODE_LEN ' + str(max_bullet) + '\n\n')
 
-	f.write('const s16 ' + 'physics_sim_' + str(sim_index) + '[] =' + '\n')
+	f.write('const s16 ' + 'physics_sim_' + str(current_scenario) + '[] =' + '\n')
 	f.write('{\n')
 
 	out_str = ''
