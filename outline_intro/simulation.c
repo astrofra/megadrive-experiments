@@ -12,33 +12,34 @@ void RSE_physics_simulation(void)
 	u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[80];
 	u8 current_scenario = 0;
-	s16 *physics_sim = NULL;
+	s16 *physics_sim;
 	s16 sim_frame_len, sim_node_len;
 
-	void set_simulation(void)
+	void inline set_simulation(void)
 	{
 		switch(current_scenario)
 		{
 			case 0:
-				physics_sim = physics_sim_0;
+				physics_sim = (s16 *)physics_sim_0;
 				sim_frame_len = SIMULATION_0_FRAME_LEN;
 				sim_node_len = SIMULATION_0_NODE_LEN;
 				break;
 
 			case 1:
-				physics_sim = physics_sim_1;
+				physics_sim = (s16 *)physics_sim_1;
 				sim_frame_len = SIMULATION_1_FRAME_LEN;
 				sim_node_len = SIMULATION_1_NODE_LEN;
 				break;
 		}
-	}
+	};
 
 	RSE_turn_screen_to_black();
 
+	set_simulation();
+
+	VDP_waitVSync();
 	SYS_disableInts();
-	MEM_init();
-	VDP_setPlanSize(64, 32);
-	VDP_setScreenWidth320();
+	// VDP_setPlanSize(64, 32);
 	VDP_clearPlan(APLAN, 1);
 	VDP_clearPlan(BPLAN, 1);	
 	SPR_init(257);
@@ -61,8 +62,6 @@ void RSE_physics_simulation(void)
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
 	SYS_enableInts();
-
-	set_simulation();
 
 	while (TRUE)
 	{

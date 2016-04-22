@@ -18,4 +18,4 @@
 #define LOGO_CHAR_W			112
 #define LOGO_CHAR_H			80
 
-#endif LOGO_SCREEN
+#endif
