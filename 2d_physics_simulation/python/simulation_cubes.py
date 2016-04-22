@@ -10,7 +10,7 @@ import codecs
 from random import uniform
 from utils import *
 
-current_scenario = 1  # <------- SET ME TO 0, 1, ...
+current_scenario = 0  # <------- SET ME TO 0, 1, ...
 
 filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
@@ -91,13 +91,13 @@ def throw_bullet(size=1.0, mass=1.0, type='sphere'):
 	new_bullet.SetName('type;' + type + ';size;' + str(int(size)) + ';mass;' + str(int(mass)))
 
 
-def throw_bullets_at_interval(dt, interval=1.0):
+def throw_bullets_at_interval(dt, interval=1.0, mass=1.0, type='sphere'):
 	global throw_bullet_timeout, bullet_count
 	throw_bullet_timeout += dt
 
 	if bullet_count < max_bullet and throw_bullet_timeout > interval:
 		throw_bullet_timeout = 0.0
-		throw_bullet()
+		throw_bullet(mass=mass, type=type)
 		bullet_count += 1
 
 
@@ -170,36 +170,33 @@ def execute_scenario_0(dt, dt_sum):
 
 def setup_scenario_1():
 	# walls
-	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
-	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.2), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * -0.1), tile_quantizer(md_screen_h * 0.25), 0),gs.Vector3(0,0, pi * 0.25)),
 						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
 
-	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * -0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-						  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
-	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_h * 0.4), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
-						  width=sphere_radius * 2.0, height=sphere_radius * 8, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * 0.1), tile_quantizer(md_screen_h * -0.15), 0),gs.Vector3(0,0, pi * -0.25)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * -0.1), tile_quantizer(md_screen_h * -0.5), 0),gs.Vector3(0,0, pi * 0.25)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
 
 
 def execute_scenario_1(dt, dt_sum):
 	if not ('state' in g_dict):
 		g_dict['state'] = 0
-		enable_ground(True)
+		enable_ground(False)
 
 	if g_dict['state'] == 0:
-		if dt_sum < 10.0:
-			interval = RangeAdjust(dt_sum, 0.0, 5.0, 3.0, 0.25)
-			interval = Clamp(interval, 0.25, 3.0)
-			throw_bullets_at_interval(dt, interval)
+		if dt_sum < 12.0:
+			interval = RangeAdjust(dt_sum, 0.0, 3.0, 3.0, 0.1)
+			interval = Clamp(interval, 0.1, 3.0)
+			if uniform(0.0, 1.0) < 0.1:
+				throw_bullets_at_interval(dt, interval, mass=25.0, type='sphere_black')
+			else:
+				throw_bullets_at_interval(dt, interval)
 		else:
 			g_dict['state'] = 1
 
 	if g_dict['state'] == 1:
-		if dt_sum > 12.0:
-			enable_ground(False)
-			g_dict['state'] = 2
-
-	if g_dict['state'] == 2:
 		if dt_sum > 15.0:
 			return False
 
