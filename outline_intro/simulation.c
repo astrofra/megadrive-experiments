@@ -1,6 +1,7 @@
 #include "genesis.h"
 #include <gfx.h>
 #include "writer.h"
+#include "demo_strings.h"
 #include "simulation_0.h"
 #include "simulation_1.h"
 #include "transition_helper.h"
@@ -27,12 +28,14 @@ void RSE_physics_simulation(void)
 				physics_sim = (s16 *)physics_sim_0;
 				sim_frame_len = SIMULATION_0_FRAME_LEN;
 				sim_node_len = SIMULATION_0_NODE_LEN;
+				demo_strings = (char **)strings_sim_0;
 				break;
 
 			case 1:
 				physics_sim = (s16 *)physics_sim_1;
 				sim_frame_len = SIMULATION_1_FRAME_LEN;
 				sim_node_len = SIMULATION_1_NODE_LEN;
+				demo_strings = (char **)strings_sim_1;
 				break;
 		}
 	};
@@ -67,6 +70,8 @@ void RSE_physics_simulation(void)
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_setPalette(PAL1, level_0.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
+
+	current_char_y = 2;
 
 	while (TRUE)
 	{

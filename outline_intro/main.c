@@ -17,6 +17,7 @@ void RSE_physics_simulation(void);
 
 u16 vramIndex;
 u16 fontIndex;
+char *demo_strings;
 
 int main()
 {

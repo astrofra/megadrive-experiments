@@ -1,9 +1,9 @@
 #include "genesis.h"
 #include <gfx.h>
 #include "writer.h"
-#include "demo_strings.h"
 
 extern u16 vramIndex;
+extern char **demo_strings;
 
 /* 
 	Global writer data 
@@ -123,7 +123,7 @@ u16 RSE_drawString(char *str)
 		{
 			i = charToTileIndex(c);
 			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade, current_char_y);
+				VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, current_char_y));
 		}
 	}
 
@@ -173,5 +173,5 @@ void inline RSE_updateLineWriter(void)
 				writer_state = WRT_CENTER_CUR_LINE;
 			}
 			break;
-	}		
+	}
 }

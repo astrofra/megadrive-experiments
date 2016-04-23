@@ -21,6 +21,7 @@ extern u16 current_string_len;
 extern u16 current_char_idx;
 extern u16 current_char_x;
 extern u16 writer_timer;
+extern u16 current_char_y;
 
 u16 RSE_loadFont(void);
 u16 RSE_drawString(char *str);

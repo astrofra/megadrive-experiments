@@ -1,6 +1,7 @@
 #include "genesis.h"
 #include <gfx.h>
 #include "logo_screen.h"
+#include "demo_strings.h"
 #include "transition_helper.h"
 #include "music.h"
 #include "writer.h"
@@ -40,7 +41,8 @@ u8 RSE_LogoScreen(void)
 	VDP_clearPlan(BPLAN, 0);	
 	SPR_init(257);
 
-	vramIndex = fontIndex;	
+	vramIndex = fontIndex;
+	demo_strings = (char **)strings_logo_0;
 
 	/* 
 		Group logo 
@@ -87,13 +89,16 @@ u8 RSE_LogoScreen(void)
 		SPR_update(sprites, 16);
 	}
 
+	current_char_y = 18;
+	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, 64, TRUE);
 
 	vblCount = 0;
 	while (vblCount < 60 * 5)
 	{
 		VDP_waitVSync();
-		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);	
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);
+		RSE_updateLineWriter();
 		vblCount++;
 	}
 
@@ -101,7 +106,7 @@ u8 RSE_LogoScreen(void)
 	while (vblCount < (60 * 5) + 32)
 	{
 		VDP_waitVSync();
-		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);		
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
 		vblCount++;
 	}
 
@@ -117,7 +122,7 @@ u8 RSE_LogoScreen(void)
 			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
 		}
 		SPR_update(sprites, 16);
-		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);		
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
 		vblCount++;
 	}
 
