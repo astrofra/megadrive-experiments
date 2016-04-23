@@ -1,15 +1,19 @@
 #include "genesis.h"
 #include <gfx.h>
+#include "writer.h"
 #include "simulation_0.h"
 #include "simulation_1.h"
 #include "transition_helper.h"
 
 #define MAX_SIMULATION 2;
 
+extern u16 vramIndex;
+extern u16 fontIndex;
+
 void RSE_physics_simulation(void)
 {
 	u32 vblCount = 0, i, j;
-	u16 vramIndex = TILE_USERINDEX;
+	// u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[80];
 	u8 current_scenario = 0;
 	s16 *physics_sim;
@@ -53,19 +57,22 @@ void RSE_physics_simulation(void)
     SPR_update(sprites, sim_node_len);
 	VDP_setHilightShadow(0);
 
-	vramIndex = TILE_USERINDEX;
+	vramIndex = fontIndex;
 
-	VDP_drawImageEx(APLAN, &level_0, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	VDP_drawImageEx(BPLAN, &level_0, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += level_0.tileset->numTile;
 
-	VDP_setPalette(PAL0, level_0.palette->data);
-	VDP_setPalette(PAL2, ball_metal.palette->data);
-
 	SYS_enableInts();
+
+	VDP_setPalette(PAL0, oddball_fonts.palette->data);
+	VDP_setPalette(PAL1, level_0.palette->data);
+	VDP_setPalette(PAL2, ball_metal.palette->data);
 
 	while (TRUE)
 	{
 		VDP_waitVSync();
+
+		RSE_updateLineWriter();
 	
 		j = vblCount * sim_node_len * 3;
 		for(i = 0; i < sim_node_len;i++)

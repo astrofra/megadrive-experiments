@@ -3,12 +3,15 @@
 #include "logo_screen.h"
 #include "transition_helper.h"
 #include "music.h"
+#include "writer.h"
 
-void RSE_LogoScreen(void)
+extern u16 vramIndex;
+extern u16 fontIndex;
+
+u8 RSE_LogoScreen(void)
 {
 	u16 vblCount = 0;
 	s16 i, j, k;
-	u16 vramIndex = TILE_USERINDEX;
 	s16 tile_scroll_h[1024];
 	Sprite sprites[16];
 
@@ -36,6 +39,8 @@ void RSE_LogoScreen(void)
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);	
 	SPR_init(257);
+
+	vramIndex = fontIndex;	
 
 	/* 
 		Group logo 
@@ -88,7 +93,7 @@ void RSE_LogoScreen(void)
 	while (vblCount < 60 * 5)
 	{
 		VDP_waitVSync();
-		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);		
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 80, TRUE);	
 		vblCount++;
 	}
 
@@ -120,12 +125,12 @@ void RSE_LogoScreen(void)
 		Demo logo 
 	*/
 	SYS_disableInts();
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);
+	// VDP_clearPlan(APLAN, 0);
+	// VDP_clearPlan(BPLAN, 0);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setHilightShadow(0);
 	SPR_end();
-	vramIndex = TILE_USERINDEX;
+	vramIndex = fontIndex;
 
 	VDP_drawImageEx(BPLAN, &logo_demo, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_DEMO_W) >> 4), ((SCR_H - LOGO_DEMO_H) >> 4) - 2, FALSE, TRUE);
 	vramIndex += logo_demo.tileset->numTile;
@@ -152,4 +157,8 @@ void RSE_LogoScreen(void)
 	VDP_fadeOut(1, 63, 32, TRUE);
 	RSE_pause(60);
 
+	VDP_setVerticalScroll(PLAN_B, 0);
+	VDP_setVerticalScroll(PLAN_A, 0);
+
+	return 0;
 }
