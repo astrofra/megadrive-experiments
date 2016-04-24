@@ -24,6 +24,7 @@ extern u16 writer_options;
 #define WRT_WRITE_CUR_LINE 1
 #define WRT_WAIT 2
 #define WRT_CLEAR_LINE 3
+#define WRT_IDLE_MODE 16
 
 /*
 	Writer options
@@ -33,10 +34,12 @@ extern u16 writer_options;
 #define WRT_OPT_AUTO_LINE_FEED 		(1 << 1)
 #define WRT_OPT_AUTO_NEXT_STRING	(1 << 2)
 #define WRT_OPT_AUTO_RESTART		(1 << 3)
+#define WRT_OPT_HALF_SPEED			(1 << 4)
 
 #define WRT_HAS_OPTION(OPT) (OPT & writer_options)
 
 u16 RSE_writerSetup(void);
+void RSE_writerRestart(void);
 u16 RSE_writerDrawString(char *str);
 void RSE_writerUpdateLine(void);
 u16 RSE_writerSetOption(u16 option);

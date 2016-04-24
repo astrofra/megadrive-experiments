@@ -29,6 +29,7 @@ void RSE_physics_simulation(void)
 				sim_frame_len = SIMULATION_0_FRAME_LEN;
 				sim_node_len = SIMULATION_0_NODE_LEN;
 				demo_strings = (char **)strings_sim_0;
+				RSE_writerRestart();
 				break;
 
 			case 1:
@@ -36,6 +37,7 @@ void RSE_physics_simulation(void)
 				sim_frame_len = SIMULATION_1_FRAME_LEN;
 				sim_node_len = SIMULATION_1_NODE_LEN;
 				demo_strings = (char **)strings_sim_1;
+				RSE_writerRestart();
 				break;
 		}
 	};

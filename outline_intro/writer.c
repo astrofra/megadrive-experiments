@@ -94,6 +94,14 @@ u16 RSE_writerSetup(void)
 	return vramIndex;
 }
 
+void RSE_writerRestart(void)
+{
+	writer_switch = FALSE;
+	current_string_idx = 0;
+	current_char_idx = 0;
+	writer_state = WRT_CENTER_CUR_LINE;
+}
+
 u16 inline RSE_writerSetOption(u16 option)
 {
 	writer_options |= option;
@@ -134,12 +142,13 @@ u16 RSE_writerDrawString(char *str)
 
 void inline RSE_writerUpdateLine(void)
 {
-	if (writer_state != WRT_CLEAR_LINE)
-	{
-		writer_switch = ~writer_switch;
-		if (writer_switch)
-			return;
-	}
+	if (WRT_HAS_OPTION(WRT_OPT_HALF_SPEED))
+		if (writer_state != WRT_CLEAR_LINE)
+		{
+			writer_switch = ~writer_switch;
+			if (writer_switch)
+				return;
+		}
 
 	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
 		current_plan = VDP_PLAN_A;
@@ -179,10 +188,18 @@ void inline RSE_writerUpdateLine(void)
 				current_char_idx = 0;
 				current_string_idx++;
 				if (demo_strings[current_string_idx][0] == '\0')
-					current_string_idx = 0;
+				{
+					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
+						current_string_idx = 0;
+					else
+						writer_state = WRT_IDLE_MODE;
+				}
 
 				writer_state = WRT_CENTER_CUR_LINE;
 			}
 			break;
+
+		case WRT_IDLE_MODE:
+			return;
 	}
 }
