@@ -10,6 +10,7 @@ extern u16 current_char_x;
 extern u16 current_char_y;
 extern u16 writer_timer;
 extern u16 writer_options;
+extern u16 writer_display_duration;
 
 #ifndef RSE_WRITER
 #define RSE_WRITER

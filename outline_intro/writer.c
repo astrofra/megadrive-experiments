@@ -17,6 +17,7 @@ u16 current_char_x;
 u16 current_char_y = 2;
 u16 current_plan;
 u16 writer_timer;
+u16 writer_display_duration = 50;
 u16 writer_options = (WRT_OPT_AUTO_NEXT_STRING | WRT_OPT_AUTO_RESTART | WRT_OPT_WRITE_TO_PLAN_A);
 
 u16 inline computeStringLen(char *str)
@@ -172,7 +173,7 @@ void inline RSE_writerUpdateLine(void)
 			break;
 
 		case WRT_WAIT:
-			if (writer_timer++ > 50)
+			if (writer_timer++ > writer_display_duration)
 			{
 				writer_state = WRT_CLEAR_LINE;
 				current_char_x = 0;
@@ -192,7 +193,10 @@ void inline RSE_writerUpdateLine(void)
 					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
 						current_string_idx = 0;
 					else
+					{
 						writer_state = WRT_IDLE_MODE;
+						return;
+					}
 				}
 
 				writer_state = WRT_CENTER_CUR_LINE;
