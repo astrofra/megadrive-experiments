@@ -67,17 +67,21 @@ void RSE_physics_simulation(void)
 
 	SYS_enableInts();
 
-	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_setPalette(PAL1, level_0.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
+	/*	
+		Prepare text writer
+	*/
 	current_char_y = 2;
+	RSE_writerSetOption(WRT_OPT_WRITE_TO_PLAN_A);
+	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 
 	while (TRUE)
 	{
 		VDP_waitVSync();
 
-		RSE_updateLineWriter();
+		RSE_writerUpdateLine();
 	
 		j = vblCount * sim_node_len * 3;
 		for(i = 0; i < sim_node_len;i++)

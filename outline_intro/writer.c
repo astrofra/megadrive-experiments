@@ -15,7 +15,9 @@ u16 current_string_len;
 u16 current_char_idx;
 u16 current_char_x;
 u16 current_char_y = 2;
+u16 current_plan;
 u16 writer_timer;
+u16 writer_options = (WRT_OPT_AUTO_NEXT_STRING | WRT_OPT_AUTO_RESTART | WRT_OPT_WRITE_TO_PLAN_A);
 
 u16 inline computeStringLen(char *str)
 {
@@ -95,8 +97,10 @@ u16 inline charToTileIndex(char c)
 	return 0xFF;
 }
 
-u16 RSE_loadFont(void)
+u16 RSE_writerSetup(void)
 {
+	current_plan = VDP_PLAN_A;
+
 	SYS_disableInts();
 	VDP_drawImageEx(APLAN, &oddball_fonts, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	VDP_clearPlan(APLAN, 0);
@@ -107,7 +111,19 @@ u16 RSE_loadFont(void)
 	return vramIndex;
 }
 
-u16 RSE_drawString(char *str)
+u16 inline RSE_writerSetOption(u16 option)
+{
+	writer_options |= option;
+	return writer_options;
+}
+
+u16 inline RSE_writerUnsetOption(u16 option)
+{
+	writer_options &= ~option;
+	return writer_options;
+}
+
+u16 RSE_writerDrawString(char *str)
 {
 	char c;
 	u16 i, fade, faded_idx;
@@ -123,7 +139,7 @@ u16 RSE_drawString(char *str)
 		{
 			i = charToTileIndex(c);
 			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, current_char_y));
+				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, current_char_y));
 		}
 	}
 
@@ -133,8 +149,13 @@ u16 RSE_drawString(char *str)
 	return TRUE;
 }
 
-void inline RSE_updateLineWriter(void)
+void inline RSE_writerUpdateLine(void)
 {
+	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
+		current_plan = VDP_PLAN_A;
+	else
+		current_plan = VDP_PLAN_B;
+
 	switch(writer_state)
 	{
 		case WRT_CENTER_CUR_LINE:
@@ -144,7 +165,7 @@ void inline RSE_updateLineWriter(void)
 			break;
 
 		case WRT_WRITE_CUR_LINE:
-			if (!RSE_drawString((char *)demo_strings[current_string_idx]))
+			if (!RSE_writerDrawString((char *)demo_strings[current_string_idx]))
 			{
 				writer_timer = 0;
 				writer_state = WRT_WAIT;
@@ -160,7 +181,7 @@ void inline RSE_updateLineWriter(void)
 			break;
 
 		case WRT_CLEAR_LINE:
-			VDP_setTileMapXY(VDP_PLAN_A, 0, current_char_x, current_char_y);
+			VDP_setTileMapXY(current_plan, 0, current_char_x, current_char_y);
 			current_char_x++;
 			if (current_char_x > 320 / 8)
 			{

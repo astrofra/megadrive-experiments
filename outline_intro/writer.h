@@ -1,5 +1,16 @@
 #include "genesis.h"
 
+extern u16 writer_state;
+extern u16 writer_switch;
+extern u16 current_string_idx;
+extern u16 current_string_len;
+extern u16 current_char_idx;
+extern u16 current_plan;
+extern u16 current_char_x;
+extern u16 current_char_y;
+extern u16 writer_timer;
+extern u16 writer_options;
+
 #ifndef RSE_WRITER
 #define RSE_WRITER
 
@@ -14,17 +25,21 @@
 #define WRT_WAIT 2
 #define WRT_CLEAR_LINE 3
 
-extern u16 writer_state;
-extern u16 writer_switch;
-extern u16 current_string_idx;
-extern u16 current_string_len;
-extern u16 current_char_idx;
-extern u16 current_char_x;
-extern u16 writer_timer;
-extern u16 current_char_y;
+/*
+	Writer options
+	/!\ NOT IMPLEMENTED YET
+*/
+#define WRT_OPT_WRITE_TO_PLAN_A		1
+#define WRT_OPT_AUTO_LINE_FEED 		(1 << 1)
+#define WRT_OPT_AUTO_NEXT_STRING	(1 << 2)
+#define WRT_OPT_AUTO_RESTART		(1 << 3)
 
-u16 RSE_loadFont(void);
-u16 RSE_drawString(char *str);
-void RSE_updateLineWriter(void);
+#define WRT_HAS_OPTION(OPT) (OPT & writer_options)
+
+u16 RSE_writerSetup(void);
+u16 RSE_writerDrawString(char *str);
+void RSE_writerUpdateLine(void);
+u16 RSE_writerSetOption(u16 option);
+u16 RSE_writerUnsetOption(u16 option);
 
 #endif

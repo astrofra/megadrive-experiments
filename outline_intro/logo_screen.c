@@ -16,19 +16,32 @@ u8 RSE_LogoScreen(void)
 	s16 tile_scroll_h[1024];
 	Sprite sprites[16];
 
-	void inline DrawSpotlights(void)
+	void inline drawVerticalStripes(void)
 	{
 	    u16 row, column;
-	    u16 tile_spotlight;
+	    u16 tile_stripes;
 
 	    for(row = 0; row < NUM_ROWS; row++)
 		    for(column = 0; column < NUM_SPOTLIGHTS; column++)
-			    for(tile_spotlight = 0; tile_spotlight < SPOTLIGHT_WIDTH; tile_spotlight++)
+			    for(tile_stripes = 0; tile_stripes < SPOTLIGHT_WIDTH; tile_stripes++)
 			    {
-			       VDP_setTileMapXY( APLAN, TILE_ATTR_FULL(PAL0, column%2, 0, 0, VRAM_POS_TILE_VOID),
-			          (column * SPOTLIGHT_WIDTH) + tile_spotlight, row);
+			       VDP_setTileMapXY( APLAN, TILE_ATTR_FULL(PAL0, column%2, 0, 0, TILE_SYSTEMINDEX),
+			          (column * SPOTLIGHT_WIDTH) + tile_stripes, row);
 			    }
 	}
+
+	void inline clearVerticalStripes(u16 row)
+	{
+	    u16 column;
+	    u16 tile_stripes;
+
+		for(column = 0; column < NUM_SPOTLIGHTS; column++)
+			for(tile_stripes = 0; tile_stripes < SPOTLIGHT_WIDTH; tile_stripes++)
+			{
+				VDP_setTileMapXY( APLAN, TILE_ATTR_FULL(PAL0, 1, 0, 0, TILE_SYSTEMINDEX),
+				(column * SPOTLIGHT_WIDTH) + tile_stripes, row);
+			}
+	}	
 
 	/* 
 		Screen init 
@@ -49,7 +62,7 @@ u8 RSE_LogoScreen(void)
 	*/
 	VDP_setHilightShadow(1); 
 	VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
-	DrawSpotlights();
+	drawVerticalStripes();
 
     vramIndex += logo_rse_bottom_9bits.tileset->numTile;
 
@@ -89,7 +102,12 @@ u8 RSE_LogoScreen(void)
 		SPR_update(sprites, 16);
 	}
 
+	/*	
+		Prepare text writer
+	*/
 	current_char_y = 18;
+	clearVerticalStripes(current_char_y);
+	RSE_writerUnsetOption(WRT_OPT_WRITE_TO_PLAN_A);
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, 64, TRUE);
 
@@ -98,7 +116,7 @@ u8 RSE_LogoScreen(void)
 	{
 		VDP_waitVSync();
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);
-		RSE_updateLineWriter();
+		RSE_writerUpdateLine();
 		vblCount++;
 	}
 
@@ -125,6 +143,8 @@ u8 RSE_LogoScreen(void)
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
 		vblCount++;
 	}
+
+	RSE_clearTileRow(current_char_y);
 
 	/* 
 		Demo logo 

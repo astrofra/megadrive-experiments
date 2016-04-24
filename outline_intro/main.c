@@ -29,7 +29,7 @@ int main()
 		Load the font tiles
 		that will be used during all the demo
 	*/
-	fontIndex = RSE_loadFont();
+	fontIndex = RSE_writerSetup();
 
 	/* RSE Logo */
 	RSE_LogoScreen();

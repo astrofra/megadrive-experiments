@@ -27,3 +27,11 @@ void RSE_pause(u16 frames)
 	while(--frames > 0)
 		VDP_waitVSync();
 }
+
+void RSE_clearTileRow(u16 row)
+{
+	u16 col, max_col;
+	max_col = VDP_getPlanWidth(); 
+	for(col = 0; col < max_col; col++)
+		VDP_setTileMapXY(BPLAN, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_SYSTEMINDEX), col, row);
+}
