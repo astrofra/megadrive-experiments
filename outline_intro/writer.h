@@ -14,8 +14,8 @@ extern u16 writer_options;
 #ifndef RSE_WRITER
 #define RSE_WRITER
 
-#define FONT_PUNCT_OFFSET 35
-#define FONT_LINE_OFFSET ((504 >> 3))
+#define FONT_PUNCT_OFFSET 36
+#define FONT_LINE_OFFSET ((416 >> 3))
 
 /*
 	States of the text writer

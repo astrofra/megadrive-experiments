@@ -34,62 +34,43 @@ u16 inline charToTileIndex(char c)
 		return (u16)(c - 'A'); 
 
 	if (c >= '0' && c <= '9')
-		return (u16)(c - '0') + 25;
+		return (u16)((c  + 26) - '0');
 
 	switch(c)
 	{
 		case '!':
 			return FONT_PUNCT_OFFSET;
-		case '"':
+		case '\'':
 			return FONT_PUNCT_OFFSET + 1;
-		case '#':
+		case '"':
 			return FONT_PUNCT_OFFSET + 2;
 		case '$':
 			return FONT_PUNCT_OFFSET + 3;
-		case '%':
-			return FONT_PUNCT_OFFSET + 4;
-		case '&':
-			return FONT_PUNCT_OFFSET + 5;
-		case '\'':
-			return FONT_PUNCT_OFFSET + 6;
-		case '(':
-			return FONT_PUNCT_OFFSET + 7;
-		case ')':
-			return FONT_PUNCT_OFFSET + 8;
-		case '*':
-			return FONT_PUNCT_OFFSET + 9;
-		case '+':
-			return FONT_PUNCT_OFFSET + 10;
-		case ',':
-			return FONT_PUNCT_OFFSET + 11;
-		case '-':
-			return FONT_PUNCT_OFFSET + 12;
-		case '.':
-			return FONT_PUNCT_OFFSET + 13;
 		case '/':
-			return FONT_PUNCT_OFFSET + 14;
-		case ':':
-			return FONT_PUNCT_OFFSET + 15;
-		case ';':
-			return FONT_PUNCT_OFFSET + 16;
-		case '<':
-			return FONT_PUNCT_OFFSET + 17;
-		case '=':
-			return FONT_PUNCT_OFFSET + 18;
-		case '>':
-			return FONT_PUNCT_OFFSET + 19;
+			return FONT_PUNCT_OFFSET + 4;
+		case '(':
+			return FONT_PUNCT_OFFSET + 5;
+		case ')':
+			return FONT_PUNCT_OFFSET + 6;
 		case '?':
-			return FONT_PUNCT_OFFSET + 20;
-		case '[':
-			return FONT_PUNCT_OFFSET + 21;
-		case '\\':
-			return FONT_PUNCT_OFFSET + 22;
-		case ']':
-			return FONT_PUNCT_OFFSET + 23;
-		case '^':
-			return FONT_PUNCT_OFFSET + 24;									
+			return FONT_PUNCT_OFFSET + 7;
+		case '-':
+			return FONT_PUNCT_OFFSET + 8;
 		case '_':
-			return FONT_PUNCT_OFFSET + 25;									
+			return FONT_PUNCT_OFFSET + 9;
+		case ':':
+			return FONT_PUNCT_OFFSET + 10;
+		case '=':
+			return FONT_PUNCT_OFFSET + 11;
+		case '*':
+			return FONT_PUNCT_OFFSET + 12;
+		case 'c':
+			return FONT_PUNCT_OFFSET + 13;
+		case '[':
+			return FONT_PUNCT_OFFSET + 14;
+		case ']':
+			return FONT_PUNCT_OFFSET + 15;
+
 	};
 
 	/* if no character was found,
@@ -107,6 +88,8 @@ u16 RSE_writerSetup(void)
 	SYS_enableInts();
 
 	vramIndex += oddball_fonts.tileset->numTile;
+
+	writer_switch = FALSE;
 
 	return vramIndex;
 }
@@ -151,6 +134,13 @@ u16 RSE_writerDrawString(char *str)
 
 void inline RSE_writerUpdateLine(void)
 {
+	if (writer_state != WRT_CLEAR_LINE)
+	{
+		writer_switch = ~writer_switch;
+		if (writer_switch)
+			return;
+	}
+
 	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
 		current_plan = VDP_PLAN_A;
 	else
