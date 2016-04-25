@@ -4,9 +4,10 @@
 #include "demo_strings.h"
 #include "simulation_0.h"
 #include "simulation_1.h"
+#include "simulation_2.h"
 #include "transition_helper.h"
 
-#define MAX_SIMULATION 2;
+#define MAX_SIMULATION 3;
 
 extern u16 vramIndex;
 extern u16 fontIndex;
@@ -39,6 +40,14 @@ void RSE_physics_simulation(void)
 				demo_strings = (char **)strings_sim_1;
 				RSE_writerRestart();
 				break;
+
+			case 2:
+				physics_sim = (s16 *)physics_sim_2;
+				sim_frame_len = SIMULATION_2_FRAME_LEN;
+				sim_node_len = SIMULATION_2_NODE_LEN;
+				demo_strings = (char **)strings_sim_0; // FIX ME
+				RSE_writerRestart();
+				break;				
 		}
 	};
 
