@@ -59,6 +59,7 @@ u8 RSE_LogoScreen(void)
 
 	/* 
 		Group logo 
+		Background (classic tile display)
 	*/
 	VDP_setHilightShadow(1); 
 	VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
@@ -66,6 +67,10 @@ u8 RSE_LogoScreen(void)
 
     vramIndex += logo_rse_bottom_9bits.tileset->numTile;
 
+	/* 
+		Group logo 
+		Large set of sprites
+	*/
 	for(i = 0; i < 16; i++)
 	{
 	    SPR_initSprite(&sprites[i], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
@@ -74,12 +79,15 @@ u8 RSE_LogoScreen(void)
 	}
     SPR_update(sprites, 1);
 
-	// VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	SYS_enableInts();
 
 	RSE_pause(15);
 
+	/*
+		Prepare a Sine table
+		to distort the background using the per-line scrolling
+	*/
 	for(i = 0; i < 1024; i++)
 		tile_scroll_h[i] = sinFix16(i << 2) / 2;
 
@@ -115,6 +123,10 @@ u8 RSE_LogoScreen(void)
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, 64, TRUE);
 
+	/*	
+		Write some text
+		while animating the background
+	*/
 	vblCount = 0;
 	while (vblCount < 60 * 6)
 	{
@@ -124,6 +136,10 @@ u8 RSE_LogoScreen(void)
 		vblCount++;
 	}
 
+	/*	
+		Fade out the background
+		while animating it
+	*/
 	VDP_fadePalTo(PAL1, palette_black, 32, TRUE);
 	while (vblCount < (60 * 6) + 32)
 	{
@@ -132,8 +148,11 @@ u8 RSE_LogoScreen(void)
 		vblCount++;
 	}
 
+	/*	
+		Fade out the foreground
+		while scrolling it from below
+	*/
 	VDP_fadeOut(1, 63, 32, TRUE);
-
 	for(i = 0; i < 32; i++)
 	{
 		VDP_waitVSync();
@@ -159,11 +178,18 @@ u8 RSE_LogoScreen(void)
 	SPR_end();
 	vramIndex = fontIndex;
 
+	/* 
+		Demo logo 
+		(classic tile display)
+	*/
 	VDP_drawImageEx(BPLAN, &logo_demo, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_DEMO_W) >> 4), ((SCR_H - LOGO_DEMO_H) >> 4) - 2, FALSE, TRUE);
 	vramIndex += logo_demo.tileset->numTile;
 
 	SYS_enableInts();
 
+	/*
+		Prepare a new Sine table
+	*/
 	for(i = 0; i < 1024; i++)
 	{
 		k = 1024 - i;
@@ -174,6 +200,11 @@ u8 RSE_LogoScreen(void)
 	VDP_setVerticalScrollTile(PLAN_B, 0, tile_scroll_h, 32, TRUE);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_2TILE);
 
+	/*
+		Fade in the logo
+		while scrolling it from below
+		with an animated sine-based offset
+	*/
 	VDP_fadePalTo(PAL1, logo_demo.palette->data, 32, TRUE);
 
 	for(i = 0; i < 1024 - 32; i += 4)
@@ -184,6 +215,9 @@ u8 RSE_LogoScreen(void)
 
 	RSE_pause(30);
 
+	/*
+		Simple "Outline logo"
+	*/
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_CHAR_W) >> 4), ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
 	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
 

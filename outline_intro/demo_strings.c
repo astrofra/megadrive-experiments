@@ -5,7 +5,6 @@ const char *strings_logo_0[] =
 	*/
 	"RESISTANCE PRESENTS\0",
 	"A 2016 RELEASE FOR THE SEGA MEGADRIVE\0",
-	// "RELEASED FOR THE OUTLINE 2016\0",
 
 	/*	Do not remove the next line */
 	"\0"
