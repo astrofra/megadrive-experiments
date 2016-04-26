@@ -8,6 +8,7 @@ import gs.plus.clock as clock
 from math import pi, cos, sin, asin, radians, degrees
 import codecs
 from random import uniform
+from random import seed
 from utils import *
 
 current_scenario = 2  # <------- SET ME TO 0, 1, ...
@@ -52,8 +53,16 @@ ground = scene.add_physic_plane(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vect
 
 
 def enable_ground(flag):
-	global ground
+	global ground, node_list
 	ground[1].SetEnabled(flag)
+
+	# if flag is False:
+	# 	for _node in node_list:
+	# 		if _node.GetComponent("RigidBody").GetIsSleeping():
+	# 			print("Node is sleeping!")
+	# 			_node.GetComponent("RigidBody").SetIsSleeping(False)
+	# 			_node.GetComponent("RigidBody").ApplyLinearImpulse(gs.Vector3(0,-10,0))
+	# 			_node.GetComponent("RigidBody").ApplyLinearForce(gs.Vector3(0,-10,0))
 
 
 def node_is_bullet(node):
@@ -272,6 +281,8 @@ scenario_list = [[setup_scenario_0, execute_scenario_0],
 
 # Main ========================================================================
 
+seed(0)
+
 null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3(0,0,0), 'type': 'sphere', 'size': 1.0}
 throw_bullet_timeout = 0.0
 fixed_step = True
@@ -308,6 +319,8 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 	for _node in scn.GetNodes():
 		if node_is_bullet(_node):
 			node_list.append(_node)
+			_node.GetComponent("RigidBody").SetIsSleeping(False)
+
 
 	if record_motion:
 		new_frame = []
