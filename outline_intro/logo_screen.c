@@ -1,6 +1,7 @@
 #include "genesis.h"
 #include <gfx.h>
 #include "logo_screen.h"
+#include "twister_fx.h"
 #include "demo_strings.h"
 #include "transition_helper.h"
 #include "music.h"
@@ -222,14 +223,20 @@ u8 RSE_LogoScreen(void)
 	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
 
 	RSE_pause(60 * 5);
+	// initTwisterFx();
+	// updateTwisterFx(0, 60 * 5);
 
 	VDP_fadeOut(1, 63, 32, TRUE);
 	RSE_pause(60);
+	// updateTwisterFx(60 * 5, 60);
+
+	// RSE_pause(5);
+
+	// disableTwisterFx();
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);
-
-	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
 	return 0;
 }
