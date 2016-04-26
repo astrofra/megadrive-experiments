@@ -222,18 +222,22 @@ u8 RSE_LogoScreen(void)
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_CHAR_W) >> 4), ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
 	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
 
-	RSE_pause(60 * 5);
-	// initTwisterFx();
-	// updateTwisterFx(0, 60 * 5);
+	// RSE_pause(60 * 5);
+	initTwisterFx();
+	updateTwisterFx(0, 60 * 5);
 
-	VDP_fadeOut(1, 63, 32, TRUE);
-	RSE_pause(60);
+	// VDP_fadeOut(1, 63, 32, TRUE);
+	// VDP_fadePalTo(PAL0, palette_black, 60, TRUE);
+	// RSE_pause(60);
 	// updateTwisterFx(60 * 5, 60);
 
 	// RSE_pause(5);
 
-	// disableTwisterFx();
+	disableTwisterFx();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+
+	VDP_fadeOut(1, 63, 16, TRUE);
+	RSE_pause(60);
 
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);

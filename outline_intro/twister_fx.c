@@ -47,6 +47,7 @@ void updateTwisterFx(u16 vcount_init, u16 duration)
 
 void disableTwisterFx(void)
 {
-	SYS_setHIntCallback(NULL);
+	VDP_setHInterrupt(0);
+	// SYS_setHIntCallback(NULL);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 }
