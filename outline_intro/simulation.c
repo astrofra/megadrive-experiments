@@ -5,9 +5,12 @@
 #include "simulation_0.h"
 #include "simulation_1.h"
 #include "simulation_2.h"
+#include "simulation_3.h"
+#include "simulation_4.h"
+#include "simulation_5.h"
 #include "transition_helper.h"
 
-#define MAX_SIMULATION 3;
+#define MAX_SIMULATION 6;
 
 extern u16 vramIndex;
 extern u16 fontIndex;
@@ -45,9 +48,33 @@ void RSE_physics_simulation(void)
 				physics_sim = (s16 *)physics_sim_2;
 				sim_frame_len = SIMULATION_2_FRAME_LEN;
 				sim_node_len = SIMULATION_2_NODE_LEN;
-				demo_strings = (char **)strings_sim_0; // FIX ME
+				demo_strings = (char **)strings_sim_2;
 				RSE_writerRestart();
-				break;				
+				break;
+
+			case 3:
+				physics_sim = (s16 *)physics_sim_3;
+				sim_frame_len = SIMULATION_3_FRAME_LEN;
+				sim_node_len = SIMULATION_3_NODE_LEN;
+				demo_strings = (char **)strings_sim_3;
+				RSE_writerRestart();
+				break;	
+
+			case 4:
+				physics_sim = (s16 *)physics_sim_4;
+				sim_frame_len = SIMULATION_4_FRAME_LEN;
+				sim_node_len = SIMULATION_4_NODE_LEN;
+				demo_strings = (char **)strings_sim_4;
+				RSE_writerRestart();
+				break;	
+
+			case 5:
+				physics_sim = (s16 *)physics_sim_4;
+				sim_frame_len = SIMULATION_4_FRAME_LEN;
+				sim_node_len = SIMULATION_4_NODE_LEN;
+				demo_strings = (char **)strings_sim_5;
+				RSE_writerRestart();
+				break;		
 		}
 	};
 
