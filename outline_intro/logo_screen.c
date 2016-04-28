@@ -219,7 +219,9 @@ u8 RSE_LogoScreen(void)
 	/*
 		Simple "Outline logo"
 	*/
-	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_CHAR_W) >> 4), ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 3, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
 	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
 
 	// RSE_pause(60 * 5);
