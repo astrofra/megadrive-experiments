@@ -189,6 +189,15 @@ u8 RSE_LogoScreen(void)
 	SYS_enableInts();
 
 	/*
+		Smiley sprite
+	*/
+	SPR_init(257);
+    SPR_initSprite(&sprites[0], &smiley_gelmir, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(&sprites[0], ((SCR_W - 96) >> 1), 220);
+	SPR_setFrame(&sprites[0], 0);
+    SPR_update(sprites, 1);	
+
+	/*
 		Prepare a new Sine table
 	*/
 	for(i = 0; i < 1024; i++)
@@ -208,20 +217,32 @@ u8 RSE_LogoScreen(void)
 	*/
 	VDP_fadePalTo(PAL1, logo_demo.palette->data, 32, TRUE);
 
-	for(i = 0; i < 1024 - 32; i += 4)
+	for(i = 0, j = 0; i < 1024 - 32; i += 4)
 	{
 		VDP_waitVSync();
 		VDP_setVerticalScrollTile(PLAN_B, 0, tile_scroll_h + i, 32, TRUE);
+
+		if (i >= 1024 - (64 * 4))
+		{
+			if (j == 0)
+				VDP_fadePalTo(PAL2, smiley_gelmir.palette->data, 16, TRUE);
+
+			j = (j * j) / 64;
+			SPR_setPosition(&sprites[0], ((SCR_W - 96) >> 1), ((SCR_H - 96) >> 1) + j);
+			SPR_update(sprites, 1);			
+			j++;
+		}
 	}
 
-	RSE_pause(30);
+
 
 	/*
-		Simple "Outline logo"
+		Fake raster bar (tile based)
 	*/
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 3, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
+
 	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
 
 	// RSE_pause(60 * 5);
@@ -243,6 +264,10 @@ u8 RSE_LogoScreen(void)
 
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);
+	VDP_setHorizontalScroll(PLAN_B, 0);
+	VDP_setHorizontalScroll(PLAN_A, 0);	
+
+	SPR_end();
 
 	return 0;
 }

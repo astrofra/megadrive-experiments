@@ -14,6 +14,7 @@ Framework : SGDK
 
 u8 RSE_LogoScreen(void);
 void RSE_physics_simulation(void);
+void RSE_plasma(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -31,8 +32,11 @@ int main()
 	*/
 	fontIndex = RSE_writerSetup();
 
-	/* RSE Logo */
+	// /* RSE Logo */
 	RSE_LogoScreen();
+
+	/* RSE Plasma */
+	RSE_plasma();
 
 	/* Demo !!! */
 	RSE_physics_simulation();
