@@ -15,12 +15,12 @@
 extern u16 vramIndex;
 extern u16 fontIndex;
 
-void RSE_physics_simulation(void)
+void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 {
 	u32 vblCount = 0, i, j;
 	// u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[80];
-	u8 current_scenario = 0;
+	u8 current_scenario;
 	s16 *physics_sim;
 	s16 sim_frame_len, sim_node_len;
 
@@ -80,6 +80,7 @@ void RSE_physics_simulation(void)
 
 	RSE_turn_screen_to_black();
 
+	current_scenario = first_sim;
 	set_simulation();
 
 	VDP_waitVSync();
@@ -115,7 +116,7 @@ void RSE_physics_simulation(void)
 	RSE_writerSetOption(WRT_OPT_WRITE_TO_PLAN_A);
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 
-	while (TRUE)
+	while (current_scenario <= last_sim)
 	{
 		VDP_waitVSync();
 
@@ -140,4 +141,6 @@ void RSE_physics_simulation(void)
 			set_simulation();
 		}
 	}
+
+	SPR_end();
 }

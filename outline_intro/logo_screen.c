@@ -16,6 +16,8 @@ u8 RSE_LogoScreen(void)
 	s16 i, j, k;
 	s16 tile_scroll_h[1024];
 	Sprite sprites[16];
+	u16 smiley_phase = 0;
+	s16 twister_jump_table[TWISTER_TABLE_SIZE];
 
 	void inline drawVerticalStripes(void)
 	{
@@ -42,7 +44,80 @@ u8 RSE_LogoScreen(void)
 				VDP_setTileMapXY( APLAN, TILE_ATTR_FULL(PAL0, 1, 0, 0, TILE_SYSTEMINDEX),
 				(column * SPOTLIGHT_WIDTH) + tile_stripes, row);
 			}
-	}	
+	}
+
+	void inline animateSmileyBounce(void)
+	{
+		s16 y;
+		y = cosFix16(smiley_phase << 3);
+		if (y < 0)
+			y = -y;
+		y = 64 - y;
+
+		SPR_setPosition(&sprites[0], ((SCR_W - 96) >> 1), 72 + y);
+		SPR_setFrame(&sprites[0], 0);
+	    SPR_update(sprites, 1);
+
+	    if (smiley_phase == 0)
+	    	VDP_fadePalTo(PAL2, smiley_gelmir.palette->data, 16, TRUE);
+
+	    smiley_phase++;	
+	}		
+
+	/*
+		Twister
+	*/
+	void initTwisterFx(void)
+	{
+		// s16 i, j;
+
+		for(i = 0, j = 0; i < TWISTER_TABLE_SIZE; i++)
+		{
+			j = sinFix16(i << 2) >> 2;
+			twister_jump_table[i] = j;
+		}
+
+		VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+	}
+
+	void updateTwisterFx(u16 vcount_init, u16 duration)
+	{
+		u16 vcount, hbl_done = FALSE;
+
+	    vu16 *pw;
+	    vu32 *pl;
+
+	    pw = (u16 *) GFX_DATA_PORT;
+	    pl = (u32 *) GFX_CTRL_PORT;
+
+		static void hBlank(){
+
+		    *pl = CST_WRITE_VSRAM_ADDR(0);
+		    *pw = twister_jump_table[(GET_VCOUNTER + vcount) & ((TWISTER_TABLE_SIZE >> 2) - 1)];
+		    if (!hbl_done)
+		    {
+		    	hbl_done = TRUE;
+			    animateSmileyBounce();	
+		    }
+		}
+
+		VDP_setHInterrupt(1);
+		SYS_setHIntCallback(&hBlank);
+
+		vcount = vcount_init;
+		while (vcount < duration)
+		{
+			VDP_waitVSync();
+			hbl_done = FALSE;
+			vcount++;
+		}	
+	}
+
+	void disableTwisterFx(void)
+	{
+		VDP_setHInterrupt(0);
+		VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+	}		
 
 	/* 
 		Screen init 
@@ -183,7 +258,7 @@ u8 RSE_LogoScreen(void)
 		Demo logo 
 		(classic tile display)
 	*/
-	VDP_drawImageEx(BPLAN, &logo_demo, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_DEMO_W) >> 4), ((SCR_H - LOGO_DEMO_H) >> 4) - 2, FALSE, TRUE);
+	VDP_drawImageEx(BPLAN, &logo_demo, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_DEMO_W) >> 4), ((SCR_H - LOGO_DEMO_H) >> 4) - 2, FALSE, FALSE);
 	vramIndex += logo_demo.tileset->numTile;
 
 	SYS_enableInts();
@@ -195,7 +270,7 @@ u8 RSE_LogoScreen(void)
     SPR_initSprite(&sprites[0], &smiley_gelmir, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 	SPR_setPosition(&sprites[0], ((SCR_W - 96) >> 1), 220);
 	SPR_setFrame(&sprites[0], 0);
-    SPR_update(sprites, 1);	
+    SPR_update(sprites, 1);
 
 	/*
 		Prepare a new Sine table
@@ -222,26 +297,16 @@ u8 RSE_LogoScreen(void)
 		VDP_waitVSync();
 		VDP_setVerticalScrollTile(PLAN_B, 0, tile_scroll_h + i, 32, TRUE);
 
-		if (i >= 1024 - (64 * 4))
-		{
-			if (j == 0)
-				VDP_fadePalTo(PAL2, smiley_gelmir.palette->data, 16, TRUE);
-
-			j = (j * j) / 64;
-			SPR_setPosition(&sprites[0], ((SCR_W - 96) >> 1), ((SCR_H - 96) >> 1) + j);
-			SPR_update(sprites, 1);			
-			j++;
-		}
+		if (i >= 1024 - (160 * 4))
+			animateSmileyBounce();
 	}
-
-
 
 	/*
 		Fake raster bar (tile based)
 	*/
-	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 3, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 3, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
 
 	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
 

@@ -46,17 +46,17 @@ void RSE_plasma(void)
 
 	vramIndex = fontIndex;
 
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);
 
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 128 >> 3, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 128 >> 3, FALSE, FALSE);
 
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 256 >> 3, FALSE, TRUE);
-	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, TRUE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 256 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
 
 	vramIndex += plasma.tileset->numTile;
 

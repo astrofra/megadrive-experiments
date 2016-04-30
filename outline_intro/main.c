@@ -13,7 +13,7 @@ Framework : SGDK
 */
 
 u8 RSE_LogoScreen(void);
-void RSE_physics_simulation(void);
+void RSE_physics_simulation(u8 first_sim, u8 last_sim);
 void RSE_plasma(void);
 
 u16 vramIndex;
@@ -35,9 +35,18 @@ int main()
 	// /* RSE Logo */
 	RSE_LogoScreen();
 
+	RSE_plasma();
+
+	/* Demo !!! */
+	RSE_physics_simulation(0, 1);
+
 	/* RSE Plasma */
 	RSE_plasma();
 
 	/* Demo !!! */
-	RSE_physics_simulation();
+	RSE_physics_simulation(2, 3);
+
+	while(TRUE)
+		VDP_waitVSync();
+
 }
