@@ -10,7 +10,11 @@
 #include "simulation_5.h"
 #include "transition_helper.h"
 
-#define MAX_SIMULATION 6;
+#define MAX_SIMULATION 6
+
+#define SIM_MODE_RUN			0
+#define SIM_MODE_SCROLL			1
+#define SIM_MODE_SET_NEW_SIM	2
 
 extern u16 vramIndex;
 extern u16 fontIndex;
@@ -22,6 +26,9 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	u8 current_scenario;
 	s16 *physics_sim;
 	s16 sim_frame_len, sim_node_len;
+	u8 sim_mode;
+	s8 scroll_speed;
+	s16 scroll_x;
 
 	void inline set_simulation(void)
 	{
@@ -101,6 +108,8 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 
 	VDP_drawImageEx(BPLAN, &level_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 
+	SYS_enableInts();
+
 	for(i = 2; i < 640 >> 3; i ++)
 	{
 		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), i, 0);
@@ -115,7 +124,6 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 			VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 8), i, j);
 		for(j = 9; j < 24; j += 2)
 			VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 9), i, j);
-
 		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 10), i, ((224 - 8) >> 3) - 2);
 		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 11), i, ((224 - 8) >> 3) - 1);
 		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 12), i, ((224 - 8) >> 3));
@@ -123,13 +131,15 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 
 	vramIndex += level_bg.tileset->numTile;
 
+	SYS_disableInts();
+
 	VDP_drawImageEx(APLAN, &level_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 48) >> 3, FALSE, TRUE);
-	
-	SYS_enableInts();
 
 	VDP_setPalette(PAL0, level_0.palette->data);
 	VDP_setPalette(PAL1, level_bg.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
+
+	SYS_enableInts();
 
 	/*	
 		Prepare text writer
@@ -138,30 +148,69 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	RSE_writerSetOption(WRT_OPT_WRITE_TO_PLAN_A);
 	// VDP_setPalette(PAL0, oddball_fonts.palette->data);
 
+	sim_mode = SIM_MODE_RUN;
+	scroll_speed = -1;
+	scroll_x = 0;	
+
 	while (current_scenario <= last_sim)
 	{
 		VDP_waitVSync();
 
-		RSE_writerUpdateLine();
-	
-		j = vblCount * sim_node_len * 3;
-		for(i = 0; i < sim_node_len;i++)
+		switch(sim_mode)
 		{
-			sprites[i].x = physics_sim[j++];
-			sprites[i].y = physics_sim[j++];
-			SPR_setFrame(&sprites[i], physics_sim[j++]);
+			case SIM_MODE_RUN:
+				RSE_writerUpdateLine();
+
+				j = vblCount * sim_node_len * 3;
+				for(i = 0; i < sim_node_len;i++)
+				{
+					sprites[i].x = physics_sim[j++];
+					sprites[i].y = physics_sim[j++];
+					SPR_setFrame(&sprites[i], physics_sim[j++]);
+				}
+
+				SPR_update(sprites, sim_node_len);
+
+				vblCount++;
+				if (vblCount >= sim_frame_len)
+				{
+					vblCount = 0;
+					sim_mode = SIM_MODE_SCROLL;
+				}
+				break;
+
+			case SIM_MODE_SCROLL:
+				scroll_x += (scroll_speed << 2);
+				if (scroll_speed > 0)
+				{
+					if (scroll_x > 0)
+					{
+						scroll_x = 0;
+						scroll_speed = -1;
+						sim_mode = SIM_MODE_SET_NEW_SIM;
+					}
+				}
+				else
+				{
+					if (scroll_x < -320)
+					{
+						scroll_x = -320;
+						scroll_speed = 1;
+						sim_mode = SIM_MODE_SET_NEW_SIM;
+					}					
+				}
+				VDP_setHorizontalScroll(PLAN_A, scroll_x);
+				VDP_setHorizontalScroll(PLAN_B, scroll_x >> 2);
+				break;
+
+			case SIM_MODE_SET_NEW_SIM:
+					current_scenario++;
+					current_scenario %= MAX_SIMULATION;
+					set_simulation();
+					sim_mode = SIM_MODE_RUN;
+					break;
 		}
 
-		SPR_update(sprites, sim_node_len);
-
-		vblCount++;
-		if (vblCount >= sim_frame_len)
-		{
-			vblCount = 0;
-			current_scenario++;
-			current_scenario %= MAX_SIMULATION;
-			set_simulation();
-		}
 	}
 
 	SPR_end();
