@@ -18,7 +18,6 @@ extern u16 fontIndex;
 void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 {
 	u32 vblCount = 0, i, j;
-	// u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[80];
 	u8 current_scenario;
 	s16 *physics_sim;
@@ -91,9 +90,8 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	SPR_init(257);
 	for(i = 0; i < SIMULATION_0_NODE_LEN;i++)
 	{
-	    SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	    SPR_initSprite(&sprites[i], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
 		SPR_setPosition(&sprites[i], 0, 0);
-		// SPR_setFrame(&sprites[i], i%12);
 	}
 
     SPR_update(sprites, sim_node_len);
@@ -102,17 +100,34 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	vramIndex = fontIndex;
 
 	VDP_drawImageEx(BPLAN, &level_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+
+	for(i = 2; i < 640 >> 3; i ++)
+	{
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), i, 0);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 1), i, 1);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 2), i, 2);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 3), i, 3);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 4), i, 4);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 5), i, 5);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 6), i, 6);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 7), i, 7);
+		for(j = 8; j < 25; j += 2)
+			VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 8), i, j);
+		for(j = 9; j < 24; j += 2)
+			VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 9), i, j);
+
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 10), i, ((224 - 8) >> 3) - 2);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 11), i, ((224 - 8) >> 3) - 1);
+		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 12), i, ((224 - 8) >> 3));
+	}
+
 	vramIndex += level_bg.tileset->numTile;
 
+	VDP_drawImageEx(APLAN, &level_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 48) >> 3, FALSE, TRUE);
+	
 	SYS_enableInts();
 
-	for(i = 2; i < 640 >> 3; i += 2)
-	{
-		VDP_waitVSync();
-		VDP_drawImageEx(BPLAN, &level_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), i, 0, FALSE, TRUE);
-	}
-	// VDP_drawImageEx(BPLAN, &level_0, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 320 >> 3, 0, FALSE, TRUE);
-
+	VDP_setPalette(PAL0, level_0.palette->data);
 	VDP_setPalette(PAL1, level_bg.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
@@ -121,7 +136,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	*/
 	current_char_y = 2;
 	RSE_writerSetOption(WRT_OPT_WRITE_TO_PLAN_A);
-	VDP_setPalette(PAL0, oddball_fonts.palette->data);
+	// VDP_setPalette(PAL0, oddball_fonts.palette->data);
 
 	while (current_scenario <= last_sim)
 	{

@@ -32,7 +32,7 @@ int main()
 	*/
 	fontIndex = RSE_writerSetup();
 
-	// /* RSE Logo */
+	/* RSE Logo */
 	RSE_LogoScreen();
 
 	RSE_plasma();
