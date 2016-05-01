@@ -1,4 +1,5 @@
 #include "genesis.h"
+#include "easing_table.h"
 
 #ifndef TRANSITION_HELPER
 #define TRANSITION_HELPER

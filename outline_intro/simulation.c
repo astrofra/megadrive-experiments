@@ -28,7 +28,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	s16 sim_frame_len, sim_node_len;
 	u8 sim_mode;
 	s8 scroll_speed;
-	s16 scroll_x;
+	s16 scroll_x, tscr;
 
 	void inline set_simulation(void)
 	{
@@ -149,7 +149,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	// VDP_setPalette(PAL0, oddball_fonts.palette->data);
 
 	sim_mode = SIM_MODE_RUN;
-	scroll_speed = -1;
+	scroll_speed = 1;
 	scroll_x = 0;	
 
 	while (current_scenario <= last_sim)
@@ -180,35 +180,40 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				break;
 
 			case SIM_MODE_SCROLL:
-				scroll_x += (scroll_speed << 2);
+				scroll_x += scroll_speed;
+
 				if (scroll_speed > 0)
 				{
-					if (scroll_x > 0)
+					if (scroll_x > 256)
 					{
-						scroll_x = 0;
+						scroll_x = 256;
 						scroll_speed = -1;
 						sim_mode = SIM_MODE_SET_NEW_SIM;
 					}
 				}
 				else
 				{
-					if (scroll_x < -320)
+					if (scroll_x < 0)
 					{
-						scroll_x = -320;
+						scroll_x = 0;
 						scroll_speed = 1;
 						sim_mode = SIM_MODE_SET_NEW_SIM;
 					}					
 				}
-				VDP_setHorizontalScroll(PLAN_A, scroll_x);
-				VDP_setHorizontalScroll(PLAN_B, scroll_x >> 2);
+				
+				tscr = (easing_table[scroll_x * 4] * -320) >> 10;
+				if (tscr >= EASING_TABLE_LEN)
+					tscr = EASING_TABLE_LEN - 1;
+				VDP_setHorizontalScroll(PLAN_A, tscr);
+				VDP_setHorizontalScroll(PLAN_B, tscr >> 2);
 				break;
 
 			case SIM_MODE_SET_NEW_SIM:
-					current_scenario++;
-					current_scenario %= MAX_SIMULATION;
-					set_simulation();
-					sim_mode = SIM_MODE_RUN;
-					break;
+				current_scenario++;
+				current_scenario %= MAX_SIMULATION;
+				set_simulation();
+				sim_mode = SIM_MODE_RUN;
+				break;
 		}
 
 	}
