@@ -324,8 +324,8 @@ u8 RSE_LogoScreen(void)
 	disableTwisterFx();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
-	VDP_fadeOut(1, 63, 16, TRUE);
-	RSE_pause(60);
+	VDP_fadeOut(1, 63, 8, TRUE);
+	RSE_pause(16);
 
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);

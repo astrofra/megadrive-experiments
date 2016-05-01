@@ -39,7 +39,7 @@ void RSE_plasma(void)
 
 	VDP_waitVSync();
 	SYS_disableInts();
-	// VDP_setPlanSize(64, 32);
+	VDP_setPlanSize(64, 32);
 	VDP_clearPlan(APLAN, 1);
 	VDP_clearPlan(BPLAN, 1);
 	VDP_setHilightShadow(0);	

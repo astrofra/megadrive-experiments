@@ -85,7 +85,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 
 	VDP_waitVSync();
 	SYS_disableInts();
-	// VDP_setPlanSize(64, 32);
+	VDP_setPlanSize(128, 32);
 	VDP_clearPlan(APLAN, 1);
 	VDP_clearPlan(BPLAN, 1);	
 	SPR_init(257);
@@ -101,12 +101,19 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 
 	vramIndex = fontIndex;
 
-	VDP_drawImageEx(BPLAN, &level_0, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-	vramIndex += level_0.tileset->numTile;
+	VDP_drawImageEx(BPLAN, &level_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += level_bg.tileset->numTile;
 
 	SYS_enableInts();
 
-	VDP_setPalette(PAL1, level_0.palette->data);
+	for(i = 2; i < 640 >> 3; i += 2)
+	{
+		VDP_waitVSync();
+		VDP_drawImageEx(BPLAN, &level_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), i, 0, FALSE, TRUE);
+	}
+	// VDP_drawImageEx(BPLAN, &level_0, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 320 >> 3, 0, FALSE, TRUE);
+
+	VDP_setPalette(PAL1, level_bg.palette->data);
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 
 	/*	
