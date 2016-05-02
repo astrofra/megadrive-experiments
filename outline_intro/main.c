@@ -18,11 +18,15 @@ void RSE_plasma(void);
 
 u16 vramIndex;
 u16 fontIndex;
+u8 framerate;
 char *demo_strings;
 
 int main()
 {
 	vramIndex = TILE_USERINDEX;
+	framerate = 60;
+	if (SYS_isPAL())
+		framerate = 50;
 
 	RSE_turn_screen_to_black();
 

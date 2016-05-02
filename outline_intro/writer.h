@@ -11,6 +11,7 @@ extern u16 current_char_y;
 extern u16 writer_timer;
 extern u16 writer_options;
 extern u16 writer_display_duration;
+extern u16 x_offset;
 
 #ifndef RSE_WRITER
 #define RSE_WRITER
@@ -45,5 +46,6 @@ u16 RSE_writerDrawString(char *str);
 void RSE_writerUpdateLine(void);
 u16 RSE_writerSetOption(u16 option);
 u16 RSE_writerUnsetOption(u16 option);
+void RSE_writerSetXOffset(u16 offset);
 
 #endif

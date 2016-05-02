@@ -13,6 +13,7 @@ u16 writer_switch;
 u16 current_string_idx;
 u16 current_string_len;
 u16 current_char_idx;
+u16 x_offset;
 u16 current_char_x;
 u16 current_char_y = 2;
 u16 current_plan;
@@ -91,8 +92,14 @@ u16 RSE_writerSetup(void)
 	vramIndex += oddball_fonts.tileset->numTile;
 
 	writer_switch = FALSE;
+	x_offset = 0;
 
 	return vramIndex;
+}
+
+void RSE_writerSetXOffset(u16 offset)
+{ 
+	x_offset = offset;
 }
 
 void RSE_writerRestart(void)
@@ -131,7 +138,7 @@ u16 RSE_writerDrawString(char *str)
 		{
 			i = charToTileIndex(c);
 			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, current_char_y));
+				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade + x_offset, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, current_char_y));
 		}
 	}
 
@@ -181,7 +188,7 @@ void inline RSE_writerUpdateLine(void)
 			break;
 
 		case WRT_CLEAR_LINE:
-			VDP_setTileMapXY(current_plan, 0, current_char_x, current_char_y);
+			VDP_setTileMapXY(current_plan, 0, current_char_x + x_offset, current_char_y);
 			current_char_x++;
 			if (current_char_x > 320 / 8)
 			{

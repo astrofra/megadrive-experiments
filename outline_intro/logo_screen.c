@@ -9,6 +9,7 @@
 
 extern u16 vramIndex;
 extern u16 fontIndex;
+extern u8 framerate;
 
 u8 RSE_LogoScreen(void)
 {
@@ -204,7 +205,7 @@ u8 RSE_LogoScreen(void)
 		while animating the background
 	*/
 	vblCount = 0;
-	while (vblCount < 60 * 6)
+	while (vblCount < framerate * 6)
 	{
 		VDP_waitVSync();
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);
@@ -217,7 +218,7 @@ u8 RSE_LogoScreen(void)
 		while animating it
 	*/
 	VDP_fadePalTo(PAL1, palette_black, 32, TRUE);
-	while (vblCount < (60 * 6) + 32)
+	while (vblCount < (framerate * 6) + 32)
 	{
 		VDP_waitVSync();
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
@@ -312,7 +313,7 @@ u8 RSE_LogoScreen(void)
 
 	// RSE_pause(60 * 5);
 	initTwisterFx();
-	updateTwisterFx(0, 60 * 5);
+	updateTwisterFx(0, framerate * 5);
 
 	// VDP_fadeOut(1, 63, 32, TRUE);
 	// VDP_fadePalTo(PAL0, palette_black, 60, TRUE);

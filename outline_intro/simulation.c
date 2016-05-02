@@ -202,11 +202,16 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 					}					
 				}
 				
-				tscr = (easing_table[scroll_x * 4] * -320) >> 10;
+				tscr = scroll_x * 4;
 				if (tscr >= EASING_TABLE_LEN)
 					tscr = EASING_TABLE_LEN - 1;
+				else
+					if (tscr < 0)
+						tscr = 0;
+				tscr = (easing_table[tscr] * -320) >> 10;
 				VDP_setHorizontalScroll(PLAN_A, tscr);
 				VDP_setHorizontalScroll(PLAN_B, tscr >> 2);
+				RSE_writerSetXOffset(tscr >> 3);
 				break;
 
 			case SIM_MODE_SET_NEW_SIM:
