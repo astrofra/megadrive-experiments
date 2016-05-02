@@ -96,6 +96,9 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	VDP_setHilightShadow(0);
 	SYS_enableInts();
 
+	for(i = 0; i < 32; i++)
+		RSE_clearTileRowA(i);
+
 	SPR_init(257);
 	for(i = 0; i < SIMULATION_0_NODE_LEN;i++)
 	{

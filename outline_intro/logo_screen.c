@@ -243,7 +243,7 @@ u8 RSE_LogoScreen(void)
 		vblCount++;
 	}
 
-	RSE_clearTileRow(current_char_y);
+	RSE_clearTileRowB(current_char_y);
 
 	/* 
 		Demo logo 
