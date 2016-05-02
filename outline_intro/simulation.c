@@ -174,7 +174,6 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				vblCount++;
 				if (vblCount >= sim_frame_len)
 				{
-					vblCount = 0;
 					sim_mode = SIM_MODE_SCROLL;
 				}
 				break;
@@ -209,6 +208,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				break;
 
 			case SIM_MODE_SET_NEW_SIM:
+				vblCount = 0;
 				current_scenario++;
 				current_scenario %= MAX_SIMULATION;
 				set_simulation();
