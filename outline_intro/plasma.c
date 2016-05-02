@@ -40,53 +40,11 @@ void RSE_plasma(void)
 	VDP_waitVSync();
 	SYS_disableInts();
 	VDP_setPlanSize(64, 32);
-	VDP_clearPlan(APLAN, 1);
-	VDP_clearPlan(BPLAN, 1);
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);
 	VDP_setHilightShadow(0);	
 
 	vramIndex = fontIndex;
-
-	void drawPlasma(u16 idx)
-	{
-		switch(idx)
-		{
-			case 0:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-				break;
-				
-			case 1:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, TRUE);			
-				break;
-				
-			case 2:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, TRUE);
-				break;
-				
-			case 3:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, TRUE);
-				break;
-				
-			case 4:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, TRUE);
-				break;
-				
-			case 5:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 128 >> 3, FALSE, TRUE);
-				break;
-				
-			case 6:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, TRUE);
-				break;
-				
-			case 7:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 256 >> 3, FALSE, TRUE);
-				break;
-				
-			case 8:
-				VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, TRUE);
-				break;	
-		}
-	}
 
 	vramIndex += plasma.tileset->numTile;
 
@@ -101,7 +59,46 @@ void RSE_plasma(void)
 		VDP_waitVSync();
 
 		if (vblCount < 9)
-			drawPlasma(vblCount);
+		{
+			switch(vblCount)
+			{
+				case 0:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+					break;
+					
+				case 1:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, TRUE);			
+					break;
+					
+				case 2:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, TRUE);
+					break;
+					
+				case 3:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, TRUE);
+					break;
+					
+				case 4:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, TRUE);
+					break;
+					
+				case 5:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 128 >> 3, FALSE, TRUE);
+					break;
+					
+				case 6:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, TRUE);
+					break;
+					
+				case 7:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 256 >> 3, FALSE, TRUE);
+					break;
+					
+				case 8:
+					VDP_drawImageEx(APLAN, &plasma, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, TRUE);
+					break;	
+			}
+		}
 
 		VDP_setHorizontalScrollTile(PLAN_A, 0, tile_scroll_h + ((vblCount << 1) & 1023), 32, TRUE);
 		VDP_setVerticalScrollTile(PLAN_A, 0, tile_scroll_v + (vblCount & 1023), 32, TRUE);
@@ -128,11 +125,14 @@ void RSE_plasma(void)
 
 	VDP_waitVSync();
 
+	SPR_end();	
+
+	SYS_disableInts();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);
 	VDP_setHorizontalScroll(PLAN_B, 0);
 	VDP_setHorizontalScroll(PLAN_A, 0);	
+	SYS_enableInts();
 
-	SPR_end();	
 }
