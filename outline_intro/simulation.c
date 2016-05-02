@@ -89,11 +89,13 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	current_scenario = first_sim;
 	set_simulation();
 
-	VDP_waitVSync();
 	SYS_disableInts();
 	VDP_setPlanSize(128, 32);
-	VDP_clearPlan(APLAN, 1);
-	VDP_clearPlan(BPLAN, 1);	
+	// VDP_clearPlan(APLAN, 0);
+	// VDP_clearPlan(BPLAN, 0);	
+	VDP_setHilightShadow(0);
+	SYS_enableInts();
+
 	SPR_init(257);
 	for(i = 0; i < SIMULATION_0_NODE_LEN;i++)
 	{
@@ -102,13 +104,10 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	}
 
     SPR_update(sprites, sim_node_len);
-	VDP_setHilightShadow(0);
 
 	vramIndex = fontIndex;
 
 	VDP_drawImageEx(BPLAN, &level_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-
-	SYS_enableInts();
 
 	for(i = 2; i < 640 >> 3; i ++)
 	{
