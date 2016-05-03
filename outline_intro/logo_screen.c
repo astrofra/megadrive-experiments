@@ -60,7 +60,7 @@ u8 RSE_LogoScreen(void)
 	    SPR_update(sprites, 1);
 
 	    if (smiley_phase == 0)
-	    	VDP_fadePalTo(PAL2, smiley_gelmir.palette->data, 16, TRUE);
+	    	VDP_fadePalTo(PAL2, smiley_gelmir.palette->data, (16 * 60) / framerate, TRUE);
 
 	    smiley_phase++;	
 	}		
@@ -139,22 +139,44 @@ u8 RSE_LogoScreen(void)
 		Background (classic tile display)
 	*/
 	VDP_setHilightShadow(1); 
-	VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
-	drawVerticalStripes();
+	if (SYS_isPAL())
+	{
+		VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits_smaller, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - 224) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
+	    vramIndex += logo_rse_bottom_9bits_smaller.tileset->numTile;
+	}
+	else
+	{
+		VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
+	    vramIndex += logo_rse_bottom_9bits.tileset->numTile;
+	}
 
-    vramIndex += logo_rse_bottom_9bits.tileset->numTile;
+	drawVerticalStripes();
 
 	/* 
 		Group logo 
 		Large set of sprites
 	*/
-	for(i = 0; i < 16; i++)
+	if (SYS_isPAL())
 	{
-	    SPR_initSprite(&sprites[i], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-		SPR_setPosition(&sprites[i], ((SCR_W - LOGO_W) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
-		SPR_setFrame(&sprites[i], i);
+		for(i = 0; i < 14; i++)
+		{
+		    SPR_initSprite(&sprites[i], &logo_rse_top_9bits_smaller, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+			SPR_setPosition(&sprites[i], ((SCR_W - 224) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
+			SPR_setFrame(&sprites[i], i);
+		}
+		SPR_update(sprites, 1);
 	}
-    SPR_update(sprites, 1);
+	else
+	{
+		for(i = 0; i < 16; i++)
+		{
+		    SPR_initSprite(&sprites[i], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+			SPR_setPosition(&sprites[i], ((SCR_W - LOGO_W) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
+			SPR_setFrame(&sprites[i], i);
+		}
+	    SPR_update(sprites, 1);
+	}
+
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	SYS_enableInts();
@@ -173,21 +195,40 @@ u8 RSE_LogoScreen(void)
 	/* 
 		Fade to the logo's palette
 	*/
-	VDP_fadePalTo(PAL2, logo_rse_top_9bits.palette->data, 32, TRUE);
-	
-	for(i = 24; i > -16; i--)
-	{
-		VDP_waitVSync();
-		for(k = 0; k < 16; k++)
+	VDP_fadePalTo(PAL2, logo_rse_top_9bits.palette->data, (32 * 60) / framerate, TRUE);
+
+	if (SYS_isPAL())
+	{	
+		for(i = 24; i > -16; i--)
 		{
-			j = i + (16 - k);
-			if (j < 0)
-				j = 0;
-			j = (j * j) >> 5;
-			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 + j);
+			VDP_waitVSync();
+			for(k = 0; k < 14; k++)
+			{
+				j = i + (14 - k);
+				if (j < 0)
+					j = 0;
+				j = (j * j) >> 5;
+				SPR_setPosition(&sprites[k], ((SCR_W - 224) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 + j);
+			}
+			SPR_update(sprites, 14);
 		}
-		SPR_update(sprites, 16);
 	}
+	else
+	{	
+		for(i = 24; i > -16; i--)
+		{
+			VDP_waitVSync();
+			for(k = 0; k < 16; k++)
+			{
+				j = i + (16 - k);
+				if (j < 0)
+					j = 0;
+				j = (j * j) >> 5;
+				SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 + j);
+			}
+			SPR_update(sprites, 16);
+		}
+	}		
 
 	/*	
 		Prepare text writer
@@ -198,7 +239,7 @@ u8 RSE_LogoScreen(void)
 	RSE_writerUnsetOption(WRT_OPT_WRITE_TO_PLAN_A);
 	RSE_writerUnsetOption(WRT_OPT_AUTO_RESTART);
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
-	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, 64, TRUE);
+	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, (64 * 60) / framerate, TRUE);
 
 	/*	
 		Write some text
@@ -217,7 +258,7 @@ u8 RSE_LogoScreen(void)
 		Fade out the background
 		while animating it
 	*/
-	VDP_fadePalTo(PAL1, palette_black, 32, TRUE);
+	VDP_fadePalTo(PAL1, palette_black, (32 * 60) / framerate, TRUE);
 	while (vblCount < (framerate * 6) + 32)
 	{
 		VDP_waitVSync();
@@ -229,19 +270,39 @@ u8 RSE_LogoScreen(void)
 		Fade out the foreground
 		while scrolling it from below
 	*/
-	VDP_fadeOut(1, 63, 32, TRUE);
-	for(i = 0; i < 32; i++)
+	VDP_fadeOut(1, 63, (32 * 60) / framerate, TRUE);
+
+	if (SYS_isPAL())
 	{
-		VDP_waitVSync();
-		for(k = 0; k < 16; k++)
+		for(i = 0; i < 32; i++)
 		{
-			j = i + k;
-			j = (j * j) >> 5;
-			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
+			VDP_waitVSync();
+			for(k = 0; k < 14; k++)
+			{
+				j = i + k;
+				j = (j * j) >> 5;
+				SPR_setPosition(&sprites[k], ((SCR_W - 224) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
+			}
+			SPR_update(sprites, 14);
+			VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
+			vblCount++;
 		}
-		SPR_update(sprites, 16);
-		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
-		vblCount++;
+	}
+	else
+	{
+		for(i = 0; i < 32; i++)
+		{
+			VDP_waitVSync();
+			for(k = 0; k < 16; k++)
+			{
+				j = i + k;
+				j = (j * j) >> 5;
+				SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
+			}
+			SPR_update(sprites, 16);
+			VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
+			vblCount++;
+		}		
 	}
 
 	RSE_clearTileRowB(current_char_y);
@@ -291,7 +352,7 @@ u8 RSE_LogoScreen(void)
 		while scrolling it from below
 		with an animated sine-based offset
 	*/
-	VDP_fadePalTo(PAL1, logo_demo.palette->data, 32, TRUE);
+	VDP_fadePalTo(PAL1, logo_demo.palette->data, (32 * 60) / framerate, TRUE);
 
 	for(i = 0, j = 0; i < 1024 - 32; i += 4)
 	{
@@ -309,7 +370,7 @@ u8 RSE_LogoScreen(void)
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 3, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
 
-	VDP_fadePalTo(PAL0, outline_logo.palette->data, 16, TRUE);
+	VDP_fadePalTo(PAL0, outline_logo.palette->data, (16 * 60) / framerate, TRUE);
 
 	// RSE_pause(60 * 5);
 	initTwisterFx();
@@ -325,7 +386,7 @@ u8 RSE_LogoScreen(void)
 	disableTwisterFx();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
-	VDP_fadeOut(1, 63, 8, TRUE);
+	VDP_fadeOut(1, 63, (8 * 60) / framerate, TRUE);
 	RSE_pause(16);
 
 	VDP_setVerticalScroll(PLAN_B, 0);
