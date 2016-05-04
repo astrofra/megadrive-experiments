@@ -259,7 +259,8 @@ u8 RSE_LogoScreen(void)
 		while animating it
 	*/
 	VDP_fadePalTo(PAL1, palette_black, (32 * 60) / framerate, TRUE);
-	while (vblCount < (framerate * 6) + 32)
+
+	while (vblCount < (framerate * 6) + ((32 * 60) / framerate))
 	{
 		VDP_waitVSync();
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
