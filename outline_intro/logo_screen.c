@@ -164,7 +164,7 @@ u8 RSE_LogoScreen(void)
 			SPR_setPosition(&sprites[i], ((SCR_W - 224) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
 			SPR_setFrame(&sprites[i], i);
 		}
-		SPR_update(sprites, 1);
+		// SPR_update(sprites, 1);
 	}
 	else
 	{
@@ -174,7 +174,7 @@ u8 RSE_LogoScreen(void)
 			SPR_setPosition(&sprites[i], ((SCR_W - LOGO_W) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
 			SPR_setFrame(&sprites[i], i);
 		}
-	    SPR_update(sprites, 1);
+	    // SPR_update(sprites, 1);
 	}
 
 

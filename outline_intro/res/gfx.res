@@ -10,3 +10,4 @@ IMAGE level_bg "level_bg.png" 0
 IMAGE oddball_fonts "childwrite_8x8.png" 0
 SPRITE smiley_gelmir "smiley-gelmir.png" 12 12 0
 IMAGE plasma "plasma.png" 0
+IMAGE plasma_greets "plasma_greetings.png" 0
