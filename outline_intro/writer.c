@@ -17,6 +17,7 @@ u16 x_offset;
 u16 current_char_x;
 u16 current_char_y = 2;
 u16 current_plan;
+u8 current_pal;
 u16 writer_timer;
 u16 writer_display_duration = 50;
 u16 writer_options = (WRT_OPT_AUTO_NEXT_STRING | WRT_OPT_AUTO_RESTART | WRT_OPT_WRITE_TO_PLAN_A);
@@ -83,6 +84,7 @@ u16 inline charToTileIndex(char c)
 u16 RSE_writerSetup(void)
 {
 	current_plan = VDP_PLAN_A;
+	current_pal = PAL0;
 
 	SYS_disableInts();
 	VDP_drawImageEx(APLAN, &oddball_fonts, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
@@ -138,7 +140,7 @@ u16 RSE_writerDrawString(char *str)
 		{
 			i = charToTileIndex(c);
 			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade + x_offset, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, current_char_y));
+				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade + x_offset, TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
 		}
 	}
 
@@ -159,9 +161,15 @@ void inline RSE_writerUpdateLine(void)
 		}
 
 	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
+	{
 		current_plan = VDP_PLAN_A;
+		current_pal = PAL0;
+	}
 	else
+	{
 		current_plan = VDP_PLAN_B;
+		current_pal = PAL1;
+	}
 
 	switch(writer_state)
 	{
@@ -206,6 +214,69 @@ void inline RSE_writerUpdateLine(void)
 					}
 				}
 
+				writer_state = WRT_CENTER_CUR_LINE;
+			}
+			break;
+
+		case WRT_IDLE_MODE:
+			return;
+	}
+}
+
+void inline RSE_writerUpdateMultiLine(void)
+{
+	if (WRT_HAS_OPTION(WRT_OPT_HALF_SPEED))
+		if (writer_state != WRT_CLEAR_LINE)
+		{
+			writer_switch = ~writer_switch;
+			if (writer_switch)
+				return;
+		}
+
+	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
+	{
+		current_plan = VDP_PLAN_A;
+		current_pal = PAL0;
+	}
+	else
+	{
+		current_plan = VDP_PLAN_B;
+		current_pal = PAL1;
+	}
+
+	switch(writer_state)
+	{
+		case WRT_CENTER_CUR_LINE:
+			current_string_len = computeStringLen((char *)demo_strings[current_string_idx]);
+			current_char_x = ((320 / 8) - current_string_len) >> 1;
+			writer_state = WRT_WRITE_CUR_LINE;
+			break;
+
+		case WRT_WRITE_CUR_LINE:
+			if (!RSE_writerDrawString((char *)demo_strings[current_string_idx]))
+			{
+				writer_timer = 0;
+				writer_state = WRT_WAIT;
+			}
+			break;
+
+		case WRT_WAIT:
+			if (writer_timer++ > writer_display_duration)
+			{
+				current_char_x = 0;
+				current_char_y++;
+				current_char_idx = 0;
+				current_string_idx++;
+				if (demo_strings[current_string_idx][0] == '\0')
+				{
+					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
+						current_string_idx = 0;
+					else
+					{
+						writer_state = WRT_IDLE_MODE;
+						return;
+					}
+				}				
 				writer_state = WRT_CENTER_CUR_LINE;
 			}
 			break;

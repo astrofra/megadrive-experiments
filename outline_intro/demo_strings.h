@@ -9,5 +9,7 @@ extern const char *strings_sim_2[];
 extern const char *strings_sim_3[];
 extern const char *strings_sim_4[];
 extern const char *strings_sim_5[];
+extern const char *strings_credits[];
+extern const char *strings_greets[];
 
 #endif

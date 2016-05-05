@@ -44,6 +44,7 @@ u16 RSE_writerSetup(void);
 void RSE_writerRestart(void);
 u16 RSE_writerDrawString(char *str);
 void RSE_writerUpdateLine(void);
+void RSE_writerUpdateMultiLine(void);
 u16 RSE_writerSetOption(u16 option);
 u16 RSE_writerUnsetOption(u16 option);
 void RSE_writerSetXOffset(u16 offset);

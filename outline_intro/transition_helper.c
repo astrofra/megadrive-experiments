@@ -43,3 +43,14 @@ void RSE_clearTileRowA(u16 row)
 	for(col = 0; col < max_col; col++)
 		VDP_setTileMapXY(APLAN, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_SYSTEMINDEX), col, row);
 }
+
+void RSE_resetScrolling(void)
+{
+	SYS_disableInts();
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+	VDP_setVerticalScroll(PLAN_B, 0);
+	VDP_setVerticalScroll(PLAN_A, 0);
+	VDP_setHorizontalScroll(PLAN_B, 0);
+	VDP_setHorizontalScroll(PLAN_A, 0);	
+	SYS_enableInts();	
+}
