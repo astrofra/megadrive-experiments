@@ -10,6 +10,9 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
+s16 p_tile_scroll_h[2048],
+	p_tile_scroll_v[2048];
+
 /*
 	Plasma screen
 	mode : 
@@ -21,10 +24,6 @@ void RSE_plasma(u8 mode)
 	u32 vblCount = 0, i, j;
 	u16 tmp_timer;
 	Image plasma_img;
-
-	// u16 vramIndex = TILE_USERINDEX;
-	s16 tile_scroll_h[2048],
-		tile_scroll_v[2048];
 
 	u16 palette_cycle[16 * 16];
 
@@ -52,8 +51,8 @@ void RSE_plasma(u8 mode)
 	*/
 	for(i = 0; i < 2048; i++)
 	{
-		tile_scroll_h[i] = (sinFix16(i << 2) >> 1) - 32; //  + ((sinFix16((i + 256) << 4) >> 1) * sinFix16(i) / 350);
-		tile_scroll_v[i] = (cosFix16(i << 2)) + 64 + ((cosFix16((i + 128) << 4) >> 1) * sinFix16(i + 256) / 350);
+		p_tile_scroll_h[i] = (sinFix16(i << 2) >> 1) - 32; //  + ((sinFix16((i + 256) << 4) >> 1) * sinFix16(i) / 350);
+		p_tile_scroll_v[i] = (cosFix16(i << 2)) + 64 + ((cosFix16((i + 128) << 4) >> 1) * sinFix16(i + 256) / 350);
 	}
 
 	/*
@@ -143,8 +142,8 @@ void RSE_plasma(u8 mode)
 			}
 		}
 
-		VDP_setHorizontalScrollTile(PLAN_B, 0, tile_scroll_h + ((vblCount << 1) & 1023), 32, TRUE);
-		VDP_setVerticalScrollTile(PLAN_B, 0, tile_scroll_v + (vblCount & 1023), 32, TRUE);
+		VDP_setHorizontalScrollTile(PLAN_B, 0, p_tile_scroll_h + ((vblCount << 1) & 1023), 32, TRUE);
+		VDP_setVerticalScrollTile(PLAN_B, 0, p_tile_scroll_v + (vblCount & 1023), 32, TRUE);
 		VDP_setPalette(PAL1, palette_cycle + (((vblCount >> 2) << 4) & 255));
 		vblCount++;
 	}
@@ -159,8 +158,8 @@ void RSE_plasma(u8 mode)
 	{
 		VDP_waitVSync();
 
-		VDP_setHorizontalScrollTile(PLAN_B, 0, tile_scroll_h + ((vblCount << 1) & 1023), 32, TRUE);
-		VDP_setVerticalScrollTile(PLAN_B, 0, tile_scroll_v + (vblCount & 1023), 32, TRUE);
+		VDP_setHorizontalScrollTile(PLAN_B, 0, p_tile_scroll_h + ((vblCount << 1) & 1023), 32, TRUE);
+		VDP_setVerticalScrollTile(PLAN_B, 0, p_tile_scroll_v + (vblCount & 1023), 32, TRUE);
 		vblCount++;
 		i++;
 	}

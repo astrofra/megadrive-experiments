@@ -18,7 +18,7 @@ const char *strings_credits[] =
 	"---------------------------------\0",
 	" \0",
 
-	"PIXELS : GELMIR, FRA, SIM1\0",
+	"PIXELS : GELMIR, SIM1, FRA\0",
 	" \0",
 
 	"MUSIC : NAINAIN\0",
@@ -28,7 +28,7 @@ const char *strings_credits[] =
 	" \0",
 
 	"DONE WITH THE SGDK FRAMEWORK\0",
-	" \0",
+	// " \0",
 
 	"PHYSICS SIMULATION BY HARFANG 3D\0",
 	" \0",
@@ -49,14 +49,23 @@ const char *strings_greets[] =
 	"GREETINGS FLYING TO:\0",
 	" \0",	
 	"DARKLITE, DEFENCE FORCE\0",
+	" \0",	
 	"DESIRE, FLUSH, FOCUS DESIGN\0",
+	" \0",	
 	"INSANE, LEMON, LIVE!, LOONIES\0",
+	" \0",	
 	"MANKIND, MOODS PLATEAU\0",
+	" \0",	
 	"PACIFIC, RSI, SCARAB, SCOOPEX\0",
+	" \0",	
 	"TRBL, WANTED TEAM, Y-CREW\0",
+	" \0",	
 	"ADORU, ZERKMAN, MOOZ, UKKO, PHAAZON\0",
+	" \0",	
 	"ALKAMA, BAUDSURFER, MOG,\0",
+	" \0",	
 	"PHAAZON, TITEIKO, STFSUX\0", 
+	" \0",	
 	"GRASS, 4PLAY, SIM1, MOONSOON\0",
 	" \0",
 

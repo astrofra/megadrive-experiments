@@ -11,11 +11,12 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
+s16 l_tile_scroll_h[1024];
+
 u8 RSE_LogoScreen(void)
 {
 	u16 vblCount = 0;
 	s16 i, j, k;
-	s16 tile_scroll_h[1024];
 	Sprite sprites[16];
 	u16 smiley_phase = 0;
 	s16 twister_jump_table[TWISTER_TABLE_SIZE];
@@ -139,56 +140,41 @@ u8 RSE_LogoScreen(void)
 		Background (classic tile display)
 	*/
 	VDP_setHilightShadow(1); 
-	if (SYS_isPAL())
-	{
-		VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits_smaller, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - 224) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
-	    vramIndex += logo_rse_bottom_9bits_smaller.tileset->numTile;
-	}
-	else
-	{
-		VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, TRUE);
+		VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, FALSE);
 	    vramIndex += logo_rse_bottom_9bits.tileset->numTile;
-	}
+
+	while(DMA_getQueueSize() > 0);
 
 	drawVerticalStripes();
+
+	while(DMA_getQueueSize() > 0);
 
 	/* 
 		Group logo 
 		Large set of sprites
-	*/
-	if (SYS_isPAL())
+	*/		
+	for(i = 0; i < 16; i++)
 	{
-		for(i = 0; i < 14; i++)
-		{
-		    SPR_initSprite(&sprites[i], &logo_rse_top_9bits_smaller, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-			SPR_setPosition(&sprites[i], ((SCR_W - 224) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
-			SPR_setFrame(&sprites[i], i);
-		}
-		// SPR_update(sprites, 1);
-	}
-	else
-	{
-		for(i = 0; i < 16; i++)
-		{
-		    SPR_initSprite(&sprites[i], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-			SPR_setPosition(&sprites[i], ((SCR_W - LOGO_W) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
-			SPR_setFrame(&sprites[i], i);
-		}
-	    // SPR_update(sprites, 1);
+	    SPR_initSprite(&sprites[i], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, FALSE));
+		SPR_setPosition(&sprites[i], ((SCR_W - LOGO_W) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
+		SPR_setFrame(&sprites[i], i);
 	}
 
+	while(DMA_getQueueSize() > 0);
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	SYS_enableInts();
 
-	RSE_pause(15);
+	// RSE_pause(15);
+	while(DMA_getQueueSize() > 0);
+
 
 	/*
 		Prepare a Sine table
 		to distort the background using the per-line scrolling
 	*/
 	for(i = 0; i < 1024; i++)
-		tile_scroll_h[i] = sinFix16(i << 2) / 2;
+		l_tile_scroll_h[i] = sinFix16(i << 2) / 2;
 
 	play_music();
 
@@ -197,38 +183,19 @@ u8 RSE_LogoScreen(void)
 	*/
 	VDP_fadePalTo(PAL2, logo_rse_top_9bits.palette->data, (32 * 60) / framerate, TRUE);
 
-	if (SYS_isPAL())
-	{	
-		for(i = 24; i > -16; i--)
+	for(i = 24; i > -16; i--)
+	{
+		VDP_waitVSync();
+		for(k = 0; k < 16; k++)
 		{
-			VDP_waitVSync();
-			for(k = 0; k < 14; k++)
-			{
-				j = i + (14 - k);
-				if (j < 0)
-					j = 0;
-				j = (j * j) >> 5;
-				SPR_setPosition(&sprites[k], ((SCR_W - 224) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 + j);
-			}
-			SPR_update(sprites, 14);
+			j = i + (16 - k);
+			if (j < 0)
+				j = 0;
+			j = (j * j) >> 5;
+			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 + j);
 		}
+		SPR_update(sprites, 16);
 	}
-	else
-	{	
-		for(i = 24; i > -16; i--)
-		{
-			VDP_waitVSync();
-			for(k = 0; k < 16; k++)
-			{
-				j = i + (16 - k);
-				if (j < 0)
-					j = 0;
-				j = (j * j) >> 5;
-				SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 + j);
-			}
-			SPR_update(sprites, 16);
-		}
-	}		
 
 	/*	
 		Prepare text writer
@@ -249,7 +216,7 @@ u8 RSE_LogoScreen(void)
 	while (vblCount < framerate * 6)
 	{
 		VDP_waitVSync();
-		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, l_tile_scroll_h + (vblCount & 511), 60, TRUE);
 		RSE_writerUpdateLine();
 		vblCount++;
 	}
@@ -263,7 +230,7 @@ u8 RSE_LogoScreen(void)
 	while (vblCount < (framerate * 6) + ((32 * 60) / framerate))
 	{
 		VDP_waitVSync();
-		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, l_tile_scroll_h + (vblCount & 511), 60, TRUE);		
 		vblCount++;
 	}
 
@@ -273,38 +240,19 @@ u8 RSE_LogoScreen(void)
 	*/
 	VDP_fadeOut(1, 63, (32 * 60) / framerate, TRUE);
 
-	if (SYS_isPAL())
+	for(i = 0; i < 32; i++)
 	{
-		for(i = 0; i < 32; i++)
+		VDP_waitVSync();
+		for(k = 0; k < 16; k++)
 		{
-			VDP_waitVSync();
-			for(k = 0; k < 14; k++)
-			{
-				j = i + k;
-				j = (j * j) >> 5;
-				SPR_setPosition(&sprites[k], ((SCR_W - 224) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
-			}
-			SPR_update(sprites, 14);
-			VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
-			vblCount++;
+			j = i + k;
+			j = (j * j) >> 5;
+			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
 		}
-	}
-	else
-	{
-		for(i = 0; i < 32; i++)
-		{
-			VDP_waitVSync();
-			for(k = 0; k < 16; k++)
-			{
-				j = i + k;
-				j = (j * j) >> 5;
-				SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
-			}
-			SPR_update(sprites, 16);
-			VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, tile_scroll_h + (vblCount & 511), 60, TRUE);		
-			vblCount++;
-		}		
-	}
+		SPR_update(sprites, 16);
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, l_tile_scroll_h + (vblCount & 511), 60, TRUE);		
+		vblCount++;
+	}		
 
 	RSE_clearTileRowB(current_char_y);
 
@@ -342,10 +290,10 @@ u8 RSE_LogoScreen(void)
 	{
 		k = 1024 - i;
 		k = (k * k) >> 10;
-		tile_scroll_h[i] = 32 + ((cosFix16(i << 2) * k) >> 10);
+		l_tile_scroll_h[i] = 32 + ((cosFix16(i << 2) * k) >> 10);
 	}
 
-	VDP_setVerticalScrollTile(PLAN_B, 0, tile_scroll_h, 32, TRUE);
+	VDP_setVerticalScrollTile(PLAN_B, 0, l_tile_scroll_h, 32, TRUE);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_2TILE);
 
 	/*
@@ -358,7 +306,7 @@ u8 RSE_LogoScreen(void)
 	for(i = 0, j = 0; i < 1024 - 32; i += 4)
 	{
 		VDP_waitVSync();
-		VDP_setVerticalScrollTile(PLAN_B, 0, tile_scroll_h + i, 32, TRUE);
+		VDP_setVerticalScrollTile(PLAN_B, 0, l_tile_scroll_h + i, 32, TRUE);
 
 		if (i >= 1024 - (160 * 4))
 			animateSmileyBounce();
@@ -389,6 +337,8 @@ u8 RSE_LogoScreen(void)
 
 	VDP_fadeOut(1, 63, (8 * 60) / framerate, TRUE);
 	RSE_pause(16);
+	for(i = 0; i  < 224 >> 3; i++)
+		clearVerticalStripes(i);
 
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);

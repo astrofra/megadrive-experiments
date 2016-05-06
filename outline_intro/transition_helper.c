@@ -1,5 +1,10 @@
 #include "genesis.h"
 
+const s16 tile_sc_table[] =  { 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
 void RSE_turn_screen_to_white(void)
 {
 	/* Turn whole palette to white */
@@ -47,6 +52,12 @@ void RSE_clearTileRowA(u16 row)
 void RSE_resetScrolling(void)
 {
 	SYS_disableInts();
+	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_2TILE);
+	VDP_setHorizontalScrollTile(PLAN_A, 0, tile_sc_table, 32, TRUE);
+	VDP_setVerticalScrollTile(PLAN_A, 0, tile_sc_table, 32, TRUE);	
+	VDP_setHorizontalScrollTile(PLAN_B, 0, tile_sc_table, 32, TRUE);
+	VDP_setVerticalScrollTile(PLAN_B, 0, tile_sc_table, 32, TRUE);
+
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);
