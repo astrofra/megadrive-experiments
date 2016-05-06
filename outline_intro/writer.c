@@ -49,7 +49,7 @@ u16 inline charToTileIndex(char c)
 			return FONT_PUNCT_OFFSET + 2;
 		case '$':
 			return FONT_PUNCT_OFFSET + 3;
-		case '/':
+		case ',':
 			return FONT_PUNCT_OFFSET + 4;
 		case '(':
 			return FONT_PUNCT_OFFSET + 5;
@@ -59,20 +59,20 @@ u16 inline charToTileIndex(char c)
 			return FONT_PUNCT_OFFSET + 7;
 		case '-':
 			return FONT_PUNCT_OFFSET + 8;
-		case '_':
+		case '@':
 			return FONT_PUNCT_OFFSET + 9;
 		case ':':
 			return FONT_PUNCT_OFFSET + 10;
 		case '=':
 			return FONT_PUNCT_OFFSET + 11;
-		case '*':
+		case '+':
 			return FONT_PUNCT_OFFSET + 12;
 		case 'c':
 			return FONT_PUNCT_OFFSET + 13;
 		case '[':
 			return FONT_PUNCT_OFFSET + 14;
 		case ']':
-			return FONT_PUNCT_OFFSET + 15;
+			return FONT_PUNCT_OFFSET + 15;		
 
 	};
 

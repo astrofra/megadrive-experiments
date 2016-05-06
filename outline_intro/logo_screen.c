@@ -140,8 +140,8 @@ u8 RSE_LogoScreen(void)
 		Background (classic tile display)
 	*/
 	VDP_setHilightShadow(1); 
-		VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, FALSE);
-	    vramIndex += logo_rse_bottom_9bits.tileset->numTile;
+	VDP_drawImageEx(BPLAN, &logo_rse_bottom_9bits, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), ((SCR_W - LOGO_W) >> 4), (SCR_H - LOGO_H) >> 4, FALSE, FALSE);
+    vramIndex += logo_rse_bottom_9bits.tileset->numTile;
 
 	while(DMA_getQueueSize() > 0);
 
@@ -153,14 +153,12 @@ u8 RSE_LogoScreen(void)
 		Group logo 
 		Large set of sprites
 	*/		
-	for(i = 0; i < 16; i++)
+	for(i = 0; i < 8; i++)
 	{
 	    SPR_initSprite(&sprites[i], &logo_rse_top_9bits, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, FALSE));
-		SPR_setPosition(&sprites[i], ((SCR_W - LOGO_W) >> 1) + (i << 4), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
+		SPR_setPosition(&sprites[i], ((SCR_W - LOGO_W) >> 1) + (i << 5), ((SCR_H - LOGO_H) >> 1) - 4 + 64);
 		SPR_setFrame(&sprites[i], i);
 	}
-
-	while(DMA_getQueueSize() > 0);
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	SYS_enableInts();
@@ -186,15 +184,15 @@ u8 RSE_LogoScreen(void)
 	for(i = 24; i > -16; i--)
 	{
 		VDP_waitVSync();
-		for(k = 0; k < 16; k++)
+		for(k = 0; k < 8; k++)
 		{
-			j = i + (16 - k);
+			j = i + (8 - k);
 			if (j < 0)
 				j = 0;
 			j = (j * j) >> 5;
-			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 + j);
+			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 5), ((SCR_H - LOGO_H) >> 1) - 4 + j);
 		}
-		SPR_update(sprites, 16);
+		SPR_update(sprites, 8);
 	}
 
 	/*	
@@ -243,13 +241,13 @@ u8 RSE_LogoScreen(void)
 	for(i = 0; i < 32; i++)
 	{
 		VDP_waitVSync();
-		for(k = 0; k < 16; k++)
+		for(k = 0; k < 8; k++)
 		{
 			j = i + k;
 			j = (j * j) >> 5;
-			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 4), ((SCR_H - LOGO_H) >> 1) - 4 - j);
+			SPR_setPosition(&sprites[k], ((SCR_W - LOGO_W) >> 1) + (k << 5), ((SCR_H - LOGO_H) >> 1) - 4 - j);
 		}
-		SPR_update(sprites, 16);
+		SPR_update(sprites, 8);
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, l_tile_scroll_h + (vblCount & 511), 60, TRUE);		
 		vblCount++;
 	}		

@@ -30,7 +30,7 @@ const char *strings_credits[] =
 	"DONE WITH THE SGDK FRAMEWORK\0",
 	// " \0",
 
-	"PHYSICS SIMULATION BY HARFANG 3D\0",
+	// "PHYSICS SIMULATION BY HARFANG 3D\0",
 	" \0",
 
 	"---------------------------------\0",
