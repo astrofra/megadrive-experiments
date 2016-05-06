@@ -133,9 +133,17 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 
 	vramIndex += level_bg.tileset->numTile;
 
-	SYS_disableInts();
+	switch(current_scenario)
+	{
+		case 0:
+		case 1:
+			VDP_drawImageEx(APLAN, &level_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 48) >> 3, FALSE, TRUE);
+			vramIndex += level_0.tileset->numTile;
+			VDP_drawImageEx(APLAN, &level_1, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 320 >> 3, (224 - 208) >> 3, FALSE, TRUE);
+			break;
+	}
 
-	VDP_drawImageEx(APLAN, &level_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 48) >> 3, FALSE, TRUE);
+	SYS_disableInts();
 
 	VDP_setPalette(PAL0, level_0.palette->data);
 	VDP_setPalette(PAL1, level_bg.palette->data);
