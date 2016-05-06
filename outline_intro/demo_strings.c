@@ -124,28 +124,3 @@ const char *strings_sim_3[] =
 	"\0"
 };
 
-
-const char *strings_sim_4[] = 
-{
-	/*
-	"<----------- MAX HEADROOM ------------->\0"
-	*/
-	"--- SIM #4  0123456789 ! :]\0",
-	"ZBCDELMNOPQRSTUVWXYA 0123456789 ! :]\0",
-
-	/*	Do not remove the next line */
-	"\0"
-};
-
-const char *strings_sim_5[] = 
-{
-	/*
-	"<----------- MAX HEADROOM ------------->\0"
-	*/
-	"--- SIM #5  0123456789 ! :]\0",
-	"ZBCDELMNOPQRSTUVWXYA 0123456789 ! :]\0",
-
-	/*	Do not remove the next line */
-	"\0"
-};
-

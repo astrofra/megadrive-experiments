@@ -6,8 +6,6 @@
 #include "simulation_1.h"
 #include "simulation_2.h"
 #include "simulation_3.h"
-#include "simulation_4.h"
-#include "simulation_5.h"
 #include "transition_helper.h"
 
 #define MAX_SIMULATION 6
@@ -65,22 +63,6 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				demo_strings = (char **)strings_sim_3;
 				RSE_writerRestart();
 				break;	
-
-			case 4:
-				physics_sim = (s16 *)physics_sim_4;
-				sim_frame_len = SIMULATION_4_FRAME_LEN;
-				sim_node_len = SIMULATION_4_NODE_LEN;
-				demo_strings = (char **)strings_sim_4;
-				RSE_writerRestart();
-				break;	
-
-			case 5:
-				physics_sim = (s16 *)physics_sim_4;
-				sim_frame_len = SIMULATION_4_FRAME_LEN;
-				sim_node_len = SIMULATION_4_NODE_LEN;
-				demo_strings = (char **)strings_sim_5;
-				RSE_writerRestart();
-				break;		
 		}
 	};
 
