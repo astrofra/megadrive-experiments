@@ -6,6 +6,7 @@
 #include "simulation_1.h"
 #include "simulation_2.h"
 #include "simulation_3.h"
+#include "wipe_effect.h"
 #include "transition_helper.h"
 
 #define MAX_SIMULATION 6
@@ -13,9 +14,17 @@
 #define SIM_MODE_RUN			0
 #define SIM_MODE_SCROLL			1
 #define SIM_MODE_SET_NEW_SIM	2
+#define SIM_CLEAR_SCREEN		3
+#define SIM_MODE_EXIT			4
+
+#define SIM_0_END_OFFSET		0
+#define SIM_1_END_OFFSET		0
+#define SIM_2_END_OFFSET		0
+#define SIM_3_END_OFFSET		0
 
 extern u16 vramIndex;
 extern u16 fontIndex;
+extern u8 framerate;
 
 void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 {
@@ -35,7 +44,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 			case 0:
 				physics_sim = (s16 *)physics_sim_0;
 				sim_frame_len = SIMULATION_0_FRAME_LEN;
-				sim_node_len = SIMULATION_0_NODE_LEN;
+				sim_node_len = SIMULATION_0_NODE_LEN + (SIM_0_END_OFFSET * framerate);
 				demo_strings = (char **)strings_sim_0;
 				RSE_writerRestart();
 				break;
@@ -43,7 +52,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 			case 1:
 				physics_sim = (s16 *)physics_sim_1;
 				sim_frame_len = SIMULATION_1_FRAME_LEN;
-				sim_node_len = SIMULATION_1_NODE_LEN;
+				sim_node_len = SIMULATION_1_NODE_LEN + (SIM_1_END_OFFSET * framerate);
 				demo_strings = (char **)strings_sim_1;
 				RSE_writerRestart();
 				break;
@@ -51,7 +60,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 			case 2:
 				physics_sim = (s16 *)physics_sim_2;
 				sim_frame_len = SIMULATION_2_FRAME_LEN;
-				sim_node_len = SIMULATION_2_NODE_LEN;
+				sim_node_len = SIMULATION_2_NODE_LEN + (SIM_2_END_OFFSET * framerate);
 				demo_strings = (char **)strings_sim_2;
 				RSE_writerRestart();
 				break;
@@ -59,7 +68,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 			case 3:
 				physics_sim = (s16 *)physics_sim_3;
 				sim_frame_len = SIMULATION_3_FRAME_LEN;
-				sim_node_len = SIMULATION_3_NODE_LEN;
+				sim_node_len = SIMULATION_3_NODE_LEN + (SIM_3_END_OFFSET * framerate);
 				demo_strings = (char **)strings_sim_3;
 				RSE_writerRestart();
 				break;	
@@ -148,9 +157,9 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 
 	sim_mode = SIM_MODE_RUN;
 	scroll_speed = 1;
-	scroll_x = 0;	
+	scroll_x = 0;
 
-	while (current_scenario <= last_sim)
+	while (current_scenario <= last_sim && sim_mode != SIM_MODE_EXIT)
 	{
 		VDP_waitVSync();
 
@@ -172,7 +181,10 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				vblCount++;
 				if (vblCount >= sim_frame_len)
 				{
-					sim_mode = SIM_MODE_SCROLL;
+					if (current_scenario < last_sim)
+						sim_mode = SIM_MODE_SCROLL;
+					else
+						sim_mode = SIM_CLEAR_SCREEN;
 				}
 				break;
 
@@ -217,9 +229,20 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				set_simulation();
 				sim_mode = SIM_MODE_RUN;
 				break;
+
+			case SIM_CLEAR_SCREEN:
+				VDP_fadeOut(1, 63, 32, FALSE);
+				// transition_fx(0, vramIndex);
+				sim_mode = SIM_MODE_EXIT;
+				break;
+
+			case SIM_MODE_EXIT:
+				break;
 		}
 
 	}
 
 	SPR_end();
+	RSE_resetScrolling();
+	RSE_writerSetXOffset(0);
 }

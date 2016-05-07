@@ -94,7 +94,7 @@ void RSE_plasma(u8 mode)
 	SYS_enableInts();
 
 	tmp_timer = (512 * 60) / framerate;
-	while (vblCount < tmp_timer)
+	while (vblCount < tmp_timer || !RSE_writerIsDone())
 	{
 		VDP_waitVSync();
 

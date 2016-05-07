@@ -18,6 +18,7 @@ u16 current_char_x;
 u16 current_char_y = 2;
 u16 current_plan;
 u8 current_pal;
+u8 writer_is_done;
 u16 writer_timer;
 u16 writer_display_duration = 50;
 u16 writer_options = (WRT_OPT_AUTO_NEXT_STRING | WRT_OPT_AUTO_RESTART | WRT_OPT_WRITE_TO_PLAN_A);
@@ -94,6 +95,7 @@ u16 RSE_writerSetup(void)
 	vramIndex += oddball_fonts.tileset->numTile;
 
 	writer_switch = FALSE;
+	writer_is_done = FALSE;
 	x_offset = 0;
 
 	return vramIndex;
@@ -110,6 +112,7 @@ void RSE_writerRestart(void)
 	current_string_idx = 0;
 	current_char_idx = 0;
 	writer_state = WRT_CENTER_CUR_LINE;
+	writer_is_done = FALSE;
 }
 
 u16 inline RSE_writerSetOption(u16 option)
@@ -205,6 +208,7 @@ void inline RSE_writerUpdateLine(void)
 				current_string_idx++;
 				if (demo_strings[current_string_idx][0] == '\0')
 				{
+					writer_is_done = TRUE;
 					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
 						current_string_idx = 0;
 					else
@@ -222,6 +226,9 @@ void inline RSE_writerUpdateLine(void)
 			return;
 	}
 }
+
+u8 inline RSE_writerIsDone(void)
+{	return writer_is_done; }
 
 void inline RSE_writerUpdateMultiLine(void)
 {
@@ -269,6 +276,7 @@ void inline RSE_writerUpdateMultiLine(void)
 				current_string_idx++;
 				if (demo_strings[current_string_idx][0] == '\0')
 				{
+					writer_is_done = TRUE;
 					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
 						current_string_idx = 0;
 					else
