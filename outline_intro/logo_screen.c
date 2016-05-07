@@ -12,6 +12,7 @@ extern u16 fontIndex;
 extern u8 framerate;
 
 s16 l_tile_scroll_h[1024];
+u16 twister_y_offset;
 
 u8 RSE_LogoScreen(void)
 {
@@ -72,6 +73,7 @@ u8 RSE_LogoScreen(void)
 	void initTwisterFx(void)
 	{
 		// s16 i, j;
+		twister_y_offset = 0;
 
 		for(i = 0, j = 0; i < TWISTER_TABLE_SIZE; i++)
 		{
@@ -82,7 +84,7 @@ u8 RSE_LogoScreen(void)
 		VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	}
 
-	void updateTwisterFx(u16 vcount_init, u16 duration)
+	void updateTwisterFx(u16 vcount_init, u16 duration, u16 offset)
 	{
 		u16 vcount, hbl_done = FALSE;
 
@@ -95,7 +97,7 @@ u8 RSE_LogoScreen(void)
 		static void hBlank(){
 
 		    *pl = CST_WRITE_VSRAM_ADDR(0);
-		    *pw = twister_jump_table[(GET_VCOUNTER + vcount) & ((TWISTER_TABLE_SIZE >> 2) - 1)];
+		    *pw = twister_jump_table[(GET_VCOUNTER + vcount) & ((TWISTER_TABLE_SIZE >> 2) - 1)] - twister_y_offset;
 		    if (!hbl_done)
 		    {
 		    	hbl_done = TRUE;
@@ -111,6 +113,7 @@ u8 RSE_LogoScreen(void)
 		{
 			VDP_waitVSync();
 			hbl_done = FALSE;
+			twister_y_offset += offset;
 			vcount++;
 		}	
 	}
@@ -322,27 +325,26 @@ u8 RSE_LogoScreen(void)
 
 	// RSE_pause(60 * 5);
 	initTwisterFx();
-	updateTwisterFx(0, framerate * 5);
-
-	// VDP_fadeOut(1, 63, 32, TRUE);
-	// VDP_fadePalTo(PAL0, palette_black, 60, TRUE);
-	// RSE_pause(60);
-	// updateTwisterFx(60 * 5, 60);
-
-	// RSE_pause(5);
+	updateTwisterFx(0, framerate * 3, 0);
+	updateTwisterFx(framerate * 3, (framerate * 3) + (framerate >> 1), 1);
+	updateTwisterFx((framerate * 3) + (framerate >> 1), framerate * 4, 2);
+	updateTwisterFx((framerate * 4), (framerate * 4) + (framerate >> 3), 3);
 
 	disableTwisterFx();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
-	VDP_fadeOut(1, 63, (8 * 60) / framerate, TRUE);
-	RSE_pause(16);
-	for(i = 0; i  < 224 >> 3; i++)
-		clearVerticalStripes(i);
+	VDP_fadeOut(1, 63, (8 * 60) / framerate, FALSE);
 
-	VDP_setVerticalScroll(PLAN_B, 0);
-	VDP_setVerticalScroll(PLAN_A, 0);
-	VDP_setHorizontalScroll(PLAN_B, 0);
-	VDP_setHorizontalScroll(PLAN_A, 0);	
+	// for(i = 0; i  < 224 >> 3; i++)
+	// 	clearVerticalStripes(i);
+
+	for(i = 0; i  < 224 >> 3; i++)
+	{
+		RSE_clearTileRowB(i);
+		RSE_clearTileRowA(i);
+	}
+
+	RSE_resetScrolling();
 
 	SPR_end();
 
