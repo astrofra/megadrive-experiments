@@ -153,7 +153,7 @@ u16 RSE_writerDrawString(char *str)
 void inline RSE_writerUpdateLine(void)
 {
 	if (WRT_HAS_OPTION(WRT_OPT_HALF_SPEED))
-		if (writer_state != WRT_CLEAR_LINE)
+		if (writer_state == WRT_WRITE_CUR_LINE)
 		{
 			writer_switch = ~writer_switch;
 			if (writer_switch)
@@ -226,7 +226,7 @@ void inline RSE_writerUpdateLine(void)
 void inline RSE_writerUpdateMultiLine(void)
 {
 	if (WRT_HAS_OPTION(WRT_OPT_HALF_SPEED))
-		if (writer_state != WRT_CLEAR_LINE)
+		if (writer_state == WRT_WRITE_CUR_LINE)
 		{
 			writer_switch = ~writer_switch;
 			if (writer_switch)

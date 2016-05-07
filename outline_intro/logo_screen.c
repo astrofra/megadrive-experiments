@@ -203,6 +203,7 @@ u8 RSE_LogoScreen(void)
 	clearVerticalStripes(current_char_y);
 	RSE_writerUnsetOption(WRT_OPT_WRITE_TO_PLAN_A);
 	RSE_writerUnsetOption(WRT_OPT_AUTO_RESTART);
+	RSE_writerSetOption(WRT_OPT_HALF_SPEED);
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, (64 * 60) / framerate, TRUE);
 
