@@ -231,7 +231,8 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				break;
 
 			case SIM_CLEAR_SCREEN:
-				VDP_fadeOut(1, 63, 32, FALSE);
+				VDP_fadeOut(1, 63, 32, TRUE);
+				RSE_pause(RSE_FRAMES(32));
 				// transition_fx(0, vramIndex);
 				sim_mode = SIM_MODE_EXIT;
 				break;

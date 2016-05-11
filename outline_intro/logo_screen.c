@@ -53,7 +53,7 @@ u8 RSE_LogoScreen(void)
 	s16 inline animateSmileyBounce(void)
 	{
 		s16 y;
-		y = cosFix16(smiley_phase << 3);
+		y = cosFix16(RSE_FRAMES(smiley_phase) << 3);
 		if (y < 0)
 			y = -y;
 		y = 64 - y;
@@ -118,7 +118,7 @@ u8 RSE_LogoScreen(void)
 			y_logo_bounce = 64 - y_logo_bounce;
 			if (y_logo_bounce > 8)
 				y_logo_bounce = 8;
-			y_logo_bounce = 34 - y_logo_bounce;
+			y_logo_bounce = 42 - y_logo_bounce;
 			VDP_setVerticalScroll(PLAN_B, y_logo_bounce);
 			twister_y_offset += offset;
 			vcount++;
@@ -340,13 +340,14 @@ u8 RSE_LogoScreen(void)
 	disableTwisterFx();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
-	VDP_fadeOut(1, 63, (8 * 60) / framerate, FALSE);
+	VDP_fadeOut(1, 63, RSE_FRAMES(10), TRUE);
 
 	// for(i = 0; i  < 224 >> 3; i++)
 	// 	clearVerticalStripes(i);
 
 	for(i = 0; i  < 224 >> 3; i++)
 	{
+		VDP_waitVSync();
 		RSE_clearTileRowB(i);
 		RSE_clearTileRowA(i);
 	}

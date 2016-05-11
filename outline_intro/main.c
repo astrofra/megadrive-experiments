@@ -15,6 +15,7 @@ Framework : SGDK
 u8 RSE_LogoScreen(void);
 void RSE_physics_simulation(u8 first_sim, u8 last_sim);
 void RSE_plasma(u8 mode);
+void RSE_plasma_init(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -27,6 +28,8 @@ int main()
 	framerate = 60;
 	if (SYS_isPAL())
 		framerate = 50;
+
+	RSE_plasma_init();
 
 	RSE_turn_screen_to_black();
 

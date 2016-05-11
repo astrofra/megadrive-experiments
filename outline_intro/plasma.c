@@ -13,19 +13,34 @@ extern u8 framerate;
 s16 p_tile_scroll_h[2048],
 	p_tile_scroll_v[2048];
 
+u16 p_palette_cycle[16 * 16];
+
 /*
 	Plasma screen
 	mode : 
 		0 : credits mode
 		1 : greetings mode
 */
+
+void RSE_plasma_init(void)
+{
+	u16 i;
+	/*
+		Init scroll
+	*/
+	for(i = 0; i < 2048; i++)
+	{
+		p_tile_scroll_h[i] = (sinFix16(i << 2) >> 1) - 32; //  + ((sinFix16((i + 256) << 4) >> 1) * sinFix16(i) / 350);
+		p_tile_scroll_v[i] = (cosFix16(i << 2)) + 64 + ((cosFix16((i + 128) << 4) >> 1) * sinFix16(i + 256) / 350);
+	}
+}
+
 void RSE_plasma(u8 mode)
 {
-	u32 vblCount = 0, i, j;
+	u32 vblCount = 0;
+	u16 i, j;
 	u16 tmp_timer;
 	Image plasma_img;
-
-	u16 palette_cycle[16 * 16];
 
 	RSE_turn_screen_to_black();
 
@@ -47,24 +62,16 @@ void RSE_plasma(u8 mode)
 	}
 
 	/*
-		Init scroll
-	*/
-	for(i = 0; i < 2048; i++)
-	{
-		p_tile_scroll_h[i] = (sinFix16(i << 2) >> 1) - 32; //  + ((sinFix16((i + 256) << 4) >> 1) * sinFix16(i) / 350);
-		p_tile_scroll_v[i] = (cosFix16(i << 2)) + 64 + ((cosFix16((i + 128) << 4) >> 1) * sinFix16(i + 256) / 350);
-	}
-
-	/*
 		Init palette
 	*/
 	for(i = 0; i < 16; i++)
 	{
+		VDP_waitVSync();
 		for(j = 0; j <  16; j++)
-			palette_cycle[j + (i * 16)] = (plasma_img.palette->data[(j + i) & 0xF]); // | (((sinFix16(i * 64) + 64) >> 1) & 0x00F);
+			p_palette_cycle[j + (i * 16)] = (plasma_img.palette->data[(j + i) & 0xF]); // | (((sinFix16(i * 64) + 64) >> 1) & 0x00F);
 
-		palette_cycle[i * 16] = 0x0;
-	}
+		p_palette_cycle[i * 16] = 0x0;
+	}		
 
 	/*
 		Init writer
@@ -76,10 +83,11 @@ void RSE_plasma(u8 mode)
 	RSE_resetScrolling();
 
 	VDP_waitVSync();
+
 	SYS_disableInts();
 	VDP_setPlanSize(64, 32);
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);
+	// VDP_clearPlan(APLAN, 0);
+	// VDP_clearPlan(BPLAN, 0);
 	VDP_setHilightShadow(0);	
 
 	vramIndex = fontIndex;
@@ -100,51 +108,51 @@ void RSE_plasma(u8 mode)
 
 		RSE_writerUpdateMultiLine();
 
-		if (vblCount < 9)
+		if (vblCount < 9 << 1)
 		{
 			switch(vblCount)
 			{
 				case 0:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 					break;
 					
-				case 1:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, TRUE);			
+				case 1 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, FALSE);			
 					break;
 					
-				case 2:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, TRUE);
+				case 2 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);
 					break;
 					
-				case 3:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, TRUE);
+				case 3 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, FALSE);
 					break;
 					
-				case 4:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, TRUE);
+				case 4 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, FALSE);
 					break;
 					
-				case 5:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 128 >> 3, FALSE, TRUE);
+				case 5 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 128 >> 3, FALSE, FALSE);
 					break;
 					
-				case 6:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, TRUE);
+				case 6 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
 					break;
 					
-				case 7:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 256 >> 3, FALSE, TRUE);
+				case 7 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 256 >> 3, FALSE, FALSE);
 					break;
 					
-				case 8:
-					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, TRUE);
+				case 8 << 1:
+					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
 					break;	
 			}
 		}
 
-		VDP_setHorizontalScrollTile(PLAN_B, 0, p_tile_scroll_h + ((vblCount << 1) & 1023), 32, TRUE);
-		VDP_setVerticalScrollTile(PLAN_B, 0, p_tile_scroll_v + (vblCount & 1023), 32, TRUE);
-		VDP_setPalette(PAL1, palette_cycle + (((vblCount >> 2) << 4) & 255));
+		VDP_setHorizontalScrollTile(PLAN_B, 0, p_tile_scroll_h + ((vblCount << 1) & 1023), 32, FALSE);
+		VDP_setVerticalScrollTile(PLAN_B, 0, p_tile_scroll_v + (vblCount & 1023), 32, FALSE);
+		VDP_setPalette(PAL1, p_palette_cycle + (((vblCount >> 2) << 4) & 255));
 		vblCount++;
 	}
 

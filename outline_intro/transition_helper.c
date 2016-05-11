@@ -57,7 +57,11 @@ void RSE_resetScrolling(void)
 	VDP_setVerticalScrollTile(PLAN_A, 0, tile_sc_table, 32, TRUE);	
 	VDP_setHorizontalScrollTile(PLAN_B, 0, tile_sc_table, 32, TRUE);
 	VDP_setVerticalScrollTile(PLAN_B, 0, tile_sc_table, 32, TRUE);
+	SYS_enableInts();
 
+	VDP_waitVSync();
+
+	SYS_disableInts();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setVerticalScroll(PLAN_B, 0);
 	VDP_setVerticalScroll(PLAN_A, 0);
