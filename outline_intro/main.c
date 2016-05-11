@@ -36,6 +36,8 @@ int main()
 	*/
 	fontIndex = RSE_writerSetup();
 
+	RSE_pause(RSE_FRAMES(20));
+
 	/* RSE Logo */
 	RSE_LogoScreen();
 

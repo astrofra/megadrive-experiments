@@ -21,6 +21,7 @@ u8 RSE_LogoScreen(void)
 	Sprite sprites[16];
 	u16 smiley_phase = 0;
 	s16 twister_jump_table[TWISTER_TABLE_SIZE];
+	s16 y_logo_bounce;
 
 	void inline drawVerticalStripes(void)
 	{
@@ -49,7 +50,7 @@ u8 RSE_LogoScreen(void)
 			}
 	}
 
-	void inline animateSmileyBounce(void)
+	s16 inline animateSmileyBounce(void)
 	{
 		s16 y;
 		y = cosFix16(smiley_phase << 3);
@@ -62,9 +63,10 @@ u8 RSE_LogoScreen(void)
 	    SPR_update(sprites, 1);
 
 	    if (smiley_phase == 0)
-	    	VDP_fadePalTo(PAL2, smiley_gelmir.palette->data, (16 * 60) / framerate, TRUE);
+	    	VDP_fadePalTo(PAL2, smiley_gelmir.palette->data, RSE_FRAMES(16), TRUE);
 
-	    smiley_phase++;	
+	    smiley_phase++;
+	    return y;
 	}		
 
 	/*
@@ -101,7 +103,7 @@ u8 RSE_LogoScreen(void)
 		    if (!hbl_done)
 		    {
 		    	hbl_done = TRUE;
-			    animateSmileyBounce();	
+			    y_logo_bounce = animateSmileyBounce();	
 		    }
 		}
 
@@ -113,6 +115,11 @@ u8 RSE_LogoScreen(void)
 		{
 			VDP_waitVSync();
 			hbl_done = FALSE;
+			y_logo_bounce = 64 - y_logo_bounce;
+			if (y_logo_bounce > 8)
+				y_logo_bounce = 8;
+			y_logo_bounce = 34 - y_logo_bounce;
+			VDP_setVerticalScroll(PLAN_B, y_logo_bounce);
 			twister_y_offset += offset;
 			vcount++;
 		}	
