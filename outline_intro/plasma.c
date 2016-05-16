@@ -36,7 +36,7 @@ void RSE_plasma_init(void)
 	*/
 	for(i = 0; i < 2048; i++)
 	{
-		p_tile_scroll_h[i] = (sinFix16(i << 2) >> 1) - 32; //  + ((sinFix16((i + 256) << 4) >> 1) * sinFix16(i) / 350);
+		p_tile_scroll_h[i] = (sinFix16(i << 2) >> 1) - 32;
 		p_tile_scroll_v[i] = (cosFix16(i << 2)) + 64 + ((cosFix16((i + 128) << 4) >> 1) * sinFix16(i + 256) / 350);
 	}
 }
@@ -88,9 +88,14 @@ void RSE_plasma(u8 mode)
 				for(j = 0; j <  16; j++)
 					p_palette_cycle[j + ((15 - i) * 16)] = (plasma_img.palette->data[(j + i) & 0xF]);
 
+			}	
+
+			for(i = 0; i < 16; i++)
+			{
 				p_palette_cycle[i * 16] = 0x0;
 				p_palette_cycle[(i * 16) + 15] = col;
 			}	
+
 			break;
 	}	
 
@@ -202,129 +207,3 @@ void RSE_plasma(u8 mode)
 
 	RSE_resetScrolling();
 }
-
-// void RSE_superPlasma(void)
-// {
-// 	u32 vblCount = 0;
-// 	u16 i, j;
-// 	u16 tmp_timer;
-// 	Image plasma_img;
-
-// 	RSE_turn_screen_to_black();
-
-// 	/*
-// 		Init palette
-// 	*/
-// 	for(i = 0; i < 16; i++)
-// 	{
-// 		VDP_waitVSync();
-// 		for(j = 0; j <  16; j++)
-// 			p_palette_cycle[j + (i * 16)] = (plasma.palette->data[(j + i) & 0xF]); // | (((sinFix16(i * 64) + 64) >> 1) & 0x00F);
-
-// 		p_palette_cycle[i * 16] = 0x0;
-// 	}			
-
-// 	RSE_resetScrolling();
-
-// 	VDP_waitVSync();
-
-// 	SYS_disableInts();
-// 	VDP_setPlanSize(64, 32);
-// 	// VDP_clearPlan(APLAN, 0);
-// 	// VDP_clearPlan(BPLAN, 0);
-// 	VDP_setHilightShadow(0);	
-
-// 	vramIndex = fontIndex;
-
-// 	vramIndex += plasma.tileset->numTile;
-
-// 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_2TILE);	
-
-// 	VDP_setPalette(PAL0, plasma.palette->data);
-// 	VDP_setPalette(PAL1, plasma.palette->data);
-
-// 	SYS_enableInts();
-
-// 	tmp_timer = (512 * 60) / framerate;
-// 	while (vblCount < tmp_timer || !RSE_writerIsDone())
-// 	{
-// 		VDP_waitVSync();
-
-// 		RSE_writerUpdateMultiLine();
-
-// 		if (vblCount < 9 << 1)
-// 		{
-// 			switch(vblCount)
-// 			{
-// 				case 0:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-// 					break;
-
-// 				case 1:
-// 					VDP_drawImageEx(APLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, FALSE);			
-// 					break;
-					
-// 				case 1 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 0, FALSE, FALSE);			
-// 					break;
-					
-// 				case 2 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);
-// 					break;
-					
-// 				case 3 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, FALSE);
-// 					break;
-					
-// 				case 4 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 128 >> 3, FALSE, FALSE);
-// 					break;
-					
-// 				case 5 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 128 >> 3, FALSE, FALSE);
-// 					break;
-					
-// 				case 6 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
-// 					break;
-					
-// 				case 7 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 128 >> 3, 256 >> 3, FALSE, FALSE);
-// 					break;
-					
-// 				case 8 << 1:
-// 					VDP_drawImageEx(BPLAN, &plasma_img, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 256 >> 3, FALSE, FALSE);
-// 					break;	
-// 			}
-// 		}
-
-// 		// PLASMA_SCROLL_A();
-// 		PLASMA_SCROLL_B();
-// 		VDP_setPalette(PAL1, p_palette_cycle + (((vblCount >> 2) << 4) & 255));
-// 		vblCount++;
-// 	}
-
-// 	/*
-// 		Fade out
-// 	*/
-// 	VDP_fadeOut(1, 63, 32, TRUE);	
-// 	i = 0;
-
-// 	while (i < 32)
-// 	{
-// 		VDP_waitVSync();
-
-// 		// VDP_setHorizontalScrollTile(PLAN_B, 0, p_tile_scroll_h + ((vblCount << 1) & 1023), 32, TRUE);
-// 		// VDP_setVerticalScrollTile(PLAN_B, 0, p_tile_scroll_v + (vblCount & 1023), 32, TRUE);
-// 		// PLASMA_SCROLL_A();
-// 		PLASMA_SCROLL_B();
-// 		vblCount++;
-// 		i++;
-// 	}
-
-// 	VDP_waitVSync();
-
-// 	SPR_end();	
-
-// 	RSE_resetScrolling();
-// }

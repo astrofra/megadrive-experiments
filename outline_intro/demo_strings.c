@@ -3,7 +3,7 @@ const char *strings_logo_0[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"RESISTANCE PRESENTS\0",
+	"ccc RESISTANCE PRESENTS ccc\0",
 	"A 2016 RELEASE FOR THE SEGA MEGADRIVE\0",
 
 	/*	Do not remove the next line */
@@ -15,7 +15,7 @@ const char *strings_credits[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"---------------------------------\0",
+	"ccc CREDITS ccc\0",
 	" \0",
 
 	"PIXELS : GELMIR, SIM1, FRA\0",
@@ -30,10 +30,6 @@ const char *strings_credits[] =
 	"DONE WITH THE SGDK FRAMEWORK\0",
 	// " \0",
 
-	// "PHYSICS SIMULATION BY HARFANG 3D\0",
-	" \0",
-
-	"---------------------------------\0",
 	/*	Do not remove the next line */
 	"\0"
 };
@@ -43,10 +39,10 @@ const char *strings_greets[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"---------------------------------\0",
-	" \0",
+	// "---------------------------------\0",
+	// " \0",
 
-	"GREETINGS FLYING TO:\0",
+	"ccc GREETINGS FLY TO ccc\0",
 	" \0",	
 	"DARKLITE, DEFENCE FORCE\0",
 	" \0",	
@@ -69,7 +65,7 @@ const char *strings_greets[] =
 	"GRASS, 4PLAY, SIM1, MOONSOON\0",
 	" \0",
 
-	"---------------------------------\0",
+	// "---------------------------------\0",
 	/*	Do not remove the next line */
 	"\0"
 };
