@@ -127,12 +127,34 @@ void RSE_plasma(u8 mode)
 
 	SYS_enableInts();
 
+	/*
+		Draw the plasma
+		(frame interleaved)
+	*/
 	tmp_timer = (512 * 60) / framerate;
 	while (vblCount < tmp_timer || !RSE_writerIsDone())
 	{
 		VDP_waitVSync();
 
-		RSE_writerUpdateMultiLine();
+		/*
+			Draw a top/bottom line
+			to frame the image.
+		*/
+		if (vblCount < 328 >> 3)
+		{
+			i = vblCount;
+			/* Top line */
+			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + FONT_LINE_OFFSET - 2, i, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 0));
+			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + (FONT_LINE_OFFSET << 1) - 2, i + 1, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 0));
+			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + (FONT_LINE_OFFSET << 2) - 2, i + 2, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 0));
+
+			/* Bottom line */
+			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + FONT_LINE_OFFSET - 1, (320 >> 3) - i, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, (224 >> 3) - 1));
+			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + (FONT_LINE_OFFSET << 1) - 1, (320 >> 3) - i - 1, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, (224 >> 3) - 1));
+			VDP_setTileMapXY(VDP_PLAN_A, TILE_USERINDEX + (FONT_LINE_OFFSET << 2) - 1, (320 >> 3) - i - 2, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, (224 >> 3) - 1));
+		}
+		else
+			RSE_writerUpdateMultiLine();
 
 		if (vblCount < 9 << 1)
 		{
