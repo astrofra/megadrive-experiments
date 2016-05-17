@@ -41,6 +41,7 @@ extern u16 x_offset;
 #define WRT_HAS_OPTION(OPT) (OPT & writer_options)
 
 u16 RSE_writerSetup(void);
+void RSE_writerSetInitialY(u16 initial_y);
 void RSE_writerRestart(void);
 u8 RSE_writerIsDone(void);
 u16 RSE_writerDrawString(char *str);

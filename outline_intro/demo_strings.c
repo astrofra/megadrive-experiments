@@ -63,8 +63,8 @@ const char *strings_greets[] =
 	"PHAAZON, TITEIKO, STFSUX\0", 
 	" \0",	
 	"GRASS, 4PLAY, SIM1, MOONSOON\0",
-	" \0",
-
+	"                            \0",
+	"\0",
 	// "---------------------------------\0",
 	/*	Do not remove the next line */
 	"\0"

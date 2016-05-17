@@ -103,7 +103,8 @@ void RSE_plasma(u8 mode)
 		Init writer
 	*/
 	RSE_writerSetOption(WRT_OPT_WRITE_TO_PLAN_A);
-	RSE_writerUnsetOption(WRT_OPT_AUTO_RESTART);	
+	RSE_writerUnsetOption(WRT_OPT_AUTO_RESTART);
+	RSE_writerSetInitialY(2);
 	RSE_writerRestart();		
 
 	RSE_resetScrolling();

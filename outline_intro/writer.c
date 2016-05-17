@@ -16,6 +16,7 @@ u16 current_char_idx;
 u16 x_offset;
 u16 current_char_x;
 u16 current_char_y = 2;
+u16 initial_char_y;
 u16 current_plan;
 u8 current_pal;
 u8 writer_is_done;
@@ -100,6 +101,9 @@ u16 RSE_writerSetup(void)
 
 	return vramIndex;
 }
+
+void RSE_writerSetInitialY(u16 initial_y)
+{	initial_char_y = initial_y;	}
 
 void RSE_writerSetXOffset(u16 offset)
 { 
@@ -217,6 +221,10 @@ void inline RSE_writerUpdateLine(void)
 						return;
 					}
 				}
+				else
+				if (demo_strings[current_string_idx][0] == '\1')
+					current_char_y = initial_char_y;
+
 
 				writer_state = WRT_CENTER_CUR_LINE;
 			}
