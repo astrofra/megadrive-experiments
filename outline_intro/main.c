@@ -33,7 +33,7 @@ int main()
 
 	RSE_plasma_init();
 
-	// RSE_poem();
+	RSE_poem();
 
 	RSE_turn_screen_to_black();
 

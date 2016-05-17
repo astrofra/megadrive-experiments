@@ -16,7 +16,7 @@ u16 twister_y_offset;
 
 u8 RSE_LogoScreen(void)
 {
-	u16 vblCount = 0;
+	u16 vblCount = 0, tmp_timer;
 	s16 i, j, k;
 	Sprite sprites[16];
 	u16 smiley_phase = 0;
@@ -186,6 +186,8 @@ u8 RSE_LogoScreen(void)
 
 	play_music();
 
+	RSE_pause(RSE_FRAMES(20));
+
 	/* 
 		Fade to the logo's palette
 	*/
@@ -218,11 +220,23 @@ u8 RSE_LogoScreen(void)
 	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, (64 * 60) / framerate, TRUE);
 
 	/*	
+		Animate the background
+	*/
+	vblCount = 0;
+	tmp_timer = RSE_FRAMES(60);
+	while (vblCount < tmp_timer)
+	{
+		VDP_waitVSync();
+		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, l_tile_scroll_h + (vblCount & 511), 60, TRUE);
+		vblCount++;
+	}
+
+	/*	
 		Write some text
 		while animating the background
 	*/
-	vblCount = 0;
-	while (vblCount < framerate * 6)
+	tmp_timer += RSE_FRAMES(6 * 60);
+	while (vblCount < tmp_timer)
 	{
 		VDP_waitVSync();
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, l_tile_scroll_h + (vblCount & 511), 60, TRUE);
@@ -234,9 +248,10 @@ u8 RSE_LogoScreen(void)
 		Fade out the background
 		while animating it
 	*/
-	VDP_fadePalTo(PAL1, palette_black, (32 * 60) / framerate, TRUE);
+	VDP_fadePalTo(PAL1, palette_black, RSE_FRAMES(32), TRUE);
 
-	while (vblCount < (framerate * 6) + ((32 * 60) / framerate))
+	tmp_timer += RSE_FRAMES(32);
+	while (vblCount < tmp_timer)
 	{
 		VDP_waitVSync();
 		VDP_setHorizontalScrollLine(PLAN_A, (SCR_H - LOGO_H) / 2, l_tile_scroll_h + (vblCount & 511), 60, TRUE);		
@@ -247,7 +262,7 @@ u8 RSE_LogoScreen(void)
 		Fade out the foreground
 		while scrolling it from below
 	*/
-	VDP_fadeOut(1, 63, (32 * 60) / framerate, TRUE);
+	VDP_fadeOut(1, 63, RSE_FRAMES(32), TRUE);
 
 	for(i = 0; i < 32; i++)
 	{
@@ -310,7 +325,7 @@ u8 RSE_LogoScreen(void)
 		while scrolling it from below
 		with an animated sine-based offset
 	*/
-	VDP_fadePalTo(PAL1, logo_demo.palette->data, (32 * 60) / framerate, TRUE);
+	VDP_fadePalTo(PAL1, logo_demo.palette->data, RSE_FRAMES(32), TRUE);
 
 	for(i = 0, j = 0; i < 1024 - 32; i += 4)
 	{
@@ -328,7 +343,7 @@ u8 RSE_LogoScreen(void)
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 3, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
 
-	VDP_fadePalTo(PAL0, outline_logo.palette->data, (16 * 60) / framerate, TRUE);
+	VDP_fadePalTo(PAL0, outline_logo.palette->data, RSE_FRAMES(16), TRUE);
 
 	// RSE_pause(60 * 5);
 	initTwisterFx();

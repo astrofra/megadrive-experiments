@@ -1,8 +1,10 @@
 #include "genesis.h"
 #include <gfx.h>
 #include "writer.h"
+#include "transition_helper.h"
 
 extern u16 vramIndex;
+extern u8 framerate;
 extern char **demo_strings;
 
 /* 
@@ -98,6 +100,7 @@ u16 RSE_writerSetup(void)
 	writer_switch = FALSE;
 	writer_is_done = FALSE;
 	x_offset = 0;
+	writer_display_duration = RSE_FRAMES(50);
 
 	return vramIndex;
 }
