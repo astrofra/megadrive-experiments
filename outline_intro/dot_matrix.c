@@ -120,10 +120,10 @@ void RSE_gridTileAnimation()
 		vblCount++;
 	}
 
-	VDP_fadeOut(1, 63, RSE_FRAMES(10), TRUE);
+	VDP_fadeOut(0, 63, RSE_FRAMES(16), TRUE);
 
 	i = 0;
-	while (i < RSE_FRAMES(10)) // || !RSE_writerIsDone())
+	while (i < RSE_FRAMES(16)) // || !RSE_writerIsDone())
 	{
 		VDP_waitVSync();
 		drawDotMatrix();

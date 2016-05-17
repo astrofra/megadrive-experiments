@@ -15,6 +15,10 @@ const char *strings_credits[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
+	"c\0",
+	"ccc\0",
+	" \0",
+
 	"ccc CREDITS ccc\0",
 	" \0",
 
@@ -28,7 +32,11 @@ const char *strings_credits[] =
 	" \0",
 
 	"DONE WITH THE SGDK FRAMEWORK\0",
-	// " \0",
+	" \0",
+
+	"ccc\0",
+	"c\0",
+	" \0",
 
 	/*	Do not remove the next line */
 	"\0"
