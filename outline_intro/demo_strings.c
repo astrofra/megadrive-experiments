@@ -4,7 +4,8 @@ const char *strings_logo_0[] =
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
 	"ccc RESISTANCE PRESENTS ccc\0",
-	"A 2016 RELEASE FOR THE SEGA MEGADRIVE\0",
+	"A DEMO FOR THE SEGA MEGADRIVE\0",
+	"RELEASED AT SOLSKOGEN 2016\0",
 
 	/*	Do not remove the next line */
 	"\0"

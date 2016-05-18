@@ -105,6 +105,11 @@ u16 RSE_writerSetup(void)
 	return vramIndex;
 }
 
+void RSE_writerSetDisplayDuration(u8 duration)
+{
+	writer_display_duration = duration;
+}
+
 void RSE_writerSetInitialY(u16 initial_y)
 {	initial_char_y = initial_y;	}
 

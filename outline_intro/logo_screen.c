@@ -216,6 +216,10 @@ u8 RSE_LogoScreen(void)
 	RSE_writerUnsetOption(WRT_OPT_WRITE_TO_PLAN_A);
 	RSE_writerUnsetOption(WRT_OPT_AUTO_RESTART);
 	RSE_writerSetOption(WRT_OPT_HALF_SPEED);
+	RSE_writerSetDisplayDuration(RSE_FRAMES(40));
+
+	RSE_pause(RSE_FRAMES(30));
+
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_fadePalTo(PAL1, logo_rse_bottom_9bits.palette->data, (64 * 60) / framerate, TRUE);
 
@@ -223,7 +227,7 @@ u8 RSE_LogoScreen(void)
 		Animate the background
 	*/
 	vblCount = 0;
-	tmp_timer = RSE_FRAMES(60);
+	tmp_timer = RSE_FRAMES(130);
 	while (vblCount < tmp_timer)
 	{
 		VDP_waitVSync();
@@ -235,7 +239,7 @@ u8 RSE_LogoScreen(void)
 		Write some text
 		while animating the background
 	*/
-	tmp_timer += RSE_FRAMES(6 * 60);
+	tmp_timer += RSE_FRAMES(450);
 	while (vblCount < tmp_timer)
 	{
 		VDP_waitVSync();
@@ -327,7 +331,7 @@ u8 RSE_LogoScreen(void)
 	*/
 	VDP_fadePalTo(PAL1, logo_demo.palette->data, RSE_FRAMES(32), TRUE);
 
-	for(i = 0, j = 0; i < 1024 - 32; i += 4)
+	for(i = 0; i < 1024 - 32; i += 4)
 	{
 		VDP_waitVSync();
 		VDP_setVerticalScrollTile(PLAN_B, 0, l_tile_scroll_h + i, 32, TRUE);
@@ -336,21 +340,21 @@ u8 RSE_LogoScreen(void)
 			animateSmileyBounce();
 	}
 
+	VDP_fadePalTo(PAL0, outline_logo.palette->data, RSE_FRAMES(16), TRUE);
+
 	/*
 		Fake raster bar (tile based)
 	*/
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
 	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 3, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);
-
-	VDP_fadePalTo(PAL0, outline_logo.palette->data, RSE_FRAMES(16), TRUE);
-
+	VDP_drawImageEx(APLAN, &outline_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 112 >> 2, ((SCR_H - LOGO_CHAR_H) >> 4) + 5, FALSE, FALSE);	
+	
 	// RSE_pause(60 * 5);
 	initTwisterFx();
 	updateTwisterFx(0, framerate * 3, 0);
 	updateTwisterFx(framerate * 3, (framerate * 3) + (framerate >> 1), 1);
 	updateTwisterFx((framerate * 3) + (framerate >> 1), framerate * 4, 2);
-	updateTwisterFx((framerate * 4), (framerate * 4) + (framerate >> 3), 3);
+	updateTwisterFx((framerate * 3) + (framerate >> 1), (framerate * 4) + (framerate >> 3), 3);
 
 	disableTwisterFx();
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);

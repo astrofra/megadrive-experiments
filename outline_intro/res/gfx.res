@@ -14,3 +14,4 @@ IMAGE plasma_greets "plasma_greetings.png" 0
 IMAGE transition_pattern_0 "transition_pattern_0.png" 0
 IMAGE poem "poem-by-metoikos.png" 0
 IMAGE pat_round "pat_round.png" 0
+IMAGE alexkidd "alexkidd.png" 0

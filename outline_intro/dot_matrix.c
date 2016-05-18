@@ -84,51 +84,55 @@ void RSE_gridTileAnimation()
 	SYS_disableInts();
 
 	/* Set a larger tileplan to be able to scroll */
-	VDP_setPlanSize(64, 32);
-
-	// VDP_clearPlan(APLAN, 0);
-	// VDP_clearPlan(BPLAN, 0);
+	VDP_setPlanSize(64, 64);
 
 	vramIndex = fontIndex;
 
 	/* Load the fond tiles */
 	VDP_drawImageEx(APLAN, &pat_round, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	// vramIndex += pat_round.tileset->numTile;
+	// VDP_setPalette(PAL0, pat_round.palette->data);
 
-	// VDP_drawImageEx(BPLAN, &rse_logo, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), (320 - 200) / 16, (240 - 50) / 16, FALSE, FALSE);
-	// vramIndex += rse_logo.tileset->numTile;	
-
-	VDP_setPalette(PAL0, pat_round.palette->data);
-	// VDP_setPalette(PAL1, rse_logo.palette->data);
-
-	// SPR_init(257);
- //    SPR_initSprite(&sprites[0], &rse_logo_shadow, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
- //    // SPR_initSprite(&sprites[1], &rse_logo_shadow_alt, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
-	// SPR_setPosition(&sprites[0], (320 - 160) >> 1, ((240 - 50) >> 1) + 8);
- //    SPR_update(sprites, 1);	
-
- //    VDP_setHilightShadow(0);
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+	VDP_drawImageEx(BPLAN, &alexkidd, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + pat_round.tileset->numTile), (320 - 207) >> 4, 128 >> 3, FALSE, FALSE);
+	VDP_setVerticalScroll(PLAN_B, -64);
+	// VDP_setPalette(PAL1, alexkidd.palette->data);
 
 	SYS_enableInts();
 
-	tmp_timer = RSE_FRAMES(20);
+	VDP_fadePalTo(PAL1, alexkidd.palette->data, 16, TRUE);
+	for(i = 0; i < 32; i++)
+	{
+		VDP_waitVSync();
+		VDP_setVerticalScroll(PLAN_B, ((easing_table[i << 5] * (108 + 64)) / 1024) - 64);
+	}
 
-	while (vblCount < tmp_timer) // || !RSE_writerIsDone())
+	tmp_timer = RSE_FRAMES(32);
+	VDP_fadePalTo(PAL0, pat_round.palette->data, tmp_timer, TRUE);
+
+	while (vblCount < tmp_timer)
 	{
 		VDP_waitVSync();
 		drawDotMatrix();
 		vblCount++;
 	}
 
-	VDP_fadeOut(0, 63, RSE_FRAMES(16), TRUE);
-
-	i = 0;
-	while (i < RSE_FRAMES(16)) // || !RSE_writerIsDone())
+	tmp_timer += RSE_FRAMES(60 * 10);
+	
+	while (vblCount < tmp_timer)
 	{
 		VDP_waitVSync();
 		drawDotMatrix();
 		vblCount++;
-		i++;
+	}	
+
+	tmp_timer += RSE_FRAMES(16);
+	VDP_fadeOut(0, 63, RSE_FRAMES(16), TRUE);
+
+	while (vblCount < tmp_timer)
+	{
+		VDP_waitVSync();
+		drawDotMatrix();
+		vblCount++;
 	}
 
 	RSE_turn_screen_to_black();
