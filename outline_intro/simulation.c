@@ -246,4 +246,13 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	SPR_end();
 	RSE_resetScrolling();
 	RSE_writerSetXOffset(0);
+
+	RSE_turn_screen_to_black();
+
+	for(i = 0; i  < 224 >> 3; i++)
+	{
+		VDP_waitVSync();
+		RSE_clearTileRowB(i);
+		RSE_clearTileRowA(i);
+	}
 }

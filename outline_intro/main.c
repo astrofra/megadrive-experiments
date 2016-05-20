@@ -33,7 +33,7 @@ int main()
 
 	RSE_plasma_init();
 
-	// RSE_poem();
+	RSE_poem();
 
 	RSE_turn_screen_to_black();
 
@@ -48,7 +48,7 @@ int main()
 	/* RSE Logo */
 	RSE_LogoScreen();
 
-	// RSE_plasma(0);
+	RSE_plasma(0);
 
 	/* Demo !!! */
 	RSE_physics_simulation(0, 1);

@@ -22,8 +22,8 @@ extern u8 framerate;
 
 void RSE_gridTileAnimation()
 {
-	u16 vblCount = 0, i;
-	// Sprite sprites[16];
+	u16 vblCount = 0, i, w;
+	// u8 frame_switch = 0;
 	u16 tmp_timer;
 
 	static void inline drawDotMatrix(void)
@@ -31,6 +31,10 @@ void RSE_gridTileAnimation()
 		u16 i = 0, j = 0, k;
 		u16 tile_index, luma, unpacked_luma;
 		u16 plan_width_by_y = 0;
+
+		// frame_switch = !frame_switch;
+		// if (frame_switch)
+		// 	return;
 
 	    vu32 *plctrl;
 	    vu16 *pwdata;
@@ -50,31 +54,27 @@ void RSE_gridTileAnimation()
 			addr = VDP_PLAN_A + ((i + plan_width_by_y) << 1);
 		    *plctrl = RSE_GFX_WRITE_VRAM_ADDR(addr);
 		    *pwdata = vramIndex + unpacked_luma;
-		    i++;
 
 			unpacked_luma = (luma & RSE_DOT_MASK_3) >> RSE_DOT_UNPACK_3;
-			addr = VDP_PLAN_A + ((i + plan_width_by_y) << 1);
+			addr += 2;
 		    *plctrl = RSE_GFX_WRITE_VRAM_ADDR(addr);
 		    *pwdata = vramIndex + unpacked_luma;
-		    i++;
 
 			unpacked_luma = (luma & RSE_DOT_MASK_2) >> RSE_DOT_UNPACK_2;
-			addr = VDP_PLAN_A + ((i + plan_width_by_y) << 1);
+			addr += 2;
 		    *plctrl = RSE_GFX_WRITE_VRAM_ADDR(addr);
 		    *pwdata = vramIndex + unpacked_luma;
-		    i++;
 
 			unpacked_luma = luma & RSE_DOT_MASK_1;
-			addr = VDP_PLAN_A + ((i + plan_width_by_y) << 1);
+			addr += 2;
 		    *plctrl = RSE_GFX_WRITE_VRAM_ADDR(addr);
 		    *pwdata = vramIndex + unpacked_luma;
-		    i++;			
+		    i += 4;			
 
 			if (i >= 40)
 			{
 				i = 0;
-				j++;
-				plan_width_by_y = VDP_getPlanWidth() * j;
+				plan_width_by_y += w;
 			}
 
 			tile_index++;
@@ -85,6 +85,7 @@ void RSE_gridTileAnimation()
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 64);
+	w = VDP_getPlanWidth();
 
 	vramIndex = fontIndex;
 
@@ -116,7 +117,7 @@ void RSE_gridTileAnimation()
 		vblCount++;
 	}
 
-	tmp_timer += RSE_FRAMES(60 * 10);
+	tmp_timer += RSE_FRAMES(60 * 3);
 	
 	while (vblCount < tmp_timer)
 	{
