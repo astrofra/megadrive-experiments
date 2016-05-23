@@ -43,6 +43,8 @@ int main()
 	*/
 	fontIndex = RSE_writerSetup();
 
+// RSE_physics_simulation(2, 3);
+
 	RSE_pause(RSE_FRAMES(20));
 
 	/* RSE Logo */
