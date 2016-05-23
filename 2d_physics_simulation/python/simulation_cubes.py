@@ -11,7 +11,7 @@ from random import uniform
 from random import seed
 from utils import *
 
-current_scenario = 2  # <------- SET ME TO 0, 1, ...
+current_scenario = 0  # <------- SET ME TO 0, 1, ...
 
 filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
@@ -23,9 +23,12 @@ framerate = 50
 g_dict = {}
 ground = None
 
-sprite_specs = {'sphere': {'offset': 4, 'length': 4},
-                'sphere_black': {'offset': 0, 'length': 4},
-                'sphere_red': {'offset': 8, 'length': 4}}
+sprite_specs = {'sphere': {'offset': 4, 'length': 4, 'angle': 45},
+                'sphere_black': {'offset': 0, 'length': 4, 'angle': 45},
+                'sphere_red': {'offset': 8, 'length': 4, 'angle': 45},
+                'cube': {'offset': 12, 'length': 9, 'angle': 90},
+                'elastic_cube': {'offset': 12, 'length': 9, 'angle': 90, 'restitution': 1.0},
+                'elastic_sphere': {'offset': 8, 'length': 4, 'angle': 45, 'restitution': 1.0}}
 
 
 def tile_quantizer(x):
@@ -93,28 +96,38 @@ def make_solid_pos(x,y):
 	return gs.Vector3(x, y, 0.0)
 
 
-def throw_bullet(size=1.0, mass=1.0, type='sphere'):
-	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01 * size, md_screen_w * 0.01 * size), md_screen_h / 2 + (sphere_radius * size)), gs.Vector3())
-	new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius * size, mass=mass)
-	rigid_body.ApplyLinearImpulse(world.GetY() * (-50 / scale_factor))
+def throw_bullet(size=1.0, mass=1.0, type='sphere', spread_angle=1.0, spread_pos=1.0):
+	world = gs.Matrix4.TransformationMatrix(make_solid_pos(uniform(md_screen_w * -0.01 * size * spread_pos, md_screen_w * 0.01 * size * spread_pos), md_screen_h / 2 + (sphere_radius * size)), gs.Vector3())
+	if type.find('sphere') > -1:
+		new_bullet, rigid_body = scene.add_physic_sphere(scn, world, sphere_radius * size, mass=mass)
+	elif type.find('cube') > -1:
+		new_bullet, rigid_body = scene.add_physic_cube(scn, world, sphere_radius * size * 1.6, sphere_radius * size * 1.6, sphere_radius * size * 1.6, mass=mass)
+
+	if type.find('elastic') > -1:
+		rigid_body.SetRestitution(1.15)
+
+	ejection_vector = world.GetY() + gs.Vector3(uniform(-1.0, 1.0), uniform(0.0, 1.0), 0.0) * spread_angle
+	rigid_body.ApplyLinearImpulse(ejection_vector * (-50 / scale_factor))
 	new_bullet.SetName('type;' + type + ';size;' + str(int(size)) + ';mass;' + str(int(mass)))
 
 
-def throw_bullets_at_interval(dt, interval=1.0, mass=1.0, type='sphere'):
+def throw_bullets_at_interval(dt, interval=1.0, mass=1.0, type='sphere', spread_angle=0.0, spread_pos=1.0):
 	global throw_bullet_timeout, bullet_count
-	throw_bullet_timeout += dt
+	if not (type in throw_bullet_timeout):
+		throw_bullet_timeout[type] = interval * 0.5
+	throw_bullet_timeout[type] += dt
 
-	if bullet_count < max_bullet and throw_bullet_timeout > interval:
-		throw_bullet_timeout = 0.0
-		throw_bullet(mass=mass, type=type)
+	if bullet_count < max_bullet and throw_bullet_timeout[type] > interval:
+		throw_bullet_timeout[type] = 0.0
+		throw_bullet(mass=mass, type=type, spread_angle=spread_angle, spread_pos=spread_pos)
 		bullet_count += 1
 
 
 def angle_to_image_index(angle=0.0, type='sphere', size=1.0):
 	angle = -degrees(angle)
 	print(angle)
-	angle %= 45
-	angle *= (sprite_specs[type]['length']/45)
+	angle %= sprite_specs[type]['angle']
+	angle *= (sprite_specs[type]['length']/sprite_specs[type]['angle'])
 	angle = int(angle)
 	angle += sprite_specs[type]['offset']
 	return angle
@@ -141,35 +154,46 @@ def execute_scenario_0(dt, dt_sum):
 		enable_ground(True)
 
 	if g_dict['state'] == 0:
-		if dt_sum < 10.0:
+		if dt_sum < 12.0:
 			interval = RangeAdjust(dt_sum, 0.0, 5.0, 3.0, 0.25)
 			interval = Clamp(interval, 0.25, 3.0)
-			throw_bullets_at_interval(dt, interval)
+			throw_bullets_at_interval(dt, interval * 1.35, type='cube')
+			throw_bullets_at_interval(dt, interval * 2.0, type='elastic_cube', spread_pos=5.0)
 		else:
 			g_dict['state'] = 1
 
 	if g_dict['state'] == 1:
-		if dt_sum > 12.0:
+		if dt_sum < 14.0:
+			throw_bullets_at_interval(dt, 0.5, type='elastic_cube', spread_pos=10.0)
+		else:
 			throw_bullet(1.0, 35.0, type='sphere_black')
 			g_dict['state'] = 2
 
 	if g_dict['state'] == 2:
-		if dt_sum > 16.0:
+		throw_bullets_at_interval(dt, 0.5, type='elastic_sphere', mass=0.25)
+		if dt_sum > 17.0:
 			throw_bullet(1.0, 30.0, type='sphere_black')
 			g_dict['state'] = 3
 
 	if g_dict['state'] == 3:
-		if dt_sum > 18.0:
+		throw_bullets_at_interval(dt, 0.5, type='elastic_sphere', mass=0.25)
+		throw_bullets_at_interval(dt, 0.25, type='elastic_cube', mass=0.15, spread_pos=5.0)
+		if dt_sum > 19.0:
 			throw_bullet(1.0, 25.0, type='sphere_black')
 			g_dict['state'] = 4
 
 	if g_dict['state'] == 4:
-		if dt_sum > 20.0:
+		throw_bullets_at_interval(dt, 0.5, type='elastic_sphere', mass=0.25)
+		throw_bullets_at_interval(dt, 0.25, type='elastic_cube', mass=0.15, spread_pos=5.0)
+		if dt_sum > 23.0:
 			enable_ground(False)
 			g_dict['state'] = 5
 
 	if g_dict['state'] == 5:
-		if dt_sum > 25.0:
+		if dt_sum < 25.0:
+			throw_bullets_at_interval(dt, 0.25, type='elastic_cube', mass=0.15, spread_pos=5.0)
+
+		if dt_sum > 26.0:
 			return False
 
 	return True
@@ -241,8 +265,8 @@ def execute_scenario_2(dt, dt_sum):
 		enable_ground(True)
 
 	if g_dict['state'] == 0:
-		if dt_sum < 10.0:
-			interval = RangeAdjust(dt_sum, 0.0, 5.0, 3.0, 0.25)
+		if dt_sum < 20.0:
+			interval = RangeAdjust(dt_sum, 0.0, 2.0, 3.0, 0.25)
 			interval = Clamp(interval, 0.25, 3.0)
 			throw_bullets_at_interval(dt, interval)
 		else:
@@ -275,16 +299,106 @@ def execute_scenario_2(dt, dt_sum):
 	return True
 
 
+# Scenario 3 ###########################################################################################################
+
+def setup_scenario_3():
+
+	scene.add_physic_sphere(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(0,-md_screen_h * 0.25,0),gs.Vector3(0,0,0)),
+	 					  radius=sphere_radius * 4.0, mass=0.0)
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * -0.48), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * 0.48), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * -0.48), 0.0,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 16.0, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * 0.48), 0.0,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 16.0, depth=sphere_radius, mass=0.0)
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * -0.48), md_screen_h * 0.5,0),gs.Vector3(0,0,pi * 0.5)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * 0.48), md_screen_h * 0.5,0),gs.Vector3(0,0,pi * 0.5)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 12.0, depth=sphere_radius, mass=0.0)
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * -0.2), md_screen_h * 0.5,0),gs.Vector3(0,0,pi * 0.5)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * 0.2), md_screen_h * 0.5,0),gs.Vector3(0,0,pi * 0.5)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 10.0, depth=sphere_radius, mass=0.0)
+
+def execute_scenario_3(dt, dt_sum):
+	if not ('state' in g_dict):
+		g_dict['state'] = 0
+		enable_ground(True)
+
+	if g_dict['state'] == 0:
+		if dt_sum < 22.0:
+			interval = RangeAdjust(dt_sum, 0.0, 10.0, 3.0, 0.5)
+			interval = Clamp(interval, 0.5, 3.0)
+			throw_bullets_at_interval(dt, interval, type='elastic_cube', mass=0.25)
+			throw_bullets_at_interval(dt, 2.35, type='sphere', mass=0.25)
+		else:
+			g_dict['state'] = 1
+
+	if g_dict['state'] == 1:
+		if dt_sum > 22.0:
+			enable_ground(False)
+			g_dict['state'] = 5
+
+	if g_dict['state'] == 5:
+		if dt_sum > 25.0:
+			return False
+
+	return True
+
+
+# Scenario 4 ###########################################################################################################
+
+def setup_scenario_4():
+
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * -0.48), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 16.0, depth=sphere_radius, mass=0.0)
+	scene.add_physic_cube(scn, mat=gs.Matrix4.TransformationMatrix(gs.Vector3(tile_quantizer(md_screen_w * 0.48), -md_screen_h * 0.5,0),gs.Vector3(0,0,0)),
+						  width=sphere_radius * 2.0, height=sphere_radius * 16.0, depth=sphere_radius, mass=0.0)
+
+
+def execute_scenario_4(dt, dt_sum):
+	if not ('state' in g_dict):
+		g_dict['state'] = 0
+		enable_ground(True)
+
+	if g_dict['state'] == 0:
+		if dt_sum < 10.0:
+			interval = RangeAdjust(dt_sum, 0.0, 5.0, 3.0, 0.25)
+			interval = Clamp(interval, 0.25, 3.0)
+			throw_bullets_at_interval(dt, interval, type='cube')
+		else:
+			g_dict['state'] = 1
+
+	if g_dict['state'] == 1:
+		if dt_sum > 20.0:
+			enable_ground(False)
+			g_dict['state'] = 5
+
+	if g_dict['state'] == 5:
+		if dt_sum > 25.0:
+			return False
+
+	return True
+
+
 scenario_list = [[setup_scenario_0, execute_scenario_0],
 				[setup_scenario_1, execute_scenario_1],
-				[setup_scenario_2, execute_scenario_2]]
+				[setup_scenario_2, execute_scenario_2],
+				[setup_scenario_3, execute_scenario_3],
+				[setup_scenario_4, execute_scenario_4]]
 
 # Main ========================================================================
 
 seed(0)
 
 null_bullet = {'position': gs.Vector3(0,-128,0) * (1.0/scale_factor), 'rotation': gs.Vector3(0,0,0), 'type': 'sphere', 'size': 1.0}
-throw_bullet_timeout = 0.0
+throw_bullet_timeout = {}
 fixed_step = True
 record_motion = False
 record_done = False
