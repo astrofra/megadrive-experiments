@@ -112,12 +112,8 @@ void RSE_vectorBallFX()
 		/* Update the whole list of sprites */
 		SPR_update(sprites, BALL_COUNT);
 	}	
-	
-	// VDP_clearPlan(APLAN, 0);
-	// VDP_clearPlan(BPLAN, 0);
 
 	SYS_disableInts();
-
 	/* Set the palette taken from the vector ball sprite */
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 	SPR_init(MAX_VECTOR_BALL);
@@ -129,19 +125,45 @@ void RSE_vectorBallFX()
 		SPR_setAlwaysVisible(&sprites[loop], TRUE);
 	}
 
-    SPR_update(sprites, BALL_COUNT);
+ //    SPR_update(sprites, BALL_COUNT);
+
+	SYS_enableInts();
+
+	// VDP_waitVSync();
+
+	vramIndex = fontIndex;
+
+	SYS_disableInts();
+
+	VDP_drawImageEx(BPLAN, &vball_bg, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &vball_fg, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + vball_bg.tileset->numTile), 0, 0, FALSE, FALSE);
+
+	VDP_setPalette(PAL0, vball_bg.palette->data);
+	VDP_setPalette(PAL1, vball_fg.palette->data);
+	// VDP_setPalette(PAL2, ball_metal.palette->data);
+	// VDP_setPalette(PAL3, ball_metal.palette->data);
 
 	SYS_enableInts();
 
 	angle = 0;
 
-	while (angle < RSE_FRAMES(60 * 5))
+	while (angle < RSE_FRAMES(60 * 8))
 	{
 		VDP_waitVSync();
-		// BMP_showFPS(1);
 		drawVectorBalls(sprites, angle, angle << 1);
 		angle++;
 	}
+
+	VDP_fadeOut(1, 63, 32, TRUE);
+
+	j = 0;
+	while (j < RSE_FRAMES(40))
+	{
+		VDP_waitVSync();
+		// drawVectorBalls(sprites, angle, angle << 1);
+		angle++;
+		j++;
+	}	
 
 	SPR_end();
 	RSE_resetScrolling();

@@ -16,3 +16,5 @@ IMAGE transition_pattern_0 "transition_pattern_0.png" 0
 IMAGE poem "poem-by-metoikos.png" 0
 IMAGE pat_round "pat_round.png" 0
 IMAGE alexkidd "alexkidd.png" 0
+IMAGE vball_bg "vectorball_bg.png" 0
+IMAGE vball_fg "vectorball_fg.png" 0

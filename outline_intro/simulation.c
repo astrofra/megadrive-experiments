@@ -138,7 +138,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 		case 3:
 			VDP_drawImageEx(APLAN, &level_2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 88) >> 3, FALSE, TRUE);
 			vramIndex += level_2.tileset->numTile;
-			VDP_drawImageEx(APLAN, &level_3, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 320 >> 3, (224 - 88) >> 3, FALSE, TRUE);
+			VDP_drawImageEx(APLAN, &level_3, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 320 >> 3, (224 - 128) >> 3, FALSE, TRUE);
 			break;			
 	}
 

@@ -23,7 +23,9 @@ const char *strings_credits[] =
 	"ccc CREDITS ccc\0",
 	" \0",
 
-	"PIXELS : KOYOT, GELMIR, SIM1, FRA\0",
+	"PIXELS : GRASS, GELMIR,\0",
+	" \0",
+	"KOYOT1222, SIM1, FRA\0",
 	" \0",
 
 	"MUSIC : NAINAIN\0",

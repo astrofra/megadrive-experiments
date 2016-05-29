@@ -47,6 +47,8 @@ int main()
 
 	RSE_pause(RSE_FRAMES(20));
 
+// RSE_vectorBallFX();
+
 	/* RSE Logo */
 	RSE_LogoScreen();
 
