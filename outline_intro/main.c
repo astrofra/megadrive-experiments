@@ -18,6 +18,8 @@ void RSE_plasma(u8 mode);
 void RSE_plasma_init(void);
 void RSE_poem(void);
 void RSE_gridTileAnimation();
+void RSE_vectorBallFX();
+
 
 u16 vramIndex;
 u16 fontIndex;
@@ -43,14 +45,14 @@ int main()
 	*/
 	fontIndex = RSE_writerSetup();
 
-// RSE_physics_simulation(2, 3);
-
 	RSE_pause(RSE_FRAMES(20));
 
 	/* RSE Logo */
 	RSE_LogoScreen();
 
 	RSE_plasma(0);
+
+	RSE_vectorBallFX();
 
 	/* Demo !!! */
 	RSE_physics_simulation(0, 1);
