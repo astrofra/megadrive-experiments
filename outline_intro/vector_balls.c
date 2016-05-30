@@ -114,6 +114,8 @@ void RSE_vectorBallFX()
 	}	
 
 	SYS_disableInts();
+
+	VDP_setPlanSize(64, 32);
 	/* Set the palette taken from the vector ball sprite */
 	VDP_setPalette(PAL2, ball_metal.palette->data);
 	SPR_init(MAX_VECTOR_BALL);
@@ -129,9 +131,14 @@ void RSE_vectorBallFX()
 
 	SYS_enableInts();
 
-	// VDP_waitVSync();
+	for(j = 0; j  < VDP_getPlanHeight(); j++)
+	{
+		VDP_waitVSync();
+		RSE_clearTileRowB(j);
+		RSE_clearTileRowA(j);
+	}
 
-	vramIndex = fontIndex;
+	vramIndex = 8; // fontIndex;
 
 	SYS_disableInts();
 
@@ -171,10 +178,12 @@ void RSE_vectorBallFX()
 
 	RSE_turn_screen_to_black();
 
-	for(j = 0; j  < 224 >> 3; j++)
+	for(j = 0; j  < VDP_getPlanHeight(); j++)
 	{
 		VDP_waitVSync();
 		RSE_clearTileRowB(j);
 		RSE_clearTileRowA(j);
 	}	
+
+	vramIndex = TILE_USERINDEX;
 }

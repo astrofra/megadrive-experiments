@@ -47,14 +47,14 @@ int main()
 
 	RSE_pause(RSE_FRAMES(20));
 
-// RSE_vectorBallFX();
-
 	/* RSE Logo */
 	RSE_LogoScreen();
 
 	RSE_plasma(0);
 
 	RSE_vectorBallFX();
+
+	fontIndex = RSE_writerSetup();
 
 	/* Demo !!! */
 	RSE_physics_simulation(0, 1);

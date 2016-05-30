@@ -87,12 +87,14 @@ u16 inline charToTileIndex(char c)
 
 u16 RSE_writerSetup(void)
 {
+	u16 j;
 	current_plan = VDP_PLAN_A;
 	current_pal = PAL0;
 
 	SYS_disableInts();
 	VDP_drawImageEx(APLAN, &oddball_fonts, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	VDP_clearPlan(APLAN, 0);
+	for(j = 0; j  < VDP_getPlanHeight(); j++)
+		RSE_clearTileRowA(j);
 	SYS_enableInts();
 
 	vramIndex += oddball_fonts.tileset->numTile;

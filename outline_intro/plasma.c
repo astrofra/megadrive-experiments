@@ -119,7 +119,7 @@ void RSE_plasma(u8 mode)
 
 	vramIndex = fontIndex;
 
-	vramIndex += plasma_img.tileset->numTile;
+	// vramIndex += plasma_img.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_2TILE);	
 

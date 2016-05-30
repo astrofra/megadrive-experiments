@@ -87,9 +87,6 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	VDP_setHilightShadow(0);
 	SYS_enableInts();
 
-	for(i = 0; i < 32; i++)
-		RSE_clearTileRowA(i);
-
 	SPR_init(257);
 	for(i = 0; i < SIMULATION_0_NODE_LEN;i++)
 	{
@@ -99,6 +96,9 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	}
 
     SPR_update(sprites, sim_node_len);
+
+	for(j = 0; j  < VDP_getPlanHeight(); j++)
+		RSE_clearTileRowB(j);
 
 	vramIndex = fontIndex;
 
@@ -122,6 +122,9 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 11), i, ((224 - 8) >> 3) - 1);
 		VDP_setTileMapXY(VDP_PLAN_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex + 12), i, ((224 - 8) >> 3));
 	}
+
+	for(j = 0; j  < VDP_getPlanHeight(); j++)
+		RSE_clearTileRowA(j);
 
 	vramIndex += level_bg.tileset->numTile;
 
