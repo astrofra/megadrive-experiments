@@ -116,8 +116,6 @@ void RSE_vectorBallFX()
 	SYS_disableInts();
 
 	VDP_setPlanSize(64, 32);
-	/* Set the palette taken from the vector ball sprite */
-	VDP_setPalette(PAL2, ball_metal.palette->data);
 	SPR_init(MAX_VECTOR_BALL);
 
 	/*	Initialize the needed amount of sprites */
@@ -142,11 +140,21 @@ void RSE_vectorBallFX()
 
 	SYS_disableInts();
 
-	VDP_drawImageEx(BPLAN, &vball_bg, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	VDP_drawImageEx(APLAN, &vball_fg, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + vball_bg.tileset->numTile), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &vball_bg, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+
+	SYS_enableInts();
+
+	VDP_waitVSync();
+
+	SYS_disableInts();
+
+	VDP_drawImageEx(APLAN, &vball_fg, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + vball_bg.tileset->numTile), 0, 0, FALSE, TRUE);
 
 	VDP_setPalette(PAL0, vball_bg.palette->data);
 	VDP_setPalette(PAL1, vball_fg.palette->data);
+	/* Set the palette taken from the vector ball sprite */
+	VDP_setPalette(PAL2, ball_metal.palette->data);
+
 	// VDP_setPalette(PAL2, ball_metal.palette->data);
 	// VDP_setPalette(PAL3, ball_metal.palette->data);
 

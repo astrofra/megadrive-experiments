@@ -93,7 +93,7 @@ u16 RSE_writerSetup(void)
 
 	SYS_disableInts();
 	VDP_drawImageEx(APLAN, &oddball_fonts, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	for(j = 0; j  < VDP_getPlanHeight(); j++)
+	for(j = 0; j  < 4; j++)
 		RSE_clearTileRowA(j);
 	SYS_enableInts();
 

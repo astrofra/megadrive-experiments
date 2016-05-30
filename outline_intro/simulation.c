@@ -98,7 +98,10 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
     SPR_update(sprites, sim_node_len);
 
 	for(j = 0; j  < VDP_getPlanHeight(); j++)
+	{
+		VDP_waitVSync();
 		RSE_clearTileRowB(j);
+	}
 
 	vramIndex = fontIndex;
 
@@ -124,7 +127,10 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 	}
 
 	for(j = 0; j  < VDP_getPlanHeight(); j++)
+	{
+		VDP_waitVSync();
 		RSE_clearTileRowA(j);
+	}
 
 	vramIndex += level_bg.tileset->numTile;
 
