@@ -15,7 +15,7 @@ extern u8 framerate;
 
 void RSE_vectorBallFX()
 {
-	u16 loop, j;
+	u16 loop, i, j;
 	u16 zsort_switch = 0;
 	Sprite sprites[MAX_VECTOR_BALL];
 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
@@ -171,13 +171,13 @@ void RSE_vectorBallFX()
 
 	VDP_fadeOut(1, 63, 32, TRUE);
 
-	j = 0;
-	while (j < RSE_FRAMES(40))
+	i = 0;
+	while (i < RSE_FRAMES(40))
 	{
 		VDP_waitVSync();
-		// drawVectorBalls(sprites, angle, angle << 1);
+		drawVectorBalls(sprites, angle, angle << 1);
 		angle++;
-		j++;
+		i++;
 	}	
 
 	SPR_end();
