@@ -9,6 +9,14 @@
 #define BALL_COUNT grid_cube_small_VTX_COUNT
 #define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
 
+#define VBALL_PHASE_BEGIN		0
+#define VBALL_PHASE_SPR_FADING	1
+#define VBALL_PHASE_BG_FADING	2
+#define VBALL_PHASE_FG_FADING	3
+#define VBALL_PHASE_RUN			4
+#define VBALL_PHASE_FADE		5
+#define VBALL_PHASE_QUIT		6
+
 extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
@@ -20,6 +28,8 @@ void RSE_vectorBallFX()
 	Sprite sprites[MAX_VECTOR_BALL];
 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
 	u16 angle;
+	u8 vball_phase = VBALL_PHASE_BEGIN;
+	u16 vball_timer = 0;
 
 	static void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
 	{
@@ -139,46 +149,108 @@ void RSE_vectorBallFX()
 	vramIndex = 8; // fontIndex;
 
 	SYS_disableInts();
-
-	VDP_drawImageEx(BPLAN, &vball_bg, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-
+	VDP_drawImageEx(BPLAN, &vball_bg_a, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	SYS_enableInts();
-
+	VDP_waitDMACompletion();
 	VDP_waitVSync();
 
 	SYS_disableInts();
+	VDP_drawImageEx(BPLAN, &vball_bg_b, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex + vball_bg_a.tileset->numTile), 0, 224 >> 4, FALSE, TRUE);
+	SYS_enableInts();
+	VDP_waitDMACompletion();
+	VDP_waitVSync();
 
-	VDP_drawImageEx(APLAN, &vball_fg, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + vball_bg.tileset->numTile), 0, 0, FALSE, TRUE);
+	SYS_disableInts();
+	VDP_drawImageEx(APLAN, &vball_fg_a, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + vball_bg_a.tileset->numTile + vball_bg_b.tileset->numTile), 0, (224 - 136) >> 3, FALSE, TRUE);
+	// VDP_setPalette(PAL0, vball_bg_a.palette->data);
+	// VDP_setPalette(PAL1, vball_fg_a.palette->data);
 
-	VDP_setPalette(PAL0, vball_bg.palette->data);
-	VDP_setPalette(PAL1, vball_fg.palette->data);
 	/* Set the palette taken from the vector ball sprite */
-	VDP_setPalette(PAL2, ball_metal.palette->data);
-
 	// VDP_setPalette(PAL2, ball_metal.palette->data);
-	// VDP_setPalette(PAL3, ball_metal.palette->data);
-
 	SYS_enableInts();
 
 	angle = 0;
 
-	while (angle < RSE_FRAMES(60 * 8))
+	while(vball_phase < VBALL_PHASE_QUIT)
 	{
 		VDP_waitVSync();
 		drawVectorBalls(sprites, angle, angle << 1);
 		angle++;
+
+		switch(vball_phase)
+		{
+			case VBALL_PHASE_BEGIN:
+				VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
+				vball_timer = 0;
+				vball_phase++;
+				break;
+
+			case VBALL_PHASE_SPR_FADING:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(16 * 2))
+				{
+					VDP_fadePalTo(PAL0, vball_bg_a.palette->data, RSE_FRAMES(32), TRUE);
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;				
+
+			case VBALL_PHASE_BG_FADING:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(32 * 2))
+				{
+					VDP_fadePalTo(PAL1, vball_fg_a.palette->data, RSE_FRAMES(32), TRUE);
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;
+
+			case VBALL_PHASE_FG_FADING:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(32 * 2))
+				{
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;				
+
+			case VBALL_PHASE_RUN:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(60 * 8))
+				{
+					VDP_fadeOut(1, 63, RSE_FRAMES(32), TRUE);
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;
+
+			case VBALL_PHASE_FADE:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(32))
+				{
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;				
+		}
 	}
+	// while (angle < RSE_FRAMES(60 * 10))
+	// {
+	// 	VDP_waitVSync();
+	// 	drawVectorBalls(sprites, angle, angle << 1);
+	// 	angle++;
+	// }
 
-	VDP_fadeOut(1, 63, 32, TRUE);
+	// VDP_fadeOut(1, 63, 32, TRUE);
 
-	i = 0;
-	while (i < RSE_FRAMES(40))
-	{
-		VDP_waitVSync();
-		drawVectorBalls(sprites, angle, angle << 1);
-		angle++;
-		i++;
-	}	
+	// i = 0;
+	// while (i < RSE_FRAMES(40))
+	// {
+	// 	VDP_waitVSync();
+	// 	drawVectorBalls(sprites, angle, angle << 1);
+	// 	angle++;
+	// 	i++;
+	// }	
 
 	SPR_end();
 	RSE_resetScrolling();
