@@ -19,7 +19,7 @@ void RSE_plasma_init(void);
 void RSE_poem(void);
 void RSE_gridTileAnimation();
 void RSE_vectorBallFX();
-
+void displayFullScreenPicture();
 
 u16 vramIndex;
 u16 fontIndex;
@@ -35,7 +35,7 @@ int main()
 
 	RSE_plasma_init();
 
-	// RSE_poem();
+	RSE_poem();
 
 	RSE_turn_screen_to_black();
 
@@ -67,6 +67,8 @@ int main()
 
 	/* RSE Plasma */
 	RSE_plasma(1);
+
+	displayFullScreenPicture();	
 
 	while(TRUE)
 		VDP_waitVSync();
