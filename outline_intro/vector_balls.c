@@ -27,6 +27,7 @@ void RSE_vectorBallFX()
 	u16 zsort_switch = 0;
 	Sprite sprites[MAX_VECTOR_BALL];
 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
+	short xc, yc, zc;
 	u16 angle;
 	u8 vball_phase = VBALL_PHASE_BEGIN;
 	u16 vball_timer = 0;
@@ -34,7 +35,7 @@ void RSE_vectorBallFX()
 	static void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
 	{
 		u16 loop;
-		short x, y, z, xc, yc, zc;
+		short x, y, z;
 		Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
 		fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
 		u16 distance = 1100;
@@ -171,6 +172,8 @@ void RSE_vectorBallFX()
 	{
 		VDP_waitVSync();
 		drawVectorBalls(sprites, angle, angle << 1);
+		VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
+		VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
 		angle++;
 
 		switch(vball_phase)
