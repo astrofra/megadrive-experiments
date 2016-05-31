@@ -87,8 +87,12 @@ const char *strings_sim_0[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"--- SIM #0 LMSTUVWXYZ 0123456789 ! :)\0",
-	"CPC 6128 !'\"$/()?-_:=*c[]\0",
+	"HELLO BOYS AND GIRLS, WELCOME IN THIS\0",
+	"BRAND NEW MEGADRIVE PRODUCTION\0",
+	"BROUGHT TO YOU BY RESISTANCE !!!\0",
+	"INTRODUCING ONE OF THE FIRST\0",
+	"PHYSICS SIMULATION ON THIS SEGA CONSOLE!\0",
+	"IT WON'T SET THE 68K ON FIRE, BUT STILL!\0",
 
 	/*	Do not remove the next line */
 	"\0"
@@ -99,8 +103,12 @@ const char *strings_sim_1[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"--- SIM #1  0123456789 ! :]\0",
-	"ZBCDELMNOPQRSTUVWXYA 0123456789 ! :]\0",
+	"THANKS TO 4PLAY WHO BROUGH THIS PROD\0",
+	"TO THE SOLSKOGEN 2016!\0",
+	"THIS SEEMS LIKE A SUPER COOL PARTY:)\0",
+	"I SHALL DROP BY ONE OF THESE YEARS!\0",
+	"NO MATTER WHAT, IT WARMS MY HEART...\0",
+	"JUST KNOWING THAT MY FRIENDS ARE HERE!\0",
 
 	/*	Do not remove the next line */
 	"\0"
@@ -111,8 +119,14 @@ const char *strings_sim_2[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"--- SIM #2  0123456789 ! :]\0",
-	"ZBCDELMNOPQRSTUVWXYA 0123456789 ! :]\0",
+	"HAVE YOU NOTICED THAT AUDIO TWIST ?!\0",
+	"AFTER OUR LATEST RELEASEccc\0",
+	"SOMEONE SAID THE MD MUSIC SHOULD INCLUDE\0",
+	"SOME PCM AND PSG!!! SO HERE YOU ARE!\0",
+	"NAINAIN WORKED HARD TO MAKE AN ORIGINAL\0",
+	"PIECE OF JAZZY SOUND FOR THE GENNY!\0",
+	"I HOPE YOU WILL LIKE ITcccc\0",
+	"CAN YOU HEAR THE RIFF OF HIS OLD IBANEZ?\0",
 
 	/*	Do not remove the next line */
 	"\0"
@@ -124,8 +138,14 @@ const char *strings_sim_3[] =
 	/*
 	"<----------- MAX HEADROOM ------------->\0"
 	*/
-	"--- SIM #3  0123456789 ! :]\0",
-	"ZBCDELMNOPQRSTUVWXYA 0123456789 ! :]\0",
+	"ABOUT THE SOLSKOGEN AGAINccc",
+	"I HOPE THAT DBUG WILL SHOW\0",
+	"SOME KICKASS STUFF ON THE ORIC COMPUTER\0",
+	"OR EVEN SOME GAME ?!\0",
+	"ANYWAY, DBUG, THANKS FOR THE OSDK!\0",
+	"THAT'S A HELL OF A PIECE OF SOFTWARE!\0",
+	"THE WORLD DESERVES MORE TOOLS LIKE THIS!\0",
+	"AND I'D LOVE 48H DAYS TO TEST IT :')\0",
 
 	/*	Do not remove the next line */
 	"\0"

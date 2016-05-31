@@ -162,11 +162,7 @@ void RSE_vectorBallFX()
 
 	SYS_disableInts();
 	VDP_drawImageEx(APLAN, &vball_fg_a, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + vball_bg_a.tileset->numTile + vball_bg_b.tileset->numTile), 0, (224 - 136) >> 3, FALSE, TRUE);
-	// VDP_setPalette(PAL0, vball_bg_a.palette->data);
-	// VDP_setPalette(PAL1, vball_fg_a.palette->data);
 
-	/* Set the palette taken from the vector ball sprite */
-	// VDP_setPalette(PAL2, ball_metal.palette->data);
 	SYS_enableInts();
 
 	angle = 0;
@@ -189,7 +185,7 @@ void RSE_vectorBallFX()
 				vball_timer++;
 				if (vball_timer > RSE_FRAMES(16 * 2))
 				{
-					VDP_fadePalTo(PAL0, vball_bg_a.palette->data, RSE_FRAMES(32), TRUE);
+					VDP_fadePalTo(PAL0, vball_bg_a.palette->data, RSE_FRAMES(45), TRUE);
 					vball_timer = 0;
 					vball_phase++;
 				}
@@ -197,7 +193,7 @@ void RSE_vectorBallFX()
 
 			case VBALL_PHASE_BG_FADING:
 				vball_timer++;
-				if (vball_timer > RSE_FRAMES(32 * 2))
+				if (vball_timer > RSE_FRAMES(130))
 				{
 					VDP_fadePalTo(PAL1, vball_fg_a.palette->data, RSE_FRAMES(32), TRUE);
 					vball_timer = 0;
