@@ -47,9 +47,9 @@ u16 inline charToTileIndex(char c)
 	{
 		case '!':
 			return FONT_PUNCT_OFFSET;
-		case '\'':
+		case '.':
 			return FONT_PUNCT_OFFSET + 1;
-		case '"':
+		case '\'':
 			return FONT_PUNCT_OFFSET + 2;
 		case '$':
 			return FONT_PUNCT_OFFSET + 3;
