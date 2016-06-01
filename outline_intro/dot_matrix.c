@@ -25,6 +25,7 @@ void RSE_gridTileAnimation()
 	u16 vblCount = 0, i, w;
 	// u8 frame_switch = 0;
 	u16 tmp_timer;
+	Sprite sprites[16];
 
 	static void inline drawDotMatrix(void)
 	{
@@ -86,6 +87,7 @@ void RSE_gridTileAnimation()
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 64);
 	w = VDP_getPlanWidth();
+	SPR_init(257);
 
 	vramIndex = fontIndex;
 
@@ -94,18 +96,29 @@ void RSE_gridTileAnimation()
 	// VDP_setPalette(PAL0, pat_round.palette->data);
 
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
-	VDP_drawImageEx(BPLAN, &alexkidd, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + pat_round.tileset->numTile), (320 - 207) >> 4, 128 >> 3, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &alexkidd, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + pat_round.tileset->numTile), ((320 - 207) >> 4) + 3, (128 >> 3) + 4, FALSE, FALSE);
 	VDP_setVerticalScroll(PLAN_B, -64);
 	// VDP_setPalette(PAL1, alexkidd.palette->data);
 
 	SYS_enableInts();
 
-	VDP_fadePalTo(PAL1, alexkidd.palette->data, 16, TRUE);
+	SPR_initSprite(&sprites[0], &alexkidd_overlay, 48, 4, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, FALSE));
+	SPR_update(sprites, 1);
+
+	VDP_fadePalTo(PAL1, alexkidd.palette->data, 32, TRUE);
 	for(i = 0; i < 32; i++)
 	{
 		VDP_waitVSync();
 		VDP_setVerticalScroll(PLAN_B, ((easing_table[i << 5] * (108 + 64)) / 1024) - 64);
 	}
+
+	VDP_fadePalTo(PAL2, alexkidd_overlay.palette->data, 16, TRUE);
+	for(i = 0; i < 32; i+=2)
+	{
+		VDP_waitVSync();
+		SPR_setPosition(&sprites[0], (easing_table[i << 5] * 48) / 1024, 4);
+		SPR_update(sprites, 1);
+	}	
 
 	tmp_timer = RSE_FRAMES(32);
 	VDP_fadePalTo(PAL0, pat_round.palette->data, tmp_timer, TRUE);
@@ -137,6 +150,8 @@ void RSE_gridTileAnimation()
 	}
 
 	RSE_turn_screen_to_black();
+
+	SPR_end();
 
 	for(i = 0; i  < 224 >> 3; i++)
 	{
