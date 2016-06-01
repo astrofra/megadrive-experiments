@@ -186,7 +186,7 @@ u8 RSE_LogoScreen(void)
 
 	play_music();
 
-	RSE_pause(RSE_FRAMES(20));
+	RSE_pause(RSE_FRAMES(50));
 
 	/* 
 		Fade to the logo's palette
