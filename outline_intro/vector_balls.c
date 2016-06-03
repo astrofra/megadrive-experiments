@@ -154,15 +154,31 @@ void RSE_vectorBallFX()
 	SYS_enableInts();
 	VDP_waitDMACompletion();
 	VDP_waitVSync();
+	vramIndex += vball_bg_a.tileset->numTile;
 
 	SYS_disableInts();
-	VDP_drawImageEx(BPLAN, &vball_bg_b, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex + vball_bg_a.tileset->numTile), 0, 224 >> 4, FALSE, TRUE);
+	VDP_drawImageEx(BPLAN, &vball_bg_a2, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 56 >> 3, FALSE, TRUE);
 	SYS_enableInts();
 	VDP_waitDMACompletion();
 	VDP_waitVSync();
+	vramIndex += vball_bg_a2.tileset->numTile;
 
 	SYS_disableInts();
-	VDP_drawImageEx(APLAN, &vball_fg_a, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex + vball_bg_a.tileset->numTile + vball_bg_b.tileset->numTile), 0, (224 - 136) >> 3, FALSE, TRUE);
+	VDP_drawImageEx(BPLAN, &vball_bg_b, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 224 >> 4, FALSE, TRUE);
+	SYS_enableInts();
+	VDP_waitDMACompletion();
+	VDP_waitVSync();
+	vramIndex += vball_bg_b.tileset->numTile;
+
+	SYS_disableInts();
+	VDP_drawImageEx(BPLAN, &vball_bg_b2, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, (224 >> 4) + (56 >> 3), FALSE, TRUE);
+	SYS_enableInts();
+	VDP_waitDMACompletion();
+	VDP_waitVSync();
+	vramIndex += vball_bg_b2.tileset->numTile;
+
+	SYS_disableInts();
+	VDP_drawImageEx(APLAN, &vball_fg_a, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 136) >> 3, FALSE, TRUE);
 
 	SYS_enableInts();
 

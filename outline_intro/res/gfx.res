@@ -17,7 +17,9 @@ IMAGE poem "poem-by-metoikos.png" 0
 IMAGE pat_round "pat_round.png" 0
 IMAGE alexkidd "alexkidd.png" 0
 IMAGE vball_bg_a "vectorball_bg_a.png" 0
+IMAGE vball_bg_a2 "vectorball_bg_a_2.png" 0
 IMAGE vball_bg_b "vectorball_bg_b.png" 0
+IMAGE vball_bg_b2 "vectorball_bg_b_2.png" 0
 IMAGE vball_fg_a "vectorball_fg_a.png" 0
 IMAGE endscreen_a "endscreen_a.png" 0
 IMAGE endscreen_b "endscreen_b.png" 0
