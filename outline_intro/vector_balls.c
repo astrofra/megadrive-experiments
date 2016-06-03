@@ -231,7 +231,7 @@ void RSE_vectorBallFX()
 
 			case VBALL_PHASE_RUN:
 				vball_timer++;
-				if (vball_timer > RSE_FRAMES(60 * 8))
+				if (vball_timer > RSE_FRAMES(60 * 7))
 				{
 					VDP_fadeOut(1, 63, RSE_FRAMES(32), TRUE);
 					vball_timer = 0;

@@ -29,4 +29,5 @@ IMAGE endscreen_b "endscreen_b.png" 0
 IMAGE endscreen_b2 "endscreen_b_2.png" 0
 IMAGE endscreen_b3 "endscreen_b_3.png" 0
 IMAGE endscreen_b4 "endscreen_b_4.png" 0
+IMAGE endscreen_b_dark "endscreen_b_darker.png" 0
 SPRITE alexkidd_overlay "alexkidd_overlay.png" 17 10 0
