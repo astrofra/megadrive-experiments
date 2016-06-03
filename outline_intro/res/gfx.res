@@ -22,5 +22,11 @@ IMAGE vball_bg_b "vectorball_bg_b.png" 0
 IMAGE vball_bg_b2 "vectorball_bg_b_2.png" 0
 IMAGE vball_fg_a "vectorball_fg_a.png" 0
 IMAGE endscreen_a "endscreen_a.png" 0
+IMAGE endscreen_a2 "endscreen_a_2.png" 0
+IMAGE endscreen_a3 "endscreen_a_3.png" 0
+IMAGE endscreen_a4 "endscreen_a_4.png" 0
 IMAGE endscreen_b "endscreen_b.png" 0
+IMAGE endscreen_b2 "endscreen_b_2.png" 0
+IMAGE endscreen_b3 "endscreen_b_3.png" 0
+IMAGE endscreen_b4 "endscreen_b_4.png" 0
 SPRITE alexkidd_overlay "alexkidd_overlay.png" 17 10 0
