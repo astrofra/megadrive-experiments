@@ -27,7 +27,7 @@ static void fastStarFieldFX()
 	VDP_setPlanSize(32, 32);
 
 	/* Draw the foreground */
-	RSE_turn_screen_to_black();
+	// RSE_turn_screen_to_black();
 	VDP_drawImageEx(BPLAN, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
 	vramIndex += starfield.tileset->numTile; 	
 
@@ -51,6 +51,7 @@ static void fastStarFieldFX()
 	while (TRUE)
 	{
 		VDP_waitVSync();
+		BMP_showFPS(1);
 		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, TABLE_LEN, TRUE);
 		for(i = 0; i < TABLE_LEN; i++)
 			scroll_PLAN_B[i] = (scroll_PLAN_B[i] + scroll_speed[i]) & 0xFF;
