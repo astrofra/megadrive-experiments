@@ -2,7 +2,7 @@
 #include <gfx.h>
 #include "transition_helper.h"
 
-#define	TABLE_LEN 32
+#define	TABLE_LEN (224 >> 3)
 
 static void fastStarFieldFX();
 
