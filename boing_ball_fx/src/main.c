@@ -91,7 +91,7 @@ static void beastScrollingFX(){
 			boing_sfx_timer++;
 		ball_y = abs(sinFix16(bnc_count << 3));
 		// VDP_setVerticalScroll(PLAN_A, ball_y);
-		SPR_setPosition(&sprites[0], (VDP_getScreenWidth() - 72) >> 1, 100 - ball_y);
+		SPR_setPosition(&sprites[0], (VDP_getScreenWidth() - 72) >> 1, 80 - ball_y);
 
 		if (ball_y == 0 && boing_sfx_timer > 16)
 		{
