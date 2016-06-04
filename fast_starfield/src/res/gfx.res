@@ -1,0 +1,1 @@
+IMAGE starfield "starfield.png" 0
