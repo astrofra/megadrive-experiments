@@ -68,7 +68,7 @@ const char *strings_greets[] =
 	" \0",	
 	"SCOOPEX, TRBL, WANTED TEAM, Y-CREW\0",
 	" \0",	
-	"FUNKENSTORT, MANDARINE, FLUSH\0",
+	"FUNKENSTORT, MANDARINE, FLUSH, FLC\0",
 	" \0",	
 	"ADORU, ZERKMAN, MOOZ, UKKO, PHAAZON\0",
 	" \0",	
@@ -76,9 +76,9 @@ const char *strings_greets[] =
 	" \0",
 	"PHAAZON, STFSUX, PLAYMOGAMES ORLEANS\0", 
 	" \0",
-	"4PLAY, MOONSOON\0",
+	"MOONSOON AND ALL RESISTANCE MEMBERS!\0",
 	" \0",
-	"AND ALL RESISTANCE MEMBERS !\0",
+	"ccc\0",	
 	// "---------------------------------\0",
 	/*	Do not remove the next line */
 	"\0"

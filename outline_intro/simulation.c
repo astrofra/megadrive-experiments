@@ -12,10 +12,11 @@
 #define MAX_SIMULATION 6
 
 #define SIM_MODE_RUN			0
-#define SIM_MODE_SCROLL			1
-#define SIM_MODE_SET_NEW_SIM	2
-#define SIM_CLEAR_SCREEN		3
-#define SIM_MODE_EXIT			4
+#define SIM_CLEAR_SPR			1
+#define SIM_MODE_SCROLL			2
+#define SIM_MODE_SET_NEW_SIM	3
+#define SIM_CLEAR_SCREEN		4
+#define SIM_MODE_EXIT			5
 
 #define SIM_0_END_OFFSET		0
 #define SIM_1_END_OFFSET		0
@@ -147,7 +148,7 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 		case 3:
 			VDP_drawImageEx(APLAN, &level_2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 88) >> 3, FALSE, TRUE);
 			vramIndex += level_2.tileset->numTile;
-			VDP_drawImageEx(APLAN, &level_3, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 320 >> 3, (224 - 128) >> 3, FALSE, TRUE);
+			VDP_drawImageEx(APLAN, &level_3, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 320 >> 3, (224 - 186) >> 3, FALSE, TRUE);
 			break;			
 	}
 
@@ -193,10 +194,20 @@ void RSE_physics_simulation(u8 first_sim, u8 last_sim)
 				if (vblCount >= sim_frame_len)
 				{
 					if (current_scenario < last_sim)
-						sim_mode = SIM_MODE_SCROLL;
+						sim_mode = SIM_CLEAR_SPR;
 					else
 						sim_mode = SIM_CLEAR_SCREEN;
 				}
+				break;
+
+			case SIM_CLEAR_SPR:
+				for(i = 0; i < sim_node_len;i++)
+				{
+					sprites[i].x = 348 + 0x80;
+					sprites[i].y = 250 + 0x80;
+				}
+				SPR_update(sprites, sim_node_len);
+				sim_mode = SIM_MODE_SCROLL;
 				break;
 
 			case SIM_MODE_SCROLL:

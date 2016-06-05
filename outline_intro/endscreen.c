@@ -67,6 +67,14 @@ void displayFullScreenPicture(){
 	VDP_fadePalTo(PAL0, endscreen_a.palette->data, RSE_FRAMES(16), TRUE);
 	RSE_pause(16);
 
-	while (TRUE)
+	RSE_pause(RSE_FRAMES(60 * 10));
+
+	VDP_fadeOut(1, 63, 64, TRUE);
+
+
+	while (j < 64)
+	{
 		VDP_waitVSync();
+		j++;
+	}
 }

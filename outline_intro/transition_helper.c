@@ -69,3 +69,15 @@ void RSE_resetScrolling(void)
 	VDP_setHorizontalScroll(PLAN_A, 0);	
 	SYS_enableInts();	
 }
+
+void RSE_clearAll(void)
+{
+	RSE_resetScrolling();
+
+	SPR_end();
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);	
+
+	SYS_disableInts();
+	SYS_enableInts();
+}
