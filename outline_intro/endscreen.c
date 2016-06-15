@@ -83,5 +83,7 @@ void displayFullScreenPicture(){
 		VDP_waitVSync();
 		RSE_clearTileRowB(j);
 		RSE_clearTileRowA(j);
-	}	
+	}
+
+	RSE_resetScrolling();
 }
