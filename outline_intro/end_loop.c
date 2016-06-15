@@ -16,14 +16,13 @@ void waitForUserRestart(void)
 	SYS_disableInts();
 	VDP_setPlanSize(64, 32);
 	SYS_enableInts();
-	SYS_enableInts();
 
 	/*	
 		Prepare text writer
 	*/
 	current_char_y = (224 >> 4) - 1;
 	RSE_writerSetInitialY(current_char_y);
-	RSE_writerUnsetOption(WRT_OPT_WRITE_TO_PLAN_A);
+	RSE_writerSetOption(WRT_OPT_WRITE_TO_PLAN_A);
 	RSE_writerSetOption(WRT_OPT_AUTO_RESTART);
 	RSE_writerSetOption(WRT_OPT_HALF_SPEED);
 	RSE_writerSetOption(WRT_OPT_AUTO_NEXT_STRING);
@@ -32,6 +31,7 @@ void waitForUserRestart(void)
 	VDP_setPalette(PAL0, oddball_fonts.palette->data);
 	VDP_setPalette(PAL1, oddball_fonts.palette->data);
 	demo_strings = (char **)strings_end;
+	RSE_writerRestart();
 
 	button = 0;
 	while (!button)
