@@ -40,7 +40,10 @@ int main()
 		RSE_plasma_init();
 
 		RSE_pause(RSE_FRAMES(60 * 2));
-
+	// displayFullScreenPicture();
+	// vramIndex = TILE_USERINDEX;
+	// fontIndex = RSE_writerSetup();
+	// waitForUserRestart();
 		RSE_turn_screen_to_black();
 		/*	
 			Load the font tiles
@@ -73,6 +76,7 @@ int main()
 
 		displayFullScreenPicture();
 
+		vramIndex = TILE_USERINDEX;
 		fontIndex = RSE_writerSetup();
 
 		waitForUserRestart();
