@@ -11,5 +11,6 @@ extern const char *strings_sim_4[];
 extern const char *strings_sim_5[];
 extern const char *strings_credits[];
 extern const char *strings_greets[];
+extern const char *strings_end[];
 
 #endif

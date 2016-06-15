@@ -71,10 +71,17 @@ void displayFullScreenPicture(){
 
 	VDP_fadeOut(1, 63, 64, TRUE);
 
-
+	j = 0;
 	while (j < 64)
 	{
 		VDP_waitVSync();
 		j++;
 	}
+
+	for(j = 0; j  < VDP_getPlanHeight(); j++)
+	{
+		VDP_waitVSync();
+		RSE_clearTileRowB(j);
+		RSE_clearTileRowA(j);
+	}	
 }

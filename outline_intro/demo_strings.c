@@ -153,3 +153,15 @@ const char *strings_sim_3[] =
 	"\0"
 };
 
+const char *strings_end[] = 
+{
+	/*
+	"<----------- MAX HEADROOM ------------->\0"
+	*/
+	"YOU'VE REACHED THE END OF THIS DEMO\0",
+	"PRESS ANY BUTTON TO RESTART\0",
+	"ccc RESISTANCE 2016 ccc\0"
+	/*	Do not remove the next line */
+	"\0"
+};
+

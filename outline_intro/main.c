@@ -17,10 +17,10 @@ u8 RSE_LogoScreen(void);
 void RSE_physics_simulation(u8 first_sim, u8 last_sim);
 void RSE_plasma(u8 mode);
 void RSE_plasma_init(void);
-void RSE_poem(void);
-void RSE_gridTileAnimation();
-void RSE_vectorBallFX();
-void displayFullScreenPicture();
+void RSE_gridTileAnimation(void);
+void RSE_vectorBallFX(void);
+void displayFullScreenPicture(void);
+void waitForUserRestart(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -39,7 +39,7 @@ int main()
 
 		RSE_plasma_init();
 
-		// RSE_poem();
+		RSE_pause(RSE_FRAMES(60 * 2));
 
 		RSE_turn_screen_to_black();
 		/*	
@@ -71,7 +71,11 @@ int main()
 		/* RSE Plasma */
 		RSE_plasma(1);
 
-		displayFullScreenPicture();	
+		displayFullScreenPicture();
+
+		fontIndex = RSE_writerSetup();
+
+		waitForUserRestart();
 
 		stop_music();
 
