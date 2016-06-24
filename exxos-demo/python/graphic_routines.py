@@ -8,6 +8,7 @@ from screen_specs import *
 
 def wireframe_json_to_segment_list(filename=None):
 	segment_list = []
+	new_segment = []
 
 	if filename is not None and gs.GetFilesystem().Exists(filename):
 		with open(gs.GetFilesystem().MapToAbsolute(filename), 'r') as fp:
@@ -24,11 +25,16 @@ def wireframe_json_to_segment_list(filename=None):
 			for _segment in _object_dict['segments']:
 				for _vertex_as_array in _segment:
 					# print(_vertex_as_array)
-					segment_list.append(_vertex_as_array)
+					if len(new_segment) < 2:
+						new_segment.append(_vertex_as_array)
+
+					if len(new_segment) == 2:
+						segment_list.append(new_segment)
+						new_segment = []
 					# _vertex = Vector3()
 
-				if len(_object_dict['segments']) > 0:
-					segment_list.append(_object_dict['segments'][-1])
+				# if len(_object_dict['segments']) > 0:
+				# 	segment_list.append(_object_dict['segments'][-1])
 
 	print("found total " + str(len(segment_list)) + " segment(s).")
 	return segment_list
