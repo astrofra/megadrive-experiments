@@ -139,7 +139,7 @@ def render_mask_screen():
 		render.clear()
 		dt_sec = clock.update()
 
-		master_node.GetTransform().SetRotation(master_node.GetTransform().GetRotation() + gs.Vector3(1, 1, 1) * dt_sec)
+		master_node.GetTransform().SetRotation(master_node.GetTransform().GetRotation() + gs.Vector3(1, 1, 1) * dt_sec * 0.25)
 		scene.update_scene(scn, dt_sec)
 
 		# render.commit_3d()

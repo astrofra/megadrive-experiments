@@ -23,6 +23,7 @@ def wireframe_json_to_segment_list(filename=None):
 			print('Found an object, named \'%s\'' % _object_name)
 
 			for _segment in _object_dict['segments']:
+				new_segment = []
 				for _vertex_as_array in _segment:
 					# print(_vertex_as_array)
 					if len(new_segment) < 2:
@@ -30,8 +31,10 @@ def wireframe_json_to_segment_list(filename=None):
 
 					if len(new_segment) == 2:
 						segment_list.append(new_segment)
-						new_segment = []
+						new_segment = [new_segment[1]]
 					# _vertex = Vector3()
+
+				# segment_list.append([_segment[-1], _segment[0]])
 
 				# if len(_object_dict['segments']) > 0:
 				# 	segment_list.append(_object_dict['segments'][-1])
