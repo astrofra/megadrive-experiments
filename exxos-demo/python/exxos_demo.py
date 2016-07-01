@@ -13,6 +13,7 @@ import easygui
 from utils import *
 from graphic_routines import *
 from screen_specs import *
+import starfield
 
 
 def resolution_requester():
@@ -102,7 +103,7 @@ def render_mask_screen():
 
 	# Add an environment to the scene
 	env = gs.Environment()
-	env.SetBackgroundColor(gs.Color())
+	env.SetBackgroundColor(gs.Color.Black)
 	scn.AddComponent(env)
 
 	# Add a camera
@@ -117,6 +118,10 @@ def render_mask_screen():
 	master_node = gs.Node()
 	master_node.AddComponent(gs.Transform())
 	scn.AddNode(master_node)
+
+	# Init the starfield
+	starfield.init_stars()
+	starfield.set_camera_velocity(gs.Vector3(0, 0, -50))
 
 	segment_nodes_list = []
 	for seg in mask_segment_list:
@@ -144,6 +149,9 @@ def render_mask_screen():
 
 		# render.commit_3d()
 		# render.set_depth_write3d(False)
+
+		starfield.update_stars(dt_sec)
+		starfield.draw_stars(render)
 
 		for seg in segment_nodes_list:
 			pos_a = seg[0].GetTransform().GetWorld().GetTranslation()

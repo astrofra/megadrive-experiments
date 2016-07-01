@@ -21,18 +21,18 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="exxos_demo.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="exxos_demo.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/exxos_demo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4556314">
-              <caret line="141" column="125" selection-start-line="141" selection-start-column="125" selection-end-line="141" selection-end-column="125" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="158" column="131" selection-start-line="158" selection-start-column="131" selection-end-line="158" selection-end-column="131" />
               <folding>
                 <element signature="e#189#198#0" expanded="true" />
-                <element signature="e#453#783#0" expanded="false" />
-                <element signature="e#806#1083#0" expanded="false" />
-                <element signature="e#1105#1315#0" expanded="false" />
-                <element signature="e#1346#2195#0" expanded="false" />
-                <element signature="e#2230#3160#0" expanded="false" />
+                <element signature="e#470#800#0" expanded="false" />
+                <element signature="e#823#1100#0" expanded="false" />
+                <element signature="e#1122#1332#0" expanded="false" />
+                <element signature="e#1363#2212#0" expanded="false" />
+                <element signature="e#2247#3177#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -42,30 +42,20 @@
         <entry file="file://$PROJECT_DIR$/graphic_routines.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
+              <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="31" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="starfield.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="starfield.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/starfield.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="15" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="render.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Roaming/Python/Python34/site-packages/gs/plus/render.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="373" column="0" selection-start-line="373" selection-start-column="0" selection-end-line="373" selection-end-column="0" />
-              <folding />
+            <state vertical-scroll-proportion="0.57954544">
+              <caret line="56" column="26" selection-start-line="56" selection-start-column="26" selection-end-line="56" selection-end-column="26" />
+              <folding>
+                <element signature="e#17#26#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -87,9 +77,9 @@
       <list>
         <option value="$USER_HOME$/AppData/Roaming/Python/Python34/site-packages/gs/plus/render.py" />
         <option value="$PROJECT_DIR$/screen_specs.py" />
-        <option value="$PROJECT_DIR$/starfield.py" />
         <option value="$PROJECT_DIR$/graphic_routines.py" />
         <option value="$PROJECT_DIR$/exxos_demo.py" />
+        <option value="$PROJECT_DIR$/starfield.py" />
       </list>
     </option>
   </component>
@@ -125,6 +115,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -145,7 +136,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -330,7 +320,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32896176" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32896176" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -359,17 +349,22 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/exxos_demo.py</url>
-          <line>150</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/graphic_routines.py</url>
           <line>36</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/exxos_demo.py</url>
+          <line>160</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/starfield.py</url>
+          <line>23</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="9" />
+      <option name="time" value="16" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -377,14 +372,63 @@
     <entry file="file://$PROJECT_DIR$/exxos_demo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#189#198#0" expanded="true" />
+            <element signature="e#470#800#0" expanded="false" />
+            <element signature="e#823#1100#0" expanded="false" />
+            <element signature="e#1122#1332#0" expanded="false" />
+            <element signature="e#1363#2212#0" expanded="false" />
+            <element signature="e#2247#3177#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/graphic_routines.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/starfield.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="15" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
+          <folding>
+            <element signature="e#17#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/Python/Python34/site-packages/gs/plus/render.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="373" column="0" selection-start-line="373" selection-start-column="0" selection-end-line="373" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/screen_specs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="5" column="53" selection-start-line="5" selection-start-column="33" selection-end-line="5" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/exxos_demo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
           <caret line="154" column="26" selection-start-line="154" selection-start-column="26" selection-end-line="154" selection-end-column="26" />
           <folding>
             <element signature="e#189#198#0" expanded="true" />
-            <element signature="e#453#783#0" expanded="false" />
-            <element signature="e#806#1083#0" expanded="false" />
-            <element signature="e#1105#1315#0" expanded="false" />
-            <element signature="e#1346#2195#0" expanded="false" />
-            <element signature="e#2230#3160#0" expanded="false" />
+            <element signature="e#470#800#0" expanded="false" />
+            <element signature="e#823#1100#0" expanded="false" />
+            <element signature="e#1122#1332#0" expanded="false" />
+            <element signature="e#1363#2212#0" expanded="false" />
+            <element signature="e#2247#3177#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -393,9 +437,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -403,7 +445,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="15" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
-          <folding />
+          <folding>
+            <element signature="e#17#26#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -429,11 +473,11 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#189#198#0" expanded="true" />
-            <element signature="e#453#783#0" expanded="false" />
-            <element signature="e#806#1083#0" expanded="false" />
-            <element signature="e#1105#1315#0" expanded="false" />
-            <element signature="e#1346#2195#0" expanded="false" />
-            <element signature="e#2230#3160#0" expanded="false" />
+            <element signature="e#470#800#0" expanded="false" />
+            <element signature="e#823#1100#0" expanded="false" />
+            <element signature="e#1122#1332#0" expanded="false" />
+            <element signature="e#1363#2212#0" expanded="false" />
+            <element signature="e#2247#3177#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -442,9 +486,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -452,7 +494,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="15" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
-          <folding />
+          <folding>
+            <element signature="e#17#26#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -478,11 +522,11 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#189#198#0" expanded="true" />
-            <element signature="e#453#783#0" expanded="false" />
-            <element signature="e#806#1083#0" expanded="false" />
-            <element signature="e#1105#1315#0" expanded="false" />
-            <element signature="e#1346#2195#0" expanded="false" />
-            <element signature="e#2230#3160#0" expanded="false" />
+            <element signature="e#470#800#0" expanded="false" />
+            <element signature="e#823#1100#0" expanded="false" />
+            <element signature="e#1122#1332#0" expanded="false" />
+            <element signature="e#1363#2212#0" expanded="false" />
+            <element signature="e#2247#3177#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -491,7 +535,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="15" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
-          <folding />
+          <folding>
+            <element signature="e#17#26#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -517,11 +563,11 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#189#198#0" expanded="true" />
-            <element signature="e#453#783#0" expanded="false" />
-            <element signature="e#806#1083#0" expanded="false" />
-            <element signature="e#1105#1315#0" expanded="false" />
-            <element signature="e#1346#2195#0" expanded="false" />
-            <element signature="e#2230#3160#0" expanded="false" />
+            <element signature="e#470#800#0" expanded="false" />
+            <element signature="e#823#1100#0" expanded="false" />
+            <element signature="e#1122#1332#0" expanded="false" />
+            <element signature="e#1363#2212#0" expanded="false" />
+            <element signature="e#2247#3177#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -542,6 +588,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/Python/Python34/site-packages/gs/plus/render.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.14846416">
+          <caret line="255" column="4" selection-start-line="255" selection-start-column="4" selection-end-line="255" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/screen_specs.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -550,43 +604,35 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/starfield.py">
+    <entry file="file://$PROJECT_DIR$/exxos_demo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="15" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/Python/Python34/site-packages/gs/plus/render.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="373" column="0" selection-start-line="373" selection-start-column="0" selection-end-line="373" selection-end-column="0" />
-          <folding />
+          <caret line="158" column="131" selection-start-line="158" selection-start-column="131" selection-end-line="158" selection-end-column="131" />
+          <folding>
+            <element signature="e#189#198#0" expanded="true" />
+            <element signature="e#470#800#0" expanded="false" />
+            <element signature="e#823#1100#0" expanded="false" />
+            <element signature="e#1122#1332#0" expanded="false" />
+            <element signature="e#1363#2212#0" expanded="false" />
+            <element signature="e#2247#3177#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/graphic_routines.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/exxos_demo.py">
+    <entry file="file://$PROJECT_DIR$/starfield.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4556314">
-          <caret line="141" column="125" selection-start-line="141" selection-start-column="125" selection-end-line="141" selection-end-column="125" />
+        <state vertical-scroll-proportion="0.57954544">
+          <caret line="56" column="26" selection-start-line="56" selection-start-column="26" selection-end-line="56" selection-end-column="26" />
           <folding>
-            <element signature="e#189#198#0" expanded="true" />
-            <element signature="e#453#783#0" expanded="false" />
-            <element signature="e#806#1083#0" expanded="false" />
-            <element signature="e#1105#1315#0" expanded="false" />
-            <element signature="e#1346#2195#0" expanded="false" />
-            <element signature="e#2230#3160#0" expanded="false" />
+            <element signature="e#17#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
