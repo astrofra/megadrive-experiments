@@ -160,7 +160,7 @@ const char *strings_end[] =
 	*/
 	"YOU'VE REACHED THE END OF THIS DEMO\0",
 	"PRESS ANY BUTTON TO RESTART\0",
-	"ccc RESISTANCE 2016 ccc\0"
+	"ccc RESISTANCE 2016 ccc\0",
 	/*	Do not remove the next line */
 	"\0"
 };
