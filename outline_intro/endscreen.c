@@ -60,11 +60,11 @@ void displayFullScreenPicture(){
 	VDP_waitVSync();
 	vramIndex += endscreen_b4.tileset->numTile;	
 
-	VDP_fadePalTo(PAL1, endscreen_b_dark.palette->data, RSE_FRAMES(16), TRUE);
+	VDP_fadePalTo(PAL1, endscreen_b_dark.palette->data, 16, TRUE);
 	RSE_pause(16);
-	VDP_fadePalTo(PAL1, endscreen_b.palette->data, RSE_FRAMES(16), TRUE);
+	VDP_fadePalTo(PAL1, endscreen_b.palette->data, 16, TRUE);
 	RSE_pause(16);
-	VDP_fadePalTo(PAL0, endscreen_a.palette->data, RSE_FRAMES(16), TRUE);
+	VDP_fadePalTo(PAL0, endscreen_a.palette->data, 16, TRUE);
 	RSE_pause(16);
 
 	RSE_pause(RSE_FRAMES(60 * 10));

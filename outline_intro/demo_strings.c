@@ -70,7 +70,7 @@ const char *strings_greets[] =
 	" \0",	
 	"FUNKENSTORT, MANDARINE, FLUSH, FLC\0",
 	" \0",	
-	"ADORU, ZERKMAN, MOOZ, UKKO, PHAAZON\0",
+	"ADORU, ZERKMAN, MOOZ, MAAK, UKKO\0",
 	" \0",	
 	"BAUDSURFER, MOG, NORECESS, PTOING\0",
 	" \0",
