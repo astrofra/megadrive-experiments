@@ -25,14 +25,14 @@ void RSE_vectorBallFX()
 {
 	u16 loop, i, j;
 	u16 zsort_switch = 0;
-	Sprite sprites[MAX_VECTOR_BALL];
+	Sprite *sprites[MAX_VECTOR_BALL];
 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
 	short xc, yc, zc;
 	u16 angle;
 	u8 vball_phase = VBALL_PHASE_BEGIN;
 	u16 vball_timer = 0;
 
-	static void drawVectorBalls(Sprite *sprites, u16 rx, u16 ry)
+	static void drawVectorBalls(u16 rx, u16 ry)
 	{
 		u16 loop;
 		short x, y, z;
@@ -43,37 +43,61 @@ void RSE_vectorBallFX()
 
 		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
-		x_screen += 0x80;
+		// x_screen += 0x80;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
-		y_screen += 0x80;
+		// y_screen += 0x80;
 
-		xc = cosFix32(rx << 3) >> 2;
-		yc = sinFix32(rx << 2) >> 2;
-		zc = sinFix32(rx << 2) >> 2;
+		xc = cosFix16(rx << 3);
+		yc = sinFix16(rx << 2);
+		zc = sinFix16(rx << 2);
 
 		/* precalculate the rotation */
-		_cosx = cosFix32(rx);
-		_sinx = sinFix32(rx);
-		_cosy = cosFix32(ry);
-		_siny = sinFix32(ry);
-		cs = fix32Mul(_cosx, _siny);
-		ss = fix32Mul(_siny, _sinx);
-		cc = fix32Mul(_cosx, _cosy);
-		sc = fix32Mul(_sinx, _cosy);
+		_cosx = cosFix16(rx);
+		_sinx = sinFix16(rx);
+		_cosy = cosFix16(ry);
+		_siny = sinFix16(ry);
+		cs = fix16Mul(_cosx, _siny);
+		ss = fix16Mul(_siny, _sinx);
+		cc = fix16Mul(_cosx, _cosy);
+		sc = fix16Mul(_sinx, _cosy);
 
 		/* rotate the vector balls */
 		for(loop = 0; loop < BALL_COUNT; loop++)
 		{
-			_vtx = VECTOR_BALL_ARRAY[loop];
+			// The balls are processed by Z-order
+			//	3D transformation (rotation on X and Y axis)
+			j = vball_zsort[loop].index;
 
-			//	2D rotation (on X and Y axis)
-		    t_vtx[loop].x = fix32Add(fix32Mul(_vtx.x, _sinx), fix32Mul(_vtx.y, _cosx));
-		    t_vtx[loop].y = fix32Sub(fix32Mul(_vtx.x, cs), fix32Add(fix32Mul(_vtx.y, ss), fix32Mul(_vtx.z, _cosy)));
-		    t_vtx[loop].z = fix32Sub(fix32Mul(_vtx.x, cc), fix32Mul(_vtx.y, sc) - fix32Mul(_vtx.z, _siny));
+			_vtx = VECTOR_BALL_ARRAY[j];
 
-		    t_vtx[loop].x += xc;
-		    t_vtx[loop].y += yc;
-		    t_vtx[loop].z += zc;
+		    t_vtx[j].x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
+		    t_vtx[j].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
+		    t_vtx[j].z = fix16Sub(fix16Mul(_vtx.x, cc), fix16Mul(_vtx.y, sc) - fix16Mul(_vtx.z, _siny));
+
+		    t_vtx[j].x += xc;
+		    t_vtx[j].y += yc;
+		    t_vtx[j].z += zc;
+
+			//	3D -> 2D projection
+		    x = (t_vtx[j].x << 10) / (t_vtx[j].z + distance);
+		    y = (t_vtx[j].y << 10) / (t_vtx[j].z + distance);		
+
+			x >>= 3;
+			y >>= 3;
+
+			z = t_vtx[j].z;
+			if (z < FIX16(0.0))
+				z = FIX16(0.0);
+
+			z >>= 5;
+
+			if (z > 7)
+				z = 7;
+
+	        // sprites[loop].x = x_screen + x;
+	        // sprites[loop].y = y_screen + y;
+			SPR_setPosition(sprites[loop], x_screen + x, y_screen + y);
+			SPR_setFrame(sprites[loop], z);	    
 		}
 
 		/* Z-sort the vector balls */
@@ -93,47 +117,19 @@ void RSE_vectorBallFX()
 		zsort_switch++;
 		zsort_switch &= 0x1F;
 
-		/* Display the vector balls using sprites */
-		for(loop = 0; loop < BALL_COUNT; loop++)
-		{
-			j = vball_zsort[loop].index;
-
-			//	Classic 3D -> 2D projection
-		    x = (t_vtx[j].x << 10) / (t_vtx[j].z + distance);
-		    y = (t_vtx[j].y << 10) / (t_vtx[j].z + distance);		
-
-			x >>= 3;
-			y >>= 3;
-
-			z = t_vtx[j].z;
-			if (z < FIX32(0.0))
-				z = FIX32(0.0);
-
-			z >>= 5;
-
-			if (z > 7)
-				z = 7;
-
-	        sprites[loop].x = x_screen + x;
-	        sprites[loop].y = y_screen + y;
-			// SPR_setPosition(&sprites[loop], x_screen + x, y_screen + y);
-			SPR_setFrame(&sprites[loop], z);
-		}
-
-		/* Update the whole list of sprites */
 		SPR_update(sprites, BALL_COUNT);
 	}	
 
 	SYS_disableInts();
 
 	VDP_setPlanSize(64, 32);
-	SPR_init(MAX_VECTOR_BALL);
+	SPR_init(0,0,0);
 
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < BALL_COUNT; loop++)
 	{
-	    SPR_initSprite(&sprites[loop], &ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
-		SPR_setAlwaysVisible(&sprites[loop], TRUE);
+	    sprites[loop] = SPR_addSprite(&ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
+		SPR_setAlwaysVisible(sprites[loop], TRUE);
 	}
 
  //    SPR_update(sprites, BALL_COUNT);
@@ -155,7 +151,8 @@ void RSE_vectorBallFX()
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
 		VDP_waitVSync();
-		drawVectorBalls(sprites, angle, angle << 1);
+		BMP_showFPS(0);
+		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
 		angle++;

@@ -5,7 +5,7 @@ extern u16 writer_switch;
 extern u16 current_string_idx;
 extern u16 current_string_len;
 extern u16 current_char_idx;
-extern u16 current_plan;
+extern VDPPlan current_plan;
 extern u16 current_char_x;
 extern u16 current_char_y;
 extern u16 writer_timer;

@@ -12,6 +12,5 @@ void RSE_pause(u16 frames);
 void RSE_clearTileRowB(u16 row);
 void RSE_clearTileRowA(u16 row);
 void RSE_resetScrolling(void);
-void RSE_clearAll(void);
 
 #endif

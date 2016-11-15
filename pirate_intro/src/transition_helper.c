@@ -38,7 +38,7 @@ void RSE_clearTileRowB(u16 row)
 	u16 col, max_col;
 	max_col = VDP_getPlanWidth(); 
 	for(col = 0; col < max_col; col++)
-		VDP_setTileMapXY(BPLAN, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_SYSTEMINDEX), col, row);
+		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_SYSTEMINDEX), col, row);
 }
 
 void RSE_clearTileRowA(u16 row)
@@ -46,7 +46,7 @@ void RSE_clearTileRowA(u16 row)
 	u16 col, max_col;
 	max_col = VDP_getPlanWidth(); 
 	for(col = 0; col < max_col; col++)
-		VDP_setTileMapXY(APLAN, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_SYSTEMINDEX), col, row);
+		VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_SYSTEMINDEX), col, row);
 }
 
 void RSE_resetScrolling(void)
@@ -75,8 +75,8 @@ void RSE_clearAll(void)
 	RSE_resetScrolling();
 
 	SPR_end();
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);	
+	VDP_clearPlan(PLAN_A, 0);
+	VDP_clearPlan(PLAN_B, 0);	
 
 	SYS_disableInts();
 	SYS_enableInts();

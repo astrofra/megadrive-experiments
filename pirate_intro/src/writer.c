@@ -19,7 +19,7 @@ u16 x_offset;
 u16 current_char_x;
 u16 current_char_y = 2;
 u16 initial_char_y;
-u16 current_plan;
+VDPPlan current_plan;
 u8 current_pal;
 u8 writer_is_done;
 u16 writer_timer;
@@ -88,11 +88,11 @@ u16 inline charToTileIndex(char c)
 u16 RSE_writerSetup(void)
 {
 	u16 j;
-	current_plan = VDP_PLAN_A;
+	current_plan = PLAN_A;
 	current_pal = PAL0;
 
 	SYS_disableInts();
-	VDP_drawImageEx(APLAN, &sim1_font, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_A, &sim1_font, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	for(j = 0; j  < 4; j++)
 		RSE_clearTileRowA(j);
 	SYS_enableInts();
@@ -157,7 +157,7 @@ u16 RSE_writerDrawString(char *str)
 		{
 			i = charToTileIndex(c);
 			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade + x_offset, TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
+				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade + x_offset, current_char_y); //TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
 		}
 	}
 
@@ -179,12 +179,12 @@ void inline RSE_writerUpdateLine(void)
 
 	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
 	{
-		current_plan = VDP_PLAN_A;
+		current_plan = PLAN_A;
 		current_pal = PAL0;
 	}
 	else
 	{
-		current_plan = VDP_PLAN_B;
+		current_plan = PLAN_B;
 		current_pal = PAL1;
 	}
 
@@ -260,12 +260,12 @@ void inline RSE_writerUpdateMultiLine(void)
 
 	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
 	{
-		current_plan = VDP_PLAN_A;
+		current_plan = PLAN_A;
 		current_pal = PAL0;
 	}
 	else
 	{
-		current_plan = VDP_PLAN_B;
+		current_plan = PLAN_B;
 		current_pal = PAL1;
 	}
 
