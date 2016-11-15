@@ -43,13 +43,13 @@ void RSE_vectorBallFX()
 
 		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
-		// x_screen += 0x80;
+		x_screen += 0x80;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
-		// y_screen += 0x80;
+		y_screen += 0x80;
 
-		xc = cosFix16(rx << 3);
+		xc = cosFix16(rx << 3) << 1;
 		yc = sinFix16(rx << 2);
-		zc = sinFix16(rx << 2);
+		zc = sinFix16(rx << 2) << 1;
 
 		/* precalculate the rotation */
 		_cosx = cosFix16(rx);
@@ -94,9 +94,10 @@ void RSE_vectorBallFX()
 			if (z > 7)
 				z = 7;
 
-	        // sprites[loop].x = x_screen + x;
-	        // sprites[loop].y = y_screen + y;
-			SPR_setPosition(sprites[loop], x_screen + x, y_screen + y);
+	        sprites[loop]->x = x_screen + x;
+	        sprites[loop]->y = y_screen + y;
+	        sprites[loop]->status = sprites[loop]->status | 0x0002;
+			// SPR_setPosition(sprites[loop], x_screen + x, y_screen + y);
 			SPR_setFrame(sprites[loop], z);	    
 		}
 
@@ -150,7 +151,7 @@ void RSE_vectorBallFX()
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
-		VDP_waitVSync();
+		// VDP_waitVSync();
 		BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
