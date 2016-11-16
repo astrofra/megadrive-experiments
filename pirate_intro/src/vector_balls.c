@@ -21,17 +21,19 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
-void RSE_vectorBallFX()
-{
-	u16 loop, i, j;
-	u16 zsort_switch = 0;
-	Sprite *sprites[MAX_VECTOR_BALL];
-	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
-	short xc, yc, zc;
-	u16 angle;
-	u8 vball_phase = VBALL_PHASE_BEGIN;
-	u16 vball_timer = 0;
+static u16 loop, i, j;
+static 	u16 zsort_switch = 0;
+static 	Sprite *sprites[MAX_VECTOR_BALL];
+static 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
+static 	short xc, yc, zc;
+static 	u16 angle;
+static 	u8 vball_phase = VBALL_PHASE_BEGIN;
+static 	u16 vball_timer = 0;
+static 	const Animation *animation;
+static 	u16 frameInd;
 
+void fastVectorBallFX()
+{
 	inline static void drawVectorBalls(u16 rx, u16 ry)
 	{
 		u16 loop;
@@ -98,8 +100,22 @@ void RSE_vectorBallFX()
 	        sprites[loop]->y = y_screen + y;
 	        sprites[loop]->status = sprites[loop]->status | 0x0002;
 			// SPR_setPosition(sprites[loop], x_screen + x, y_screen + y);
-			if (zsort_switch & 0x1)
-				SPR_setFrame(sprites[loop], z);  
+			// if (zsort_switch & 0x1)
+				// SPR_setFrame_inl(sprites[loop], z);  
+		    if (sprites[loop]->seqInd != z)
+		    {
+		        animation = sprites[loop]->animation;
+		        frameInd = animation->sequence[z];
+
+		        sprites[loop]->seqInd = z;
+
+		        if (sprites[loop]->frameInd != frameInd)
+		        {
+		            sprites[loop]->frameInd = frameInd;
+		            sprites[loop]->frame = animation->frames[frameInd];
+		            sprites[loop]->status |= 0x0040;
+		        }
+		    }	        
 		}
 
 		/* Z-sort the vector balls */
@@ -152,7 +168,7 @@ void RSE_vectorBallFX()
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
-		VDP_waitVSync();
+		// VDP_waitVSync();
 		BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);

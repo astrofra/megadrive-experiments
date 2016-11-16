@@ -1,11 +1,14 @@
 #include "genesis.h"
 #include "quicksort.h"
 
+static struct QSORT_ENTRY t;
+
 //------------------------------------------------------
 inline void    QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
 //------------------------------------------------------
 {   
-    struct QSORT_ENTRY t = *a;
+    // struct QSORT_ENTRY t = *a;
+    t = *a;
     *a = *b;
     *b = t;
 }
