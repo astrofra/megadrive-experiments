@@ -2,7 +2,7 @@
 #include "quicksort.h"
 
 //------------------------------------------------------
-void    inline QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
+inline void    QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
 //------------------------------------------------------
 {   
     struct QSORT_ENTRY t = *a;
@@ -12,7 +12,7 @@ void    inline QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
 
 //----------------------------------------
 // http://rosettacode.org/wiki/Sorting_algorithms/Quicksort#C
-void    QuickSort (u16 n, struct QSORT_ENTRY *a)
+inline void    QuickSort (u16 n, struct QSORT_ENTRY *a)
 //----------------------------------------
 {
     int i, j, p;

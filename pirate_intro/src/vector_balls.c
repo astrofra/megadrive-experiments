@@ -32,7 +32,7 @@ void RSE_vectorBallFX()
 	u8 vball_phase = VBALL_PHASE_BEGIN;
 	u16 vball_timer = 0;
 
-	static void drawVectorBalls(u16 rx, u16 ry)
+	inline static void drawVectorBalls(u16 rx, u16 ry)
 	{
 		u16 loop;
 		short x, y, z;
@@ -98,7 +98,8 @@ void RSE_vectorBallFX()
 	        sprites[loop]->y = y_screen + y;
 	        sprites[loop]->status = sprites[loop]->status | 0x0002;
 			// SPR_setPosition(sprites[loop], x_screen + x, y_screen + y);
-			SPR_setFrame(sprites[loop], z);	    
+			if (zsort_switch & 0x1)
+				SPR_setFrame(sprites[loop], z);  
 		}
 
 		/* Z-sort the vector balls */
@@ -151,7 +152,7 @@ void RSE_vectorBallFX()
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
-		// VDP_waitVSync();
+		VDP_waitVSync();
 		BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
