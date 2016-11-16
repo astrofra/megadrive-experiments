@@ -18,10 +18,10 @@ inline void    QSwap (struct QSORT_ENTRY *a, struct QSORT_ENTRY *b)
 inline void    QuickSort (u16 n, struct QSORT_ENTRY *a)
 //----------------------------------------
 {
-    int i, j, p;
+    short i, j, p;
     if (n < 2)
         return;
-    p = a[n / 2].value;
+    p = a[n >> 1].value;
     for (i = 0, j = n - 1;; i++, j--) {
         while (a[i].value < p)
             i++;
