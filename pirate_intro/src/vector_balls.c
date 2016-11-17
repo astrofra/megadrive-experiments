@@ -81,11 +81,8 @@ void fastVectorBallFX()
 		    t_vtx[j].z += zc;
 
 			//	3D -> 2D projection
-		    x = (t_vtx[j].x << 10) / (t_vtx[j].z + distance);
-		    y = (t_vtx[j].y << 10) / (t_vtx[j].z + distance);		
-
-			x >>= 3;
-			y >>= 3;
+		    x = (t_vtx[j].x << 7) / (t_vtx[j].z + distance);
+		    y = (t_vtx[j].y << 7) / (t_vtx[j].z + distance);
 
 			z = t_vtx[j].z;
 			if (z < FIX16(0.0))
