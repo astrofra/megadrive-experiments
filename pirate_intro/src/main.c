@@ -30,7 +30,7 @@ int main()
 	{
 		vramIndex = TILE_USERINDEX;
 
-		// play_music();
+		play_music();
 
 		RSE_turn_screen_to_black();
 		/*	
@@ -41,11 +41,11 @@ int main()
 
 		displayBarbPictureFX();
 
-		RSE_pause(RSE_FRAMES(20));
+		// RSE_pause(RSE_FRAMES(20));
 
 		fastVectorBallFX();
 
-		// stop_music();
+		stop_music();
 
 		RSE_pause(RSE_FRAMES(20));
 

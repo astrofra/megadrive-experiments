@@ -9,6 +9,8 @@ extern u8 framerate;
 
 void displayBarbPictureFX(void)
 {
+	u16 fx_phase;
+
 	SYS_disableInts();
 
 	VDP_clearPlan(PLAN_A, 0);
@@ -17,27 +19,31 @@ void displayBarbPictureFX(void)
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);
 
-	SPR_init(1, 1, 1);
+	// SPR_init(1, 1, 1);
 
 	/* Draw the foreground */
-	VDP_drawImageEx(PLAN_B, &barbarian_pic_A, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
+	VDP_drawImageEx(PLAN_A, &barbarian_pic_A, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, TRUE);
 	vramIndex += barbarian_pic_A.tileset->numTile;
-	VDP_drawImageEx(PLAN_B, &barbarian_pic_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
+	VDP_drawImageEx(PLAN_B, &barbarian_pic_B, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, TRUE);
 	vramIndex += barbarian_pic_B.tileset->numTile;
 
 	SYS_enableInts();
 
-	VDP_fadePalTo(PAL1, barbarian_pic_B_dark.palette->data, 32, TRUE);
-	RSE_pause(32);
-	VDP_fadePalTo(PAL1, barbarian_pic_B.palette->data, 32, TRUE);
-	RSE_pause(32);
-	VDP_fadePalTo(PAL0, barbarian_pic_A.palette->data, 32, TRUE);
-	RSE_pause(32);
+	// VDP_fadePalTo(PAL1, barbarian_pic_B_dark.palette->data, 32, TRUE);
+	// RSE_pause(64);
+	// VDP_fadePalTo(PAL1, barbarian_pic_B.palette->data, 32, TRUE);
+	// RSE_pause(64);
+	// VDP_fadePalTo(PAL0, barbarian_pic_A.palette->data, 32, TRUE);
+	// RSE_pause(64);
 
-	while(1) // (vball_phase < VBALL_PHASE_QUIT)
+	fx_phase = 0;
+	while(fx_phase < 60 * 8) // (vball_phase < VBALL_PHASE_QUIT)
 	{
 		VDP_waitVSync();
+		fx_phase++;
 		// BMP_showFPS(0);
 	}
 
+	VDP_clearPlan(PLAN_A, 0);
+	VDP_clearPlan(PLAN_B, 0);
 }
