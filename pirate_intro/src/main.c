@@ -30,20 +30,22 @@ int main()
 	{
 		vramIndex = TILE_USERINDEX;
 
-		play_music();
+		// play_music();
 
-		// RSE_turn_screen_to_black();
+		RSE_turn_screen_to_black();
 		/*	
 			Load the font tiles
 			that will be used during all the demo
 		*/
 		// fontIndex = RSE_writerSetup();
 
-		// RSE_pause(RSE_FRAMES(20));
+		displayBarbPictureFX();
+
+		RSE_pause(RSE_FRAMES(20));
 
 		fastVectorBallFX();
 
-		stop_music();
+		// stop_music();
 
 		RSE_pause(RSE_FRAMES(20));
 

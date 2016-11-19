@@ -67,7 +67,7 @@ void fastVectorBallFX()
 		for(loop = 0; loop < BALL_COUNT; loop++)
 		{
 			// The balls are processed by Z-order
-			//	3D transformation (rotation on X and Y axis)
+			// 3D transformation (rotation on X and Y axis)
 			j = vball_zsort[loop].index;
 
 			_vtx = VECTOR_BALL_ARRAY[j];
@@ -88,18 +88,16 @@ void fastVectorBallFX()
 			if (z < FIX16(0.0))
 				z = FIX16(0.0);
 
-			z >>= 5;
+			z >>= 6;
 
-			if (z > 7)
-				z = 7;
+			if (z > 8)
+				z = 8;
 
 	        sprites[loop]->x = x_screen + x;
 	        sprites[loop]->y = y_screen + y;
 	        sprites[loop]->status = sprites[loop]->status | 0x0002;
-			// SPR_setPosition(sprites[loop], x_screen + x, y_screen + y);
-			// if (zsort_switch & 0x1)
-				// SPR_setFrame_inl(sprites[loop], z);  
-		    if (sprites[loop]->seqInd != z)
+ 
+		    if ((zsort_switch & 0x1) && (sprites[loop]->seqInd != z))
 		    {
 		        animation = sprites[loop]->animation;
 		        frameInd = animation->sequence[z];
