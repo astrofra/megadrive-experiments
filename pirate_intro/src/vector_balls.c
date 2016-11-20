@@ -125,7 +125,7 @@ void fastVectorBallFX()
 			}
 			else
 			{
-			    if (sprites[loop]->seqInd != z)
+			    if (sprites[shadow_idx]->seqInd != z)
 			    {
 			        /* shadow */
 			        animation = sprites[shadow_idx]->animation;
@@ -170,19 +170,20 @@ void fastVectorBallFX()
 	*/
 
 	VDP_setPlanSize(64, 32);
+	VDP_setHilightShadow(1); 	
 	SPR_init(0,0,0);
 	vramIndex = 8; // fontIndex;
 
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < BALL_COUNT; loop++)
 	{
-	    sprites[loop] = SPR_addSprite(&ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
+	    sprites[loop] = SPR_addSprite(&ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
 	}
 
 	for(loop = BALL_COUNT; loop < BALL_COUNT * 2; loop++)
 	{
-	    sprites[loop] = SPR_addSprite(&ball_shadow, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
+	    sprites[loop] = SPR_addSprite(&ball_shadow, 0, 0, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 0));
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
 	}
 
@@ -195,7 +196,7 @@ void fastVectorBallFX()
 	// 	RSE_clearTileRowA(j);
 	// }
 
-	VDP_drawImageEx(PLAN_A, &checkboard, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, (224 - 128) >> 3, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_A, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, TRUE, TRUE);
 	vramIndex += checkboard.tileset->numTile;
 
 	SYS_enableInts();
@@ -207,7 +208,7 @@ void fastVectorBallFX()
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
 		VDP_waitVSync();
-		BMP_showFPS(0);
+		// BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
