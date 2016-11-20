@@ -11,14 +11,16 @@ from random import uniform
 from random import seed
 from utils import *
 
-current_scenario = 0  # <------- SET ME TO 0, 1, ...
+current_scenario = 3  # <------- SET ME TO 0, 1, ...
+recycle_bullets = False
 
 filename_out = "../../outline_intro/simulation"
 scale_factor = 10.0
 md_screen_w = 320/scale_factor
 md_screen_h = 224/scale_factor
 sphere_radius = (md_screen_w / 40.0) # / 2.0
-max_bullet = 40
+max_bullet = 35
+prev_node_count = 0
 framerate = 50
 g_dict = {}
 ground = None
@@ -112,12 +114,20 @@ def throw_bullet(size=1.0, mass=1.0, type='sphere', spread_angle=1.0, spread_pos
 
 
 def throw_bullets_at_interval(dt, interval=1.0, mass=1.0, type='sphere', spread_angle=0.0, spread_pos=1.0):
-	global throw_bullet_timeout, bullet_count
+	global throw_bullet_timeout, bullet_count, prev_node_count
 	if not (type in throw_bullet_timeout):
 		throw_bullet_timeout[type] = interval * 0.5
 	throw_bullet_timeout[type] += dt
 
-	if bullet_count < max_bullet and throw_bullet_timeout[type] > interval:
+	free_bullets = False
+	if recycle_bullets:
+		if prev_node_count < max_bullet:
+			free_bullets = True
+	else:
+		if bullet_count < max_bullet:
+			free_bullets = True
+
+	if free_bullets and throw_bullet_timeout[type] > interval:
 		throw_bullet_timeout[type] = 0.0
 		throw_bullet(mass=mass, type=type, spread_angle=spread_angle, spread_pos=spread_pos)
 		bullet_count += 1
@@ -157,13 +167,13 @@ def execute_scenario_0(dt, dt_sum):
 		if dt_sum < 12.0:
 			interval = RangeAdjust(dt_sum, 0.0, 5.0, 3.0, 0.25)
 			interval = Clamp(interval, 0.25, 3.0)
-			throw_bullets_at_interval(dt, interval * 1.35, type='cube')
+			throw_bullets_at_interval(dt, interval * 1.275, type='cube')
 			throw_bullets_at_interval(dt, interval * 2.0, type='elastic_cube', spread_pos=5.0)
 		else:
 			g_dict['state'] = 1
 
 	if g_dict['state'] == 1:
-		if dt_sum < 14.0:
+		if dt_sum < 15.0:
 			throw_bullets_at_interval(dt, 0.5, type='elastic_cube', spread_pos=10.0)
 		else:
 			throw_bullet(1.0, 35.0, type='sphere_black')
@@ -171,29 +181,29 @@ def execute_scenario_0(dt, dt_sum):
 
 	if g_dict['state'] == 2:
 		throw_bullets_at_interval(dt, 0.5, type='elastic_sphere', mass=0.25)
-		if dt_sum > 17.0:
+		if dt_sum > 18.0:
 			throw_bullet(1.0, 30.0, type='sphere_black')
 			g_dict['state'] = 3
 
 	if g_dict['state'] == 3:
 		throw_bullets_at_interval(dt, 0.5, type='elastic_sphere', mass=0.25)
 		throw_bullets_at_interval(dt, 0.25, type='elastic_cube', mass=0.15, spread_pos=5.0)
-		if dt_sum > 19.0:
+		if dt_sum > 20.0:
 			throw_bullet(1.0, 25.0, type='sphere_black')
 			g_dict['state'] = 4
 
 	if g_dict['state'] == 4:
 		throw_bullets_at_interval(dt, 0.5, type='elastic_sphere', mass=0.25)
 		throw_bullets_at_interval(dt, 0.25, type='elastic_cube', mass=0.15, spread_pos=5.0)
-		if dt_sum > 23.0:
+		if dt_sum > 22.0:
 			enable_ground(False)
 			g_dict['state'] = 5
 
 	if g_dict['state'] == 5:
-		if dt_sum < 25.0:
+		if dt_sum < 23.0:
 			throw_bullets_at_interval(dt, 0.25, type='elastic_cube', mass=0.15, spread_pos=5.0)
 
-		if dt_sum > 26.0:
+		if dt_sum > 24.0:
 			return False
 
 	return True
@@ -219,18 +229,30 @@ def execute_scenario_1(dt, dt_sum):
 		enable_ground(False)
 
 	if g_dict['state'] == 0:
-		if dt_sum < 12.0:
+		if dt_sum < 13.0:
 			interval = RangeAdjust(dt_sum, 0.0, 3.0, 3.0, 0.1)
-			interval = Clamp(interval, 0.1, 3.0)
+			interval = Clamp(interval, 0.1, 3.0) * 1.25
 			if uniform(0.0, 1.0) < 0.1:
 				throw_bullets_at_interval(dt, interval, mass=25.0, type='sphere_black')
 			else:
-				throw_bullets_at_interval(dt, interval)
+				throw_bullets_at_interval(dt, interval, mass=0.5)
+				throw_bullets_at_interval(dt, interval * 2.0, type='elastic_cube', mass=0.25, spread_pos=5.0)
 		else:
 			g_dict['state'] = 1
 
 	if g_dict['state'] == 1:
+		throw_bullets_at_interval(dt, 0.5, type='elastic_cube', mass=0.25, spread_pos=2.5)
+		throw_bullets_at_interval(dt, 1.0, type='elastic_sphere', mass=0.25, spread_pos=5.0)
+		if dt_sum > 14.0:
+			g_dict['state'] = 2
+
+	if g_dict['state'] == 2:
+		throw_bullets_at_interval(dt, 0.25, type='elastic_sphere', mass=0.25, spread_pos=5.0)
 		if dt_sum > 15.0:
+			g_dict['state'] = 3
+
+	if g_dict['state'] == 3:
+		if dt_sum > 16.0:
 			return False
 
 	return True
@@ -265,32 +287,21 @@ def execute_scenario_2(dt, dt_sum):
 		enable_ground(True)
 
 	if g_dict['state'] == 0:
-		if dt_sum < 20.0:
+		if dt_sum < 23.0:
+			throw_bullets_at_interval(dt, 2.5, type='sphere_black')
+
 			interval = RangeAdjust(dt_sum, 0.0, 2.0, 3.0, 0.25)
 			interval = Clamp(interval, 0.25, 3.0)
-			throw_bullets_at_interval(dt, interval)
+			if uniform(0.0, 1.0) < 0.5:
+				throw_bullets_at_interval(dt, interval * 1.5)
+			else:
+				throw_bullets_at_interval(dt, interval * 1.5, type='elastic_cube', mass=0.25, spread_pos=10.0)
 		else:
-			g_dict['state'] = 1
-
-	if g_dict['state'] == 1:
-		if dt_sum > 12.0:
-			throw_bullet(1.0, 35.0, type='sphere_black')
-			g_dict['state'] = 2
-
-	if g_dict['state'] == 2:
-		if dt_sum > 16.0:
-			throw_bullet(1.0, 30.0, type='sphere_black')
-			g_dict['state'] = 3
-
-	if g_dict['state'] == 3:
-		if dt_sum > 18.0:
-			throw_bullet(1.0, 25.0, type='sphere_black')
 			g_dict['state'] = 4
 
 	if g_dict['state'] == 4:
-		if dt_sum > 20.0:
-			enable_ground(False)
-			g_dict['state'] = 5
+		enable_ground(False)
+		g_dict['state'] = 5
 
 	if g_dict['state'] == 5:
 		if dt_sum > 25.0:
@@ -335,8 +346,8 @@ def execute_scenario_3(dt, dt_sum):
 		if dt_sum < 22.0:
 			interval = RangeAdjust(dt_sum, 0.0, 10.0, 3.0, 0.5)
 			interval = Clamp(interval, 0.5, 3.0)
-			throw_bullets_at_interval(dt, interval, type='elastic_cube', mass=0.25)
-			throw_bullets_at_interval(dt, 2.35, type='sphere', mass=0.25)
+			throw_bullets_at_interval(dt, interval * 1.1, type='elastic_cube', mass=0.15)
+			throw_bullets_at_interval(dt, 2.35 * 1.1, type='sphere', mass=0.25)
 		else:
 			g_dict['state'] = 1
 
@@ -387,11 +398,11 @@ def execute_scenario_4(dt, dt_sum):
 	return True
 
 
-scenario_list = [[setup_scenario_0, execute_scenario_0],
-				[setup_scenario_1, execute_scenario_1],
-				[setup_scenario_2, execute_scenario_2],
-				[setup_scenario_3, execute_scenario_3],
-				[setup_scenario_4, execute_scenario_4]]
+scenario_list = [[setup_scenario_0, execute_scenario_0, False],
+				[setup_scenario_1, execute_scenario_1, True],
+				[setup_scenario_2, execute_scenario_2, True],
+				[setup_scenario_3, execute_scenario_3, True],
+				[setup_scenario_4, execute_scenario_4, False]]
 
 # Main ========================================================================
 
@@ -405,6 +416,7 @@ record_done = False
 bullet_count = 0
 stream_list = []
 node_list = []
+recycle_bullets = scenario_list[current_scenario][2]
 
 dt_sum = 0.0
 
@@ -446,6 +458,7 @@ while not input.key_press(gs.InputDevice.KeyEscape) and not record_done:
 									'position': _pos, 'rotation': current_node.GetTransform().GetRotation()}
 					new_frame.append(new_motion)
 
+		prev_node_count = len(new_frame)
 		if len(new_frame) < max_bullet:
 			for i in range(max_bullet - len(new_frame)):
 				new_frame.append(null_bullet)

@@ -4,8 +4,8 @@
 #include "quicksort.h"
 
 #define	MAX_VECTOR_BALL 256
-#define BALL_COUNT geosphere_VTX_COUNT
-#define VECTOR_BALL_ARRAY vb_geosphere_vertex_pos
+#define BALL_COUNT grid_cube_small_VTX_COUNT
+#define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
 
 static void vectorBallFX();
 
@@ -132,8 +132,8 @@ static void vectorBallFX(){
 	SYS_enableInts();
 
 	while (TRUE){
-		VDP_waitVSync();
-		// BMP_showFPS(1);
+		// VDP_waitVSync();
+		BMP_showFPS(1);
 		drawVectorBalls(sprites, angle, angle << 1);
 		angle++;
 	}

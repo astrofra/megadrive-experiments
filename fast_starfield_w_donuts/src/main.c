@@ -73,7 +73,9 @@ static void fastStarFieldFX()
 		/*	Animate the donuts */
 		for(i = 0; i < MAX_DONUT; i++)
 		{
-	        SPR_setPosition(&sprites[i], (cosFix16(s + (i << 5)) << 1) + 160 - 16, sinFix16(s + (i << 5)) + 112 - 16);
+	        // SPR_setPosition(&sprites[i], (cosFix16(s + (i << 5)) << 1) + 160 - 16, sinFix16(s + (i << 5)) + 112 - 16);
+	        sprites[i].x = (cosFix16(s + (i << 5)) << 1) + 160 - 16 + 0x80;
+	        sprites[i].y = sinFix16(s + (i << 5)) + 112 - 16 + 0x80;
 			SPR_setFrame(&sprites[i], ((s >> 4) + i) & 0x7);
 		}
 
