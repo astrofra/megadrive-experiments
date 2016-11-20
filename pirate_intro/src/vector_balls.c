@@ -8,6 +8,7 @@
 #define	MAX_VECTOR_BALL 256
 #define BALL_COUNT grid_cube_small_VTX_COUNT
 #define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
+#define VBALL_DISTANCE 1100
 
 #define VBALL_PHASE_BEGIN		0
 #define VBALL_PHASE_SPR_FADING	1
@@ -35,7 +36,7 @@ static 	u16 frameInd;
 static short x, y, z;
 static Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
 static fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
-static u16 distance = 1100;
+// static u16 distance = 1100;
 static short x_screen, y_screen, x_screen_shadow, y_screen_shadow;
 
 void fastVectorBallFX()
@@ -45,10 +46,6 @@ void fastVectorBallFX()
 		// u16 loop;
 
 		/* Get the center of the screen (minus the half width of a vector balls) */
-		x_screen = (VDP_getScreenWidth() - 32) >> 1;
-		x_screen += 0x80;
-		y_screen = (VDP_getScreenHeight() - 32) >> 1;
-		y_screen += 0x80;
 		x_screen_shadow = x_screen + 0x30;
 		y_screen_shadow = y_screen + 0x60;
 
@@ -84,8 +81,8 @@ void fastVectorBallFX()
 		    t_vtx[j].z += zc;
 
 			//	3D -> 2D projection
-		    x = (t_vtx[j].x << 7) / (t_vtx[j].z + distance);
-		    y = (t_vtx[j].y << 7) / (t_vtx[j].z + distance);
+		    x = (t_vtx[j].x << 7) / (t_vtx[j].z + VBALL_DISTANCE);
+		    y = (t_vtx[j].y << 7) / (t_vtx[j].z + VBALL_DISTANCE);
 
 			z = t_vtx[j].z;
 			if (z < FIX16(0.0))
@@ -202,13 +199,17 @@ void fastVectorBallFX()
 	SYS_enableInts();
 
 	angle = 0;
+	x_screen = (VDP_getScreenWidth() - 32) >> 1;
+	x_screen += 0x80;
+	y_screen = (VDP_getScreenHeight() - 32) >> 1;
+	y_screen += 0x80;	
 
 	VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
 		VDP_waitVSync();
-		// BMP_showFPS(0);
+		BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
