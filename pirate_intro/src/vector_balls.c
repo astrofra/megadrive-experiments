@@ -21,7 +21,7 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
-static u16 loop, i, j;
+static u16 loop, shadow_idx, i, j;
 static 	u16 zsort_switch = 0;
 static 	Sprite *sprites[MAX_VECTOR_BALL];
 static 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
@@ -32,22 +32,25 @@ static 	u16 vball_timer = 0;
 static 	const Animation *animation;
 static 	u16 frameInd;
 
+static short x, y, z;
+static Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
+static fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
+static u16 distance = 1100;
+static short x_screen, y_screen, x_screen_shadow, y_screen_shadow;
+
 void fastVectorBallFX()
 {
 	inline static void drawVectorBalls(u16 rx, u16 ry)
 	{
-		u16 loop;
-		short x, y, z;
-		Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
-		fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
-		u16 distance = 1100;
-		short x_screen, y_screen;
+		// u16 loop;
 
 		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen = (VDP_getScreenWidth() - 32) >> 1;
 		x_screen += 0x80;
 		y_screen = (VDP_getScreenHeight() - 32) >> 1;
 		y_screen += 0x80;
+		x_screen_shadow = x_screen + 0x30;
+		y_screen_shadow = y_screen + 0x60;
 
 		xc = cosFix16(rx << 3) << 1;
 		yc = sinFix16(rx << 2);
@@ -64,7 +67,7 @@ void fastVectorBallFX()
 		sc = fix16Mul(_sinx, _cosy);
 
 		/* rotate the vector balls */
-		for(loop = 0; loop < BALL_COUNT; loop++)
+		for(loop = 0, shadow_idx = BALL_COUNT; loop < BALL_COUNT; loop++, shadow_idx++)
 		{
 			// The balls are processed by Z-order
 			// 3D transformation (rotation on X and Y axis)
@@ -93,24 +96,51 @@ void fastVectorBallFX()
 			if (z > 8)
 				z = 8;
 
+			/* Vector ball */
 	        sprites[loop]->x = x_screen + x;
 	        sprites[loop]->y = y_screen + y;
 	        sprites[loop]->status = sprites[loop]->status | 0x0002;
- 
-		    if ((zsort_switch & 0x1) && (sprites[loop]->seqInd != z))
+
+		    /* shadow */
+	        sprites[shadow_idx]->x = x_screen_shadow + x;
+	        sprites[shadow_idx]->y = y_screen_shadow + (y >> 2);
+	        sprites[shadow_idx]->status = sprites[loop]->status | 0x0002;
+
+		    if (zsort_switch & 0x1)
 		    {
-		        animation = sprites[loop]->animation;
-		        frameInd = animation->sequence[z];
+			    if (sprites[loop]->seqInd != z)
+			    {
+			        animation = sprites[loop]->animation;
+			        frameInd = animation->sequence[z];
 
-		        sprites[loop]->seqInd = z;
+			        sprites[loop]->seqInd = z;
 
-		        if (sprites[loop]->frameInd != frameInd)
-		        {
-		            sprites[loop]->frameInd = frameInd;
-		            sprites[loop]->frame = animation->frames[frameInd];
-		            sprites[loop]->status |= 0x0040;
-		        }
-		    }	        
+			        if (sprites[loop]->frameInd != frameInd)
+			        {
+			            sprites[loop]->frameInd = frameInd;
+			            sprites[loop]->frame = animation->frames[frameInd];
+			            sprites[loop]->status |= 0x0040;
+			        }
+				}
+			}
+			else
+			{
+			    if (sprites[loop]->seqInd != z)
+			    {
+			        /* shadow */
+			        animation = sprites[shadow_idx]->animation;
+			        frameInd = animation->sequence[z];
+
+			        sprites[shadow_idx]->seqInd = z;
+
+			        if (sprites[shadow_idx]->frameInd != frameInd)
+			        {
+			            sprites[shadow_idx]->frameInd = frameInd;
+			            sprites[shadow_idx]->frame = animation->frames[frameInd];
+			            sprites[shadow_idx]->status |= 0x0040;
+			        }		        
+			    }
+		    }
 		}
 
 		/* Z-sort the vector balls */
@@ -130,13 +160,18 @@ void fastVectorBallFX()
 		zsort_switch++;
 		zsort_switch &= 0x1F;
 
-		SPR_update(sprites, BALL_COUNT);
+		SPR_update(sprites, BALL_COUNT * 2);
 	}	
 
 	SYS_disableInts();
 
+	/*
+		Screen setup
+	*/
+
 	VDP_setPlanSize(64, 32);
 	SPR_init(0,0,0);
+	vramIndex = 8; // fontIndex;
 
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < BALL_COUNT; loop++)
@@ -145,18 +180,26 @@ void fastVectorBallFX()
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
 	}
 
+	for(loop = BALL_COUNT; loop < BALL_COUNT * 2; loop++)
+	{
+	    sprites[loop] = SPR_addSprite(&ball_shadow, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
+		SPR_setAlwaysVisible(sprites[loop], TRUE);
+	}
+
  //    SPR_update(sprites, BALL_COUNT);
+
+	// for(j = 0; j  < VDP_getPlanHeight(); j++)
+	// {
+	// 	VDP_waitVSync();
+	// 	RSE_clearTileRowB(j);
+	// 	RSE_clearTileRowA(j);
+	// }
+
+	VDP_drawImageEx(PLAN_A, &checkboard, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, (224 - 128) >> 3, FALSE, FALSE);
+	vramIndex += checkboard.tileset->numTile;
 
 	SYS_enableInts();
 
-	for(j = 0; j  < VDP_getPlanHeight(); j++)
-	{
-		VDP_waitVSync();
-		RSE_clearTileRowB(j);
-		RSE_clearTileRowA(j);
-	}
-
-	vramIndex = 8; // fontIndex;
 	angle = 0;
 
 	VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
@@ -164,7 +207,7 @@ void fastVectorBallFX()
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
 		VDP_waitVSync();
-		// BMP_showFPS(0);
+		BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		

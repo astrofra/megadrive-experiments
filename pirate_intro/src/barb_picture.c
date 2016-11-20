@@ -9,7 +9,7 @@ extern u8 framerate;
 
 void displayBarbPictureFX(void)
 {
-	u16 fx_phase;
+	u16 fx_phase, j;
 
 	SYS_disableInts();
 
@@ -37,13 +37,24 @@ void displayBarbPictureFX(void)
 	// RSE_pause(64);
 
 	fx_phase = 0;
-	while(fx_phase < 60 * 8) // (vball_phase < VBALL_PHASE_QUIT)
+	while(fx_phase < 60 * 2) // (vball_phase < VBALL_PHASE_QUIT)
 	{
 		VDP_waitVSync();
 		fx_phase++;
 		// BMP_showFPS(0);
 	}
 
-	VDP_clearPlan(PLAN_A, 0);
-	VDP_clearPlan(PLAN_B, 0);
+	for(j = 0; j  < VDP_getPlanHeight(); j++)
+	{
+		VDP_waitVSync();
+		RSE_clearTileRowB(j);
+		RSE_clearTileRowA(j);
+	}	
+
+	SYS_disableInts();
+
+	VDP_clearPlan(PLAN_A, TRUE);
+	VDP_clearPlan(PLAN_B, TRUE);
+
+	SYS_enableInts();	
 }
