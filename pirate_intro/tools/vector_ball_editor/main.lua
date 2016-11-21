@@ -7,13 +7,11 @@ balls = {}
 mesh_root = nil
 
 -- GUI
+
 gui = gs.GetDearImGui()
 check = true
-combo = 0
+ball_combo = 0
 color = gs.Color(1, 0, 1)
-
-function drawGrid()
-end
 
 function updateGui()
 	if gui:Begin("GUI") then
@@ -24,7 +22,7 @@ function updateGui()
 		-- 		print("Button pressed")
 		-- 	end
 
-			ball_combo = gui:Combo("Ball selector", {"Ball_0", "Ball_1", "Ball_2"}, combo)
+			ball_combo = gui:Combo("Ball selector", getVectorBallNameList(), ball_combo)
 			-- color = gui:ColorButton(color)
 		-- end
 	end
@@ -32,17 +30,35 @@ function updateGui()
 	gui:End()
 end
 
-function updateVectorBallMesh()
-	print(tostring(#balls) .. " vector balls found!")
-	for n = 1, #balls do
-		new_node = plus:AddSphere(scn, gs.Matrix4.Identity, balls[n].size)
-		new_node:GetTransform():SetPosition(balls[n].pos)
-		new_node:GetTransform():SetParent(mesh_root)
-	end
+-- View
+
+function drawGrid()
 end
 
 function updateCamera()
 	camera_node:GetTransform():SetRotation(camera_rotation)
+end
+
+function updateVectorBallMesh()
+	print(tostring(#balls) .. " vector balls found!")
+	names = getVectorBallNameList()
+	for n = 1, #balls do
+		new_node = plus:AddSphere(scn, gs.Matrix4.Identity, balls[n].size)
+		new_node:GetTransform():SetPosition(balls[n].pos)
+		new_node:GetTransform():SetParent(mesh_root)
+		new_node:SetName(names[n])
+	end
+end
+
+-- Vectorball operations
+
+function getVectorBallNameList()
+	names = {}
+	for n = 1, #balls do
+		table.insert(names, "Ball " .. tostring(n))
+	end
+
+	return names
 end
 
 function addVectorBall(_pos, _size)
