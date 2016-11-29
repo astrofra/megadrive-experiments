@@ -30,7 +30,7 @@ int main()
 	{
 		vramIndex = TILE_USERINDEX;
 
-		play_music();
+		// play_music();
 
 		RSE_turn_screen_to_black();
 		/*	
@@ -39,7 +39,7 @@ int main()
 		*/
 		// fontIndex = RSE_writerSetup();
 
-		displayBarbPictureFX();
+		// displayBarbPictureFX();
 
 		// RSE_pause(RSE_FRAMES(20));
 

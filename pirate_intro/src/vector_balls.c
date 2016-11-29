@@ -15,7 +15,8 @@
 #define VBALL_PHASE_FADEIN		2
 #define VBALL_PHASE_RUN			3
 #define VBALL_PHASE_FADEOUT		4
-#define VBALL_PHASE_QUIT		5
+#define VBALL_NEXT_OBJECT		5
+#define VBALL_PHASE_QUIT		6
 
 extern u16 vramIndex;
 extern u16 fontIndex;
@@ -31,9 +32,12 @@ static 	u8 vball_phase;
 static 	u16 vball_timer;
 static 	const Animation *animation;
 static 	u16 frameInd;
+static	u8 ball_count;
+static	Vect3D_f16 *vector_ball_array;
+static	u8 object_idx;
 
 static short x, y, z;
-static Vect3D_f16 _vtx, t_vtx[BALL_COUNT];
+static Vect3D_f16 _vtx, t_vtx[MAX_VTX_COUNT];
 static fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
 // static u16 distance = 1100;
 static short x_screen, y_screen, x_screen_shadow, y_screen_shadow;
@@ -60,13 +64,13 @@ void fastVectorBallFX()
 		sc = fix16Mul(_sinx, _cosy);
 
 		/* rotate the vector balls */
-		for(loop = 0, shadow_idx = BALL_COUNT; loop < BALL_COUNT; loop++, shadow_idx++)
+		for(loop = 0, shadow_idx = ball_count; loop < ball_count; loop++, shadow_idx++)
 		{
 			// The balls are processed by Z-order
 			// 3D transformation (rotation on X and Y axis)
 			j = vball_zsort[loop].index;
 
-			_vtx = VECTOR_BALL_ARRAY[j];
+			_vtx = vector_ball_array[j];
 
 		    t_vtx[j].x = fix16Add(fix16Mul(_vtx.x, _sinx), fix16Mul(_vtx.y, _cosx));
 		    t_vtx[j].y = fix16Sub(fix16Mul(_vtx.x, cs), fix16Add(fix16Mul(_vtx.y, ss), fix16Mul(_vtx.z, _cosy)));
@@ -141,21 +145,21 @@ void fastVectorBallFX()
 		/* Z-sort the vector balls */
 		if (zsort_switch == 0)
 		{
-			for(loop = 0; loop < BALL_COUNT; loop++)
+			for(loop = 0; loop < ball_count; loop++)
 			{
 			    //	Fill the sort table
 			    vball_zsort[loop].index = loop;
 			    vball_zsort[loop].value = t_vtx[loop].z;
 			}
 
-			QuickSort(BALL_COUNT, vball_zsort);
+			QuickSort(ball_count, vball_zsort);
 		}
 
 		//	Count 16 frames until the next depth sort
 		zsort_switch++;
 		zsort_switch &= 0x1F;
 
-		SPR_update(sprites, BALL_COUNT * 2);
+		SPR_update(sprites, ball_count << 1);
 	}	
 
 	SYS_disableInts();
@@ -169,14 +173,18 @@ void fastVectorBallFX()
 	SPR_init(0,0,0);
 	vramIndex = 8; // fontIndex;
 
+	object_idx = 0;
+	ball_count = BALL_COUNT;
+	vector_ball_array = VECTOR_BALL_ARRAY;
+
 	/*	Initialize the needed amount of sprites */
-	for(loop = 0; loop < BALL_COUNT; loop++)
+	for(loop = 0; loop < ball_count; loop++)
 	{
 	    sprites[loop] = SPR_addSprite(&ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
 	}
 
-	for(loop = BALL_COUNT; loop < BALL_COUNT * 2; loop++)
+	for(loop = ball_count; loop < ball_count << 1; loop++)
 	{
 	    sprites[loop] = SPR_addSprite(&ball_shadow, 0, 0, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 0));
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
@@ -258,9 +266,36 @@ void fastVectorBallFX()
 				if (vball_timer > RSE_FRAMES(32))
 				{
 					vball_timer = 0;
-					vball_phase = VBALL_PHASE_BEGIN;
+					vball_phase++;
 				}
-				break;				
+				break;
+
+			case VBALL_NEXT_OBJECT:
+				object_idx++;
+				zsort_switch = 0;
+
+				if (object_idx >= MAX_VBALL_OBJECTS)
+					object_idx = 0;
+
+				switch(object_idx)
+				{
+					case 0:
+						ball_count = geosphere_VTX_COUNT;
+						vector_ball_array = vb_geosphere_vertex_pos;
+						break;
+
+					case 1:
+						ball_count = grid_cube_VTX_COUNT;
+						vector_ball_array = vb_grid_cube_vertex_pos;
+						break;
+
+					case 2:
+						ball_count = grid_cube_small_VTX_COUNT;
+						vector_ball_array = vb_grid_cube_small_vertex_pos;
+						break;
+				}
+
+				vball_phase = VBALL_PHASE_BEGIN;
 		}
 	}
 
