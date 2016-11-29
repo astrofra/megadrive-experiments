@@ -11,12 +11,11 @@
 #define VBALL_DISTANCE 1100
 
 #define VBALL_PHASE_BEGIN		0
-#define VBALL_PHASE_SPR_FADING	1
-#define VBALL_PHASE_BG_FADING	2
-#define VBALL_PHASE_FG_FADING	3
-#define VBALL_PHASE_RUN			4
-#define VBALL_PHASE_FADE		5
-#define VBALL_PHASE_QUIT		6
+#define VBALL_PHASE_FADETOWHITE	1
+#define VBALL_PHASE_FADEIN		2
+#define VBALL_PHASE_RUN			3
+#define VBALL_PHASE_FADEOUT		4
+#define VBALL_PHASE_QUIT		5
 
 extern u16 vramIndex;
 extern u16 fontIndex;
@@ -28,8 +27,8 @@ static 	Sprite *sprites[MAX_VECTOR_BALL];
 static 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
 static 	short xc, yc;
 static 	u16 angle;
-static 	u8 vball_phase = VBALL_PHASE_BEGIN;
-static 	u16 vball_timer = 0;
+static 	u8 vball_phase;
+static 	u16 vball_timer;
 static 	const Animation *animation;
 static 	u16 frameInd;
 
@@ -203,7 +202,10 @@ void fastVectorBallFX()
 	y_screen = (VDP_getScreenHeight() - 32) >> 1;
 	y_screen += 0x80;	
 
-	VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
+	// VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
+
+	vball_phase = VBALL_PHASE_BEGIN;
+	vball_timer = 0;
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
@@ -214,62 +216,52 @@ void fastVectorBallFX()
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
 		angle++;
 
-		// switch(vball_phase)
-		// {
-		// 	case VBALL_PHASE_BEGIN:
-				// VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
-		// 		vball_timer = 0;
-		// 		vball_phase++;
-		// 		break;
+		switch(vball_phase)
+		{
+			case VBALL_PHASE_BEGIN:
+				VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(8), TRUE);
+				vball_timer = 0;
+				vball_phase++;
+				break;
 
-		// 	case VBALL_PHASE_SPR_FADING:
-		// 		vball_timer++;
-		// 		if (vball_timer > RSE_FRAMES(16 * 2))
-		// 		{
-		// 			VDP_fadePalTo(PAL0, vball_bg_a.palette->data, RSE_FRAMES(45), TRUE);
-		// 			vball_timer = 0;
-		// 			vball_phase++;
-		// 		}
-		// 		break;				
+			case VBALL_PHASE_FADETOWHITE:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(8))
+				{
+					VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;				
 
-		// 	case VBALL_PHASE_BG_FADING:
-		// 		vball_timer++;
-		// 		if (vball_timer > RSE_FRAMES(130))
-		// 		{
-		// 			VDP_fadePalTo(PAL1, vball_fg_a.palette->data, RSE_FRAMES(32), TRUE);
-		// 			vball_timer = 0;
-		// 			vball_phase++;
-		// 		}
-		// 		break;
+			case VBALL_PHASE_FADEIN:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(16))
+				{
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;
 
-		// 	case VBALL_PHASE_FG_FADING:
-		// 		vball_timer++;
-		// 		if (vball_timer > RSE_FRAMES(32 * 2))
-		// 		{
-		// 			vball_timer = 0;
-		// 			vball_phase++;
-		// 		}
-		// 		break;				
+			case VBALL_PHASE_RUN:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(60 * 2))
+				{
+					VDP_fadeOut(32, 32 + 15, RSE_FRAMES(32), TRUE);
+					vball_timer = 0;
+					vball_phase++;
+				}
+				break;
 
-		// 	case VBALL_PHASE_RUN:
-		// 		vball_timer++;
-		// 		if (vball_timer > RSE_FRAMES(60 * 7))
-		// 		{
-		// 			VDP_fadeOut(1, 63, RSE_FRAMES(32), TRUE);
-		// 			vball_timer = 0;
-		// 			vball_phase++;
-		// 		}
-		// 		break;
-
-		// 	case VBALL_PHASE_FADE:
-		// 		vball_timer++;
-		// 		if (vball_timer > RSE_FRAMES(32))
-		// 		{
-		// 			vball_timer = 0;
-		// 			vball_phase++;
-		// 		}
-		// 		break;				
-		// }
+			case VBALL_PHASE_FADEOUT:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(32))
+				{
+					vball_timer = 0;
+					vball_phase = VBALL_PHASE_BEGIN;
+				}
+				break;				
+		}
 	}
 
 	SPR_end();

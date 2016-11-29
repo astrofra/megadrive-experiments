@@ -1,5 +1,27 @@
 #include "genesis.h"
 
+const u16 palette_white[16] =
+{
+    0x0000,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF,
+    0x0FFF
+};
+
+
 const s16 tile_sc_table[] =  { 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 								0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 								0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
