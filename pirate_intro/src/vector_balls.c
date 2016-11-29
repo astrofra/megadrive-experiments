@@ -26,7 +26,7 @@ static u16 loop, shadow_idx, i, j;
 static 	u16 zsort_switch = 0;
 static 	Sprite *sprites[MAX_VECTOR_BALL];
 static 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
-static 	short xc, yc, zc;
+static 	short xc, yc;
 static 	u16 angle;
 static 	u8 vball_phase = VBALL_PHASE_BEGIN;
 static 	u16 vball_timer = 0;
@@ -43,15 +43,12 @@ void fastVectorBallFX()
 {
 	inline static void drawVectorBalls(u16 rx, u16 ry)
 	{
-		// u16 loop;
-
 		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen_shadow = x_screen + 0x30;
 		y_screen_shadow = y_screen + 0x60;
 
-		xc = cosFix16(rx << 3) << 1;
+		xc = cosFix16(rx << 3) << 2;
 		yc = sinFix16(rx << 2);
-		zc = sinFix16(rx << 2) << 1;
 
 		/* precalculate the rotation */
 		_cosx = cosFix16(rx);
@@ -78,11 +75,13 @@ void fastVectorBallFX()
 
 		    t_vtx[j].x += xc;
 		    t_vtx[j].y += yc;
-		    t_vtx[j].z += zc;
 
-			//	3D -> 2D projection
-		    x = (t_vtx[j].x << 7) / (t_vtx[j].z + VBALL_DISTANCE);
-		    y = (t_vtx[j].y << 7) / (t_vtx[j].z + VBALL_DISTANCE);
+			//	Isometric projection
+		    x = t_vtx[j].x + (t_vtx[j].z >> 3);
+		    y = t_vtx[j].y;
+
+		    x >>= 3;
+		    y >>= 3;
 
 			z = t_vtx[j].z;
 			if (z < FIX16(0.0))
@@ -218,7 +217,7 @@ void fastVectorBallFX()
 		// switch(vball_phase)
 		// {
 		// 	case VBALL_PHASE_BEGIN:
-		// 		VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
+				// VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
 		// 		vball_timer = 0;
 		// 		vball_phase++;
 		// 		break;
