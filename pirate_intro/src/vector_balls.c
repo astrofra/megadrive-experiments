@@ -217,8 +217,8 @@ void fastVectorBallFX()
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
-		VDP_waitVSync();
-		// BMP_showFPS(0);
+		// VDP_waitVSync();
+		BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
@@ -253,7 +253,7 @@ void fastVectorBallFX()
 
 			case VBALL_PHASE_RUN:
 				vball_timer++;
-				if (vball_timer > RSE_FRAMES(60 * 2))
+				if (vball_timer > RSE_FRAMES(60 * 8))
 				{
 					VDP_fadeOut(32, 32 + 15, RSE_FRAMES(32), TRUE);
 					vball_timer = 0;
