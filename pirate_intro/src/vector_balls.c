@@ -27,7 +27,9 @@ static 	u16 zsort_switch = 0;
 static 	Sprite *sprites[MAX_VECTOR_BALL];
 static 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
 static 	short xc, yc;
+static	short rx, ry;
 static 	u16 angle;
+static 	u16 sec_angle, sec_angle_step;
 static 	u8 vball_phase;
 static 	u16 vball_timer;
 static 	const Animation *animation;
@@ -44,14 +46,20 @@ static short x_screen, y_screen, x_screen_shadow, y_screen_shadow;
 
 void fastVectorBallFX()
 {
-	inline static void drawVectorBalls(u16 rx, u16 ry)
+	inline static void drawVectorBalls(u16 constant_angle, u16 accel_angle)
 	{
 		/* Get the center of the screen (minus the half width of a vector balls) */
 		x_screen_shadow = x_screen + 0x30;
 		y_screen_shadow = y_screen + 0x60;
 
+		rx = constant_angle;
+		ry = constant_angle >> 1;
+
 		xc = cosFix16(rx << 3) << 2;
 		yc = sinFix16(rx << 2);
+
+		rx = constant_angle + (accel_angle >> 3);
+		ry = constant_angle + (accel_angle >> 2);
 
 		/* precalculate the rotation */
 		_cosx = cosFix16(rx);
@@ -205,9 +213,12 @@ void fastVectorBallFX()
 	SYS_enableInts();
 
 	angle = 0;
+	sec_angle = 0;
+	sec_angle_step = 0;
+
 	x_screen = (VDP_getScreenWidth() - 32) >> 1;
 	x_screen += 0x80;
-	y_screen = (VDP_getScreenHeight() - 32) >> 1;
+ 	y_screen = (VDP_getScreenHeight() - 32) >> 1;
 	y_screen += 0x80;	
 
 	// VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
@@ -219,10 +230,18 @@ void fastVectorBallFX()
 	{
 		VDP_waitVSync();
 		// BMP_showFPS(0);
-		drawVectorBalls(angle, angle << 1);
+		drawVectorBalls(angle, sec_angle);
+		// drawVectorBalls(angle + (sec_angle >> 3), angle + (sec_angle >> 2));
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
 		angle++;
+
+		if ((angle & 0xFE) == 0)
+			sec_angle_step += 25;
+
+		sec_angle += sec_angle_step;
+		if (sec_angle_step >= 1)
+			sec_angle_step--;
 
 		switch(vball_phase)
 		{
@@ -292,6 +311,11 @@ void fastVectorBallFX()
 					case 2:
 						ball_count = grid_cube_small_VTX_COUNT;
 						vector_ball_array = vb_grid_cube_small_vertex_pos;
+						break;
+
+					case 3:
+						ball_count = sword_VTX_COUNT;
+						vector_ball_array = vb_sword_vertex_pos;
 						break;
 				}
 
