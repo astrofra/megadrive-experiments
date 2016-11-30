@@ -57,6 +57,9 @@ def main():
 	fc = codecs.open(filename_out, 'w')
 	fc.write('#include "genesis.h"\n\n')
 
+	max_vertex_count = 0
+	max_object_count = 0
+
 	for filename_in in os.listdir(folder_in):
 		if filename_in.find(".obj") > -1:
 			face_list = []
@@ -64,6 +67,7 @@ def main():
 			vertex_normal_list = []
 			edge_list = []
 			bounding_distance = 0.0
+			max_object_count += 1
 
 			f = codecs.open(os.path.join(folder_in, filename_in), 'r')
 			for line in f:
@@ -106,6 +110,9 @@ def main():
 							edge_list.append(new_edge)
 						new_edge = []
 
+			if len(vertex_list) > max_vertex_count:
+				max_vertex_count = len(vertex_list)
+
 			if bounding_distance > 0.0:
 				for i in range(len(vertex_list)):
 					vertex_list[i] = vertex_list[i] * (scale_factor / bounding_distance)
@@ -142,6 +149,9 @@ def main():
 			_str_out = '};'
 			fc.write(_str_out + '\n')
 
+	fh.write('\n')
+	fh.write('#define MAX_VTX_COUNT ' + str(max_vertex_count) + '\n')
+	fh.write('#define MAX_VBALL_OBJECTS ' + str(max_object_count) + '\n')
 
 	fh.close()
 	fc.close()
