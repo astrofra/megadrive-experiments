@@ -217,8 +217,8 @@ void fastVectorBallFX()
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
-		// VDP_waitVSync();
-		BMP_showFPS(0);
+		VDP_waitVSync();
+		// BMP_showFPS(0);
 		drawVectorBalls(angle, angle << 1);
 		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
 		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
