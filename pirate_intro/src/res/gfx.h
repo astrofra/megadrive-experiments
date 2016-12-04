@@ -3,6 +3,7 @@
 
 extern const Image barb_pic_back;
 extern const Image barb_pic_front;
+extern const SpriteDefinition masiaka_title;
 extern const SpriteDefinition ball_metal;
 extern const SpriteDefinition ball_shadow;
 extern const Image checkboard;

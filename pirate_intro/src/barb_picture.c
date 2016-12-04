@@ -10,6 +10,7 @@ extern u8 framerate;
 void displayBarbPictureFX(void)
 {
 	u16 fx_phase, j, scroll_A_y, scroll_B_y;
+	static 	Sprite *sprites[16];
 
 	SYS_disableInts();
 
@@ -18,14 +19,18 @@ void displayBarbPictureFX(void)
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 64);
+	VDP_setHilightShadow(0); 
+	SPR_init(16,180,128);
 
-	// SPR_init(1, 1, 1);
+	vramIndex = 8;
+
+	sprites[0] = SPR_addSprite(&masiaka_title, (320 - 240) >> 1, 256, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 
 	/* Draw the foreground */
-	VDP_drawImageEx(PLAN_A, &barb_pic_front, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-	vramIndex += barb_pic_front.tileset->numTile;
 	VDP_drawImageEx(PLAN_B, &barb_pic_back, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += barb_pic_back.tileset->numTile;
+	VDP_drawImageEx(PLAN_A, &barb_pic_front, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += barb_pic_front.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
@@ -34,8 +39,14 @@ void displayBarbPictureFX(void)
 
 	SYS_enableInts();
 
+	DMA_waitCompletion();
+
+	SPR_update(sprites, 1);
+
 	// VDP_fadePalTo(PAL1, barb_pic_back.palette->data, 16, TRUE);
 	// RSE_pause(16);
+	// VDP_fadePalTo(PAL2, masiaka_title.palette->data, 2, FALSE);
+
 	VDP_fadePalTo(PAL1, palette_white, RSE_FRAMES(8), TRUE);
 	RSE_pause(8);
 	VDP_fadePalTo(PAL1, barb_pic_back.palette->data, RSE_FRAMES(16), TRUE);
@@ -45,7 +56,7 @@ void displayBarbPictureFX(void)
 	// RSE_pause(16);
 
 	fx_phase = 0;
-	while(fx_phase < 256) // (vball_phase < VBALL_PHASE_QUIT)
+	while(fx_phase < 256)
 	{
 		VDP_waitVSync();
 		j = easing_table[fx_phase << 2];
@@ -56,14 +67,45 @@ void displayBarbPictureFX(void)
 		VDP_setVerticalScroll(PLAN_A, scroll_A_y);
 		VDP_setVerticalScroll(PLAN_B, scroll_B_y);
 
-		if (fx_phase == 256 - 64)
+		if (fx_phase == 256 - 64 - 16)
 			VDP_fadePalTo(PAL0, palette_white, RSE_FRAMES(8), TRUE);
-		if (fx_phase == 256 - 56)
-			VDP_fadePalTo(PAL0, barb_pic_front.palette->data, RSE_FRAMES(8), TRUE);		
+		if (fx_phase == 256 - 56 - 16)
+			VDP_fadePalTo(PAL0, barb_pic_front.palette->data, RSE_FRAMES(8), TRUE);
+
+		if (fx_phase >= 256 - 64)
+		{
+			if (fx_phase == 256 - 64)
+				VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(8), TRUE);
+
+			if (fx_phase == 256 - (64 - 12))
+				VDP_fadePalTo(PAL2, masiaka_title.palette->data, RSE_FRAMES(32), TRUE);
+
+			j = fx_phase - (256 - 64);
+
+			SPR_setPosition(sprites[0], (320 - 240) >> 1, ((224 - 48) >> 1) - ((easing_table[j << 4] >> 5) - 16));
+			SPR_update(sprites, 1);
+		}		
 
 		fx_phase++;
 		// BMP_showFPS(0);
 	}
+
+	// VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(8), TRUE);
+
+	// fx_phase = 0;
+	// j = 0;
+	// while(fx_phase < 64)
+	// {
+	// 	VDP_waitVSync();
+	// 	j = (easing_table[fx_phase << 4] >> 5) - 32;
+
+	// 	SPR_setPosition(sprites[0], (320 - 240) >> 1, ((224 - 48) >> 1) - j);
+	// 	SPR_update(sprites, 1);
+	// 	fx_phase++;
+
+	// 	if (fx_phase == 16)
+	// 		VDP_fadePalTo(PAL2, masiaka_title.palette->data, RSE_FRAMES(32), TRUE);
+	// }
 
 	RSE_pause(4 * 60);
 
