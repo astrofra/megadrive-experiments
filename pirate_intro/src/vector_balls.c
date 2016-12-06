@@ -10,13 +10,15 @@
 #define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
 #define VBALL_DISTANCE 1100
 
-#define VBALL_PHASE_BEGIN		0
-#define VBALL_PHASE_FADETOWHITE	1
-#define VBALL_PHASE_FADEIN		2
-#define VBALL_PHASE_RUN			3
-#define VBALL_PHASE_FADEOUT		4
-#define VBALL_NEXT_OBJECT		5
-#define VBALL_PHASE_QUIT		6
+#define VBALL_PHASE_INTRO_SCROLL	0
+#define VBALL_PHASE_INTRO_FADE		1
+#define VBALL_PHASE_BEGIN			2
+#define VBALL_PHASE_FADETOWHITE		3
+#define VBALL_PHASE_FADEIN			4
+#define VBALL_PHASE_RUN				5
+#define VBALL_PHASE_FADEOUT			6
+#define VBALL_NEXT_OBJECT			7
+#define VBALL_PHASE_QUIT			8
 
 extern u16 vramIndex;
 extern u16 fontIndex;
@@ -176,14 +178,16 @@ void fastVectorBallFX()
 		Screen setup
 	*/
 
-	VDP_setPlanSize(64, 32);
+	VDP_setPlanSize(64, 64);
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+	VDP_setVerticalScroll(PLAN_A, -64);
 	VDP_setHilightShadow(1); 	
 	SPR_init(0,0,0);
 	vramIndex = 8; // fontIndex;
 
-	object_idx = 0;
+	object_idx = 2;
 	ball_count = BALL_COUNT;
-	vector_ball_array = VECTOR_BALL_ARRAY;
+	vector_ball_array = VECTOR_BALL_ARRAY;	
 
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < ball_count; loop++)
@@ -210,7 +214,7 @@ void fastVectorBallFX()
 	VDP_drawImageEx(PLAN_A, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, TRUE, TRUE);
 	vramIndex += checkboard.tileset->numTile;
 
-	VDP_drawImageEx(PLAN_A, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), TRUE, TRUE);
+	VDP_drawImageEx(PLAN_A, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), FALSE, TRUE);
 	vramIndex += sky.tileset->numTile;
 
 	SYS_enableInts();
@@ -222,11 +226,9 @@ void fastVectorBallFX()
 	x_screen = (VDP_getScreenWidth() - 32) >> 1;
 	x_screen += 0x80;
  	y_screen = (VDP_getScreenHeight() - 32) >> 1;
-	y_screen += 0x80;	
+	y_screen += 0x80;
 
-	// VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
-
-	vball_phase = VBALL_PHASE_BEGIN;
+	vball_phase = VBALL_PHASE_INTRO_SCROLL;
 	vball_timer = 0;
 
 	while(vball_phase < VBALL_PHASE_QUIT)
@@ -248,6 +250,28 @@ void fastVectorBallFX()
 
 		switch(vball_phase)
 		{
+			case VBALL_PHASE_INTRO_SCROLL:
+				VDP_setVerticalScroll(PLAN_A, (easing_table[vball_timer << 4] >> 4) - 64);
+				vball_timer++;
+
+				if (vball_timer > 63)
+				{
+					VDP_fadePalTo(PAL1, sky.palette->data, RSE_FRAMES(32), TRUE);
+					VDP_setVerticalScroll(PLAN_A, 0);
+					vball_timer = 0;
+					vball_phase++;					
+				}			
+				break;
+
+			case VBALL_PHASE_INTRO_FADE:
+				vball_timer++;
+				if (vball_timer > RSE_FRAMES(40))
+				{
+					vball_timer = 0;
+					vball_phase++;					
+				}			
+				break;
+
 			case VBALL_PHASE_BEGIN:
 				VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(8), TRUE);
 				vball_timer = 0;

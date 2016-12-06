@@ -117,7 +117,9 @@ void displayBarbPictureFX(void)
 		RSE_clearTileRowB(j);
 		VDP_waitVSync();
 		RSE_clearTileRowA(j);
-	}	
+	}
+
+	SPR_end();
 
 	SYS_disableInts();
 

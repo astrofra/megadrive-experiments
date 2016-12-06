@@ -37,11 +37,10 @@ int main()
 			Load the font tiles
 			that will be used during all the demo
 		*/
-		// fontIndex = RSE_writerSetup();
 
 		displayBarbPictureFX();
 
-		// RSE_pause(RSE_FRAMES(20));
+		fontIndex = RSE_writerSetup();
 
 		fastVectorBallFX();
 
