@@ -210,6 +210,9 @@ void fastVectorBallFX()
 	VDP_drawImageEx(PLAN_A, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, TRUE, TRUE);
 	vramIndex += checkboard.tileset->numTile;
 
+	VDP_drawImageEx(PLAN_A, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), TRUE, TRUE);
+	vramIndex += sky.tileset->numTile;
+
 	SYS_enableInts();
 
 	angle = 0;

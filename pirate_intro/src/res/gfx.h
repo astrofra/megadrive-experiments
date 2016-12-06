@@ -7,6 +7,7 @@ extern const SpriteDefinition masiaka_title;
 extern const SpriteDefinition ball_metal;
 extern const SpriteDefinition ball_shadow;
 extern const Image checkboard;
+extern const Image sky;
 extern const Image sim1_font;
 extern const Image circles;
 
