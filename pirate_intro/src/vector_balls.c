@@ -347,6 +347,11 @@ void fastVectorBallFX()
 						ball_count = sword_VTX_COUNT;
 						vector_ball_array = vb_sword_vertex_pos;
 						break;
+
+					case 4:
+						ball_count = pyramid_VTX_COUNT;
+						vector_ball_array = vb_pyramid_vertex_pos;
+						break;						
 				}
 
 				vball_phase = VBALL_PHASE_BEGIN;
