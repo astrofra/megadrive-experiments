@@ -282,7 +282,10 @@ void fastVectorBallFX()
 				vball_timer++;
 				if (vball_timer > RSE_FRAMES(8))
 				{
-					VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
+					if (object_idx & 0x1)
+						VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
+					else
+						VDP_fadePalTo(PAL2, masiaka_title.palette->data, RSE_FRAMES(16), TRUE);
 					vball_timer = 0;
 					vball_phase++;
 				}
