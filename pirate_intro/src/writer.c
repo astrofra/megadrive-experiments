@@ -118,12 +118,10 @@ void updateScrollText(void)
 		char c;
 
 		scroll_local_offset = 0;
-
-		current_char++;
 		c = demo_strings[current_char];
 
 		if (c == '\0')
-			current_char = 0;
+			current_char = 1;
 		else
 		{
 			if (c != ' ')
@@ -136,6 +134,7 @@ void updateScrollText(void)
 		if (scroll_x_offset <= (screen_w_tile * -8))
 			scroll_x_offset = 0;
 
+		current_char++;
 	}
 
 	VDP_setHorizontalScroll(current_plan, scroll_x_offset);
