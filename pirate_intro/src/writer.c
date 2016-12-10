@@ -111,7 +111,9 @@ void updateScrollText(void)
 	scroll_x_offset -= scroll_speed;
 	scroll_local_offset += scroll_speed;
 
-	if (scroll_local_offset > letter_width)
+	current_char_x = ((-scroll_x_offset) >> 3) - 1;
+
+	if (scroll_local_offset >= letter_width)
 	{
 		char c;
 
@@ -131,9 +133,8 @@ void updateScrollText(void)
 
 		}
 
-		current_char_x += (letter_width >> 3);
-		if (current_char_x >= screen_w_tile)
-			current_char_x = 0;
+		if (scroll_x_offset <= (screen_w_tile * -8))
+			scroll_x_offset = 0;
 
 	}
 
