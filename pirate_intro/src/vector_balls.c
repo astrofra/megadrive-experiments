@@ -183,7 +183,7 @@ void fastVectorBallFX()
 	VDP_setVerticalScroll(PLAN_A, -64);
 	VDP_setHilightShadow(1); 	
 	SPR_init(0,0,0);
-	vramIndex = 8; // fontIndex;
+	vramIndex = fontIndex;
 
 	object_idx = 2;
 	ball_count = BALL_COUNT;
@@ -217,6 +217,8 @@ void fastVectorBallFX()
 	VDP_drawImageEx(PLAN_A, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), FALSE, TRUE);
 	vramIndex += sky.tileset->numTile;
 
+// VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_2TILE);
+
 	SYS_enableInts();
 
 	angle = 0;
@@ -236,9 +238,7 @@ void fastVectorBallFX()
 		VDP_waitVSync();
 		// BMP_showFPS(0);
 		drawVectorBalls(angle, sec_angle);
-		// drawVectorBalls(angle + (sec_angle >> 3), angle + (sec_angle >> 2));
-		// VDP_setHorizontalScroll(PLAN_B, ((xc) >> 6) - 16);
-		// VDP_setHorizontalScroll(PLAN_A, ((-xc) >> 4) - 32);		
+		updateScrollText();
 		angle++;
 
 		if ((angle & 0xFE) == 0)
@@ -360,7 +360,7 @@ void fastVectorBallFX()
 
 	SPR_end();
 	RSE_resetScrolling();
-	RSE_writerSetXOffset(0);
+	// RSE_writerSetXOffset(0);
 
 	RSE_turn_screen_to_black();
 

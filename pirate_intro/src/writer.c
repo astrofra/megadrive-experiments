@@ -5,26 +5,22 @@
 
 extern u16 vramIndex;
 extern u8 framerate;
-extern char **demo_strings;
+extern char *demo_strings;
 
 /* 
 	Global writer data 
 */
-u16 writer_state = 0;
-u16 writer_switch;
-u16 current_string_idx;
-u16 current_string_len;
-u16 current_char_idx;
-u16 x_offset;
+
 u16 current_char_x;
-u16 current_char_y = 2;
-u16 initial_char_y;
+u16 current_char_y;
+u8 letter_width;
+u16 current_char;
 VDPPlan current_plan;
 u8 current_pal;
-u8 writer_is_done;
-u16 writer_timer;
-u16 writer_display_duration = 50;
-u16 writer_options = (WRT_OPT_AUTO_NEXT_STRING | WRT_OPT_AUTO_RESTART | WRT_OPT_WRITE_TO_PLAN_A);
+u8 scroll_speed;
+s16 scroll_x_offset;
+u8 scroll_local_offset;
+u8 screen_w_tile;
 
 u16 inline computeStringLen(char *str)
 {
@@ -88,226 +84,61 @@ u16 inline charToTileIndex(char c)
 u16 RSE_writerSetup(void)
 {
 	u16 j;
-	current_plan = PLAN_A;
-	current_pal = PAL0;
+	current_plan = PLAN_B;
+	current_pal = PAL1;
 
 	SYS_disableInts();
-	VDP_drawImageEx(PLAN_A, &sim1_font, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_A, &sim1_font, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	for(j = 0; j  < 4; j++)
 		RSE_clearTileRowA(j);
 	SYS_enableInts();
 
 	vramIndex += sim1_font.tileset->numTile;
-
-	writer_switch = FALSE;
-	writer_is_done = FALSE;
-	x_offset = 0;
-	writer_display_duration = RSE_FRAMES(50);
+	current_char = 0;
+	letter_width = 8;
+	scroll_speed = 1;
+	scroll_x_offset = 0;
+	scroll_local_offset = 0;
+	current_char_x = 0;
+	current_char_y = 3;
+	screen_w_tile = 64;
 
 	return vramIndex;
 }
 
-void RSE_writerSetDisplayDuration(u8 duration)
+void updateScrollText(void)
 {
-	writer_display_duration = duration;
-}
+	scroll_x_offset -= scroll_speed;
+	scroll_local_offset += scroll_speed;
 
-void RSE_writerSetInitialY(u16 initial_y)
-{	initial_char_y = initial_y;	}
-
-void RSE_writerSetXOffset(u16 offset)
-{ 
-	x_offset = offset;
-}
-
-void RSE_writerRestart(void)
-{
-	writer_switch = FALSE;
-	current_string_idx = 0;
-	current_char_idx = 0;
-	writer_state = WRT_CENTER_CUR_LINE;
-	writer_is_done = FALSE;
-}
-
-u16 inline RSE_writerSetOption(u16 option)
-{
-	writer_options |= option;
-	return writer_options;
-}
-
-u16 inline RSE_writerUnsetOption(u16 option)
-{
-	writer_options &= ~option;
-	return writer_options;
-}
-
-u16 RSE_writerDrawString(char *str)
-{
-	char c;
-	u16 i, fade, faded_idx;
-	for (fade = 0; fade < 4; fade++)
+	if (scroll_local_offset > letter_width)
 	{
-		faded_idx = current_char_idx + fade;
-		c = str[faded_idx];
+		char c;
 
-		if (fade == 0 && c == 0)
-			return FALSE;
+		scroll_local_offset = 0;
 
-		if (c != ' ')
+		current_char++;
+		c = demo_strings[current_char];
+
+		if (c == '\0')
+			current_char = 0;
+		else
 		{
-			i = charToTileIndex(c);
-			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade + x_offset, current_char_y); //TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
-		}
-	}
+			if (c != ' ')
+				VDP_setTileMapXY(current_plan, TILE_USERINDEX + charToTileIndex(c), current_char_x, current_char_y); //TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
+			else
+				VDP_setTileMapXY(current_plan, 0, current_char_x, current_char_y); //TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
 
-	current_char_x++;
-	current_char_idx++;
-
-	return TRUE;
-}
-
-void inline RSE_writerUpdateLine(void)
-{
-	if (WRT_HAS_OPTION(WRT_OPT_HALF_SPEED))
-		if (writer_state == WRT_WRITE_CUR_LINE)
-		{
-			writer_switch = ~writer_switch;
-			if (writer_switch)
-				return;
 		}
 
-	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
-	{
-		current_plan = PLAN_A;
-		current_pal = PAL0;
-	}
-	else
-	{
-		current_plan = PLAN_B;
-		current_pal = PAL1;
+		current_char_x += (letter_width >> 3);
+		if (current_char_x >= screen_w_tile)
+			current_char_x = 0;
+
 	}
 
-	switch(writer_state)
-	{
-		case WRT_CENTER_CUR_LINE:
-			current_string_len = computeStringLen((char *)demo_strings[current_string_idx]);
-			current_char_x = ((320 / 8) - current_string_len) >> 1;
-			writer_state = WRT_WRITE_CUR_LINE;
-			break;
-
-		case WRT_WRITE_CUR_LINE:
-			if (!RSE_writerDrawString((char *)demo_strings[current_string_idx]))
-			{
-				writer_timer = 0;
-				writer_state = WRT_WAIT;
-			}
-			break;
-
-		case WRT_WAIT:
-			if (writer_timer++ > writer_display_duration)
-			{
-				writer_state = WRT_CLEAR_LINE;
-				current_char_x = 0;
-			}
-			break;
-
-		case WRT_CLEAR_LINE:
-			VDP_setTileMapXY(current_plan, 0, current_char_x + x_offset, current_char_y);
-			current_char_x++;
-			if (current_char_x > 320 / 8)
-			{
-				current_char_x = 0;
-				current_char_idx = 0;
-				current_string_idx++;
-				if (demo_strings[current_string_idx][0] == '\0')
-				{
-					writer_is_done = TRUE;
-					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
-						current_string_idx = 0;
-					else
-					{
-						writer_state = WRT_IDLE_MODE;
-						return;
-					}
-				}
-				else
-				if (demo_strings[current_string_idx][0] == '\1')
-					current_char_y = initial_char_y;
-
-
-				writer_state = WRT_CENTER_CUR_LINE;
-			}
-			break;
-
-		case WRT_IDLE_MODE:
-			return;
-	}
+	VDP_setHorizontalScroll(current_plan, scroll_x_offset);
 }
 
-u8 inline RSE_writerIsDone(void)
-{	return writer_is_done; }
-
-void inline RSE_writerUpdateMultiLine(void)
-{
-	if (WRT_HAS_OPTION(WRT_OPT_HALF_SPEED))
-		if (writer_state == WRT_WRITE_CUR_LINE)
-		{
-			writer_switch = ~writer_switch;
-			if (writer_switch)
-				return;
-		}
-
-	if (WRT_HAS_OPTION(WRT_OPT_WRITE_TO_PLAN_A))
-	{
-		current_plan = PLAN_A;
-		current_pal = PAL0;
-	}
-	else
-	{
-		current_plan = PLAN_B;
-		current_pal = PAL1;
-	}
-
-	switch(writer_state)
-	{
-		case WRT_CENTER_CUR_LINE:
-			current_string_len = computeStringLen((char *)demo_strings[current_string_idx]);
-			current_char_x = ((320 / 8) - current_string_len) >> 1;
-			writer_state = WRT_WRITE_CUR_LINE;
-			break;
-
-		case WRT_WRITE_CUR_LINE:
-			if (!RSE_writerDrawString((char *)demo_strings[current_string_idx]))
-			{
-				writer_timer = 0;
-				writer_state = WRT_WAIT;
-			}
-			break;
-
-		case WRT_WAIT:
-			if (writer_timer++ > writer_display_duration)
-			{
-				current_char_x = 0;
-				current_char_y++;
-				current_char_idx = 0;
-				current_string_idx++;
-				if (demo_strings[current_string_idx][0] == '\0')
-				{
-					writer_is_done = TRUE;
-					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
-						current_string_idx = 0;
-					else
-					{
-						writer_state = WRT_IDLE_MODE;
-						return;
-					}
-				}				
-				writer_state = WRT_CENTER_CUR_LINE;
-			}
-			break;
-
-		case WRT_IDLE_MODE:
-			return;
-	}
-}
+void RSE_writerSetY(u16 initial_y)
+{	current_char_y = initial_y;	}

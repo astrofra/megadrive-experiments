@@ -120,11 +120,14 @@ void displayBarbPictureFX(void)
 	}
 
 	SPR_end();
+	RSE_resetScrolling();
 
 	SYS_disableInts();
 
 	VDP_clearPlan(PLAN_A, TRUE);
 	VDP_clearPlan(PLAN_B, TRUE);
 
-	SYS_enableInts();	
+	SYS_enableInts();
+
+	vramIndex = TILE_USERINDEX;
 }
