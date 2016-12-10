@@ -21,6 +21,7 @@ u8 scroll_speed;
 s16 scroll_x_offset;
 u8 scroll_local_offset;
 u8 screen_w_tile;
+s16 scroll_tile_y[1204];
 
 u16 inline computeStringLen(char *str)
 {
@@ -84,8 +85,8 @@ u16 inline charToTileIndex(char c)
 u16 RSE_writerSetup(void)
 {
 	u16 j;
-	current_plan = PLAN_B;
-	current_pal = PAL1;
+	current_plan = PLAN_A;
+	current_pal = PAL0;
 
 	SYS_disableInts();
 	VDP_drawImageEx(PLAN_A, &sim1_font, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
@@ -102,6 +103,9 @@ u16 RSE_writerSetup(void)
 	current_char_x = 0;
 	current_char_y = 3;
 	screen_w_tile = 64;
+
+	for (j = 0; j < 1024; j++)
+		scroll_tile_y[j] = (((sinFix16(j << 4) + sinFix16(j << 2) + 64) * 3) >> 3) - 48;
 
 	return vramIndex;
 }
@@ -125,7 +129,7 @@ void updateScrollText(void)
 		else
 		{
 			if (c != ' ')
-				VDP_setTileMapXY(current_plan, TILE_USERINDEX + charToTileIndex(c), current_char_x, current_char_y); //TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
+				VDP_setTileMapXY(current_plan, TILE_ATTR_FULL(current_pal, TRUE, FALSE, FALSE, TILE_USERINDEX + charToTileIndex(c)), current_char_x, current_char_y); //TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
 			else
 				VDP_setTileMapXY(current_plan, 0, current_char_x, current_char_y); //TILE_ATTR_FULL(current_pal, FALSE, FALSE, FALSE, current_char_y));
 
@@ -137,7 +141,11 @@ void updateScrollText(void)
 		current_char++;
 	}
 
+	/* H scroll */
 	VDP_setHorizontalScroll(current_plan, scroll_x_offset);
+
+	/* V scroll */
+	VDP_setVerticalScrollTile(current_plan, 0, &(scroll_tile_y[-scroll_x_offset]), 64 >> 1, TRUE);
 }
 
 void RSE_writerSetY(u16 initial_y)

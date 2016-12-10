@@ -211,10 +211,10 @@ void fastVectorBallFX()
 	// 	RSE_clearTileRowA(j);
 	// }
 
-	VDP_drawImageEx(PLAN_A, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, TRUE, TRUE);
+	VDP_drawImageEx(PLAN_B, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, TRUE, TRUE);
 	vramIndex += checkboard.tileset->numTile;
 
-	VDP_drawImageEx(PLAN_A, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), FALSE, TRUE);
+	VDP_drawImageEx(PLAN_B, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), FALSE, TRUE);
 	vramIndex += sky.tileset->numTile;
 
 // VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_2TILE);
@@ -251,13 +251,14 @@ void fastVectorBallFX()
 		switch(vball_phase)
 		{
 			case VBALL_PHASE_INTRO_SCROLL:
-				VDP_setVerticalScroll(PLAN_A, (easing_table[vball_timer << 4] >> 4) - 64);
+				VDP_setVerticalScroll(PLAN_B, (easing_table[vball_timer << 4] >> 4) - 64);
 				vball_timer++;
 
 				if (vball_timer > 63)
 				{
 					VDP_fadePalTo(PAL1, sky.palette->data, RSE_FRAMES(32), TRUE);
-					VDP_setVerticalScroll(PLAN_A, 0);
+					VDP_setVerticalScroll(PLAN_B, 0);
+					VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_2TILE);
 					vball_timer = 0;
 					vball_phase++;					
 				}			
