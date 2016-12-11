@@ -53,9 +53,18 @@ void displayRSILogoFX(void)
 		k = j / 8;
 
 		for (i = 0; i < (120 >> 4); i++)
+		{
 			scroll_tile_x[i]+= k;
+			if (i < (120 >> 4) - 1)
+				scroll_tile_x[i]++;
+		}
+
 		for (; i < (120 >> 3); i++)
+		{
 			scroll_tile_x[i]-= k;
+			if (i > (120 >> 4))
+				scroll_tile_x[i]--;
+		}
 
 		if (j == RSE_FRAMES(4) + 1)
 			VDP_fadePalTo(PAL1, rsi_logo.palette->data, RSE_FRAMES(8), TRUE);
