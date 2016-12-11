@@ -1,3 +1,4 @@
+IMAGE rsi_logo "rsi_logo.png" 0
 IMAGE barb_pic_back "barb_pic_back.png" 0
 IMAGE barb_pic_front "barb_pic_front.png" 0
 SPRITE masiaka_title "masiaka_title.png" 30 6 0

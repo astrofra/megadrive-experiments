@@ -14,6 +14,7 @@ Framework : SGDK
 */
 
 void fastVectorBallFX(void);
+void displayRSILogoFX(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -33,10 +34,8 @@ int main()
 		play_music();
 
 		RSE_turn_screen_to_black();
-		/*	
-			Load the font tiles
-			that will be used during all the demo
-		*/
+
+		displayRSILogoFX();
 
 		displayBarbPictureFX();
 

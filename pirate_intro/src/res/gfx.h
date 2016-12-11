@@ -1,6 +1,7 @@
 #ifndef _RES_GFX_H_
 #define _RES_GFX_H_
 
+extern const Image rsi_logo;
 extern const Image barb_pic_back;
 extern const Image barb_pic_front;
 extern const SpriteDefinition masiaka_title;
