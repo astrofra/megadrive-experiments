@@ -141,11 +141,13 @@ void updateScrollText(void)
 		current_char++;
 	}
 
+	SYS_disableInts();
 	/* H scroll */
 	VDP_setHorizontalScroll(current_plan, scroll_x_offset);
 
 	/* V scroll */
-	VDP_setVerticalScrollTile(current_plan, 0, &(scroll_tile_y[-scroll_x_offset]), 64 >> 1, TRUE);
+	VDP_setVerticalScrollTile(current_plan, 0, &(scroll_tile_y[-scroll_x_offset]), 320 >> 3, TRUE);
+	SYS_enableInts();
 }
 
 void RSE_writerSetY(u16 initial_y)
