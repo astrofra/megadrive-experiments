@@ -8,3 +8,4 @@ IMAGE checkboard "checkboard.png" 0
 IMAGE sky "sky.png" 0
 IMAGE sim1_font "sim1_font.png" 0
 IMAGE circles "circles.png" 0
+SPRITE cube_anim "cube_anim.png" 4 5 0

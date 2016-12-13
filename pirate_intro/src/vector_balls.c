@@ -325,7 +325,12 @@ void fastVectorBallFX()
 				zsort_switch = 0;
 
 				if (object_idx >= MAX_VBALL_OBJECTS)
+				{
 					object_idx = 0;
+					vball_phase = VBALL_PHASE_QUIT;
+				}
+				else
+					vball_phase = VBALL_PHASE_BEGIN;
 
 				switch(object_idx)
 				{
@@ -354,23 +359,21 @@ void fastVectorBallFX()
 						vector_ball_array = vb_pyramid_vertex_pos;
 						break;						
 				}
-
-				vball_phase = VBALL_PHASE_BEGIN;
 		}
 	}
 
 	SPR_end();
-	RSE_resetScrolling();
-	// RSE_writerSetXOffset(0);
+	// RSE_resetScrolling();
+	// // RSE_writerSetXOffset(0);
 
-	RSE_turn_screen_to_black();
+	// RSE_turn_screen_to_black();
 
-	for(j = 0; j  < VDP_getPlanHeight(); j++)
-	{
-		VDP_waitVSync();
-		RSE_clearTileRowB(j);
-		RSE_clearTileRowA(j);
-	}	
+	// for(j = 0; j  < VDP_getPlanHeight(); j++)
+	// {
+	// 	VDP_waitVSync();
+	// 	RSE_clearTileRowB(j);
+	// 	RSE_clearTileRowA(j);
+	// }	
 
-	vramIndex = TILE_USERINDEX;
+	// vramIndex = TILE_USERINDEX;
 }
