@@ -6,8 +6,8 @@
 #include "transition_helper.h"
 
 #define	MAX_VECTOR_BALL 256
-#define BALL_COUNT grid_cube_small_VTX_COUNT
-#define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
+#define BALL_COUNT geosphere_VTX_COUNT
+#define VECTOR_BALL_ARRAY vb_geosphere_vertex_pos
 #define VBALL_DISTANCE 1100
 
 #define VBALL_PHASE_INTRO_SCROLL	0
@@ -181,11 +181,11 @@ void fastVectorBallFX()
 	VDP_setPlanSize(64, 64);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setVerticalScroll(PLAN_A, -64);
-	VDP_setHilightShadow(1); 	
+	VDP_setHilightShadow(1);
 	SPR_init(0,0,0);
 	vramIndex = fontIndex;
 
-	object_idx = 2;
+	object_idx = 0;
 	ball_count = BALL_COUNT;
 	vector_ball_array = VECTOR_BALL_ARRAY;	
 

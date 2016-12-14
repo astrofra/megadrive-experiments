@@ -12,5 +12,6 @@ extern const Image sky;
 extern const Image sim1_font;
 extern const Image circles;
 extern const SpriteDefinition cube_anim;
+extern const SpriteDefinition cube_shadow;
 
 #endif // _RES_GFX_H_
