@@ -217,6 +217,11 @@ void fastVectorBallFX()
 	VDP_drawImageEx(PLAN_B, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), FALSE, TRUE);
 	vramIndex += sky.tileset->numTile;
 
+	// VDP_setWindowHPos(TRUE, 0);
+	// VDP_setWindowVPos(TRUE, 0);
+	// VDP_drawImageEx(PLAN_WINDOW, &rsi_logo, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 16, FALSE, TRUE);
+	// vramIndex += rsi_logo.tileset->numTile;
+
 // VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_2TILE);
 
 	SYS_enableInts();

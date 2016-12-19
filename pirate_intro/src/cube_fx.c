@@ -13,10 +13,11 @@ void flat3DCubeFX(void)
 {
 	u16 cube_phase;
 	s16 x_cube, y_cube;
-	u16 cube_frame;
+	u16 cube_frame, sec_frame_step;
 	Sprite *sprites[2];
 
 	cube_frame = 0;
+	sec_frame_step = 4;
 	cube_phase = 0;
 
 	SPR_init(0,0,0);
@@ -34,13 +35,13 @@ void flat3DCubeFX(void)
 		VDP_waitVSync();
 		updateScrollText();
 
-		x_cube = (sinFix16((cube_phase * 5) >> 1)) + 160 - 40;
-		y_cube = cosFix16(cube_phase << 1) + 96 - 40;
+		x_cube = (sinFix16((cube_phase * 5) >> 1)) + 160 - 64;
+		y_cube = ((cosFix16(cube_phase << 1) * 3) >> 2) + 96 - 64;
 
 		SPR_setPosition(sprites[0], x_cube, y_cube);
-		SPR_setFrame(sprites[0], (cube_frame >> 2) & 63);
+		SPR_setFrame(sprites[0], (cube_frame >> 1) & 127);
 
-		SPR_setPosition(sprites[1], x_cube + 32, (y_cube >> 3) + 180);
+		SPR_setPosition(sprites[1], x_cube + 32 + (y_cube >> 3), (y_cube >> 3) + 190);
 		SPR_setFrame(sprites[1], (cube_frame >> 2) & 63);
 
 		SPR_update(sprites, 2);
