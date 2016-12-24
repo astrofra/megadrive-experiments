@@ -1,1 +1,1 @@
-XGM vgm_music "vgm_music.vgm"
+XGM vgm_music "masiaka001.vgm"
