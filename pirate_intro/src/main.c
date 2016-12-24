@@ -36,9 +36,9 @@ int main()
 
 		RSE_turn_screen_to_black();
 
-		// displayRSILogoFX();
+		displayRSILogoFX();
 
-		// displayBarbPictureFX();
+		displayBarbPictureFX();
 
 		fontIndex = RSE_writerSetup();
 
