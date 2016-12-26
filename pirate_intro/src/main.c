@@ -16,6 +16,8 @@ Framework : SGDK
 void fastVectorBallFX(void);
 void displayRSILogoFX(void);
 void flat3DCubeFX(void);
+void displayBarbTitleFX(void);
+void displayBarbPictureFX(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -38,13 +40,15 @@ int main()
 
 		displayRSILogoFX();
 
-		displayBarbPictureFX();
+		displayBarbTitleFX();
 
 		fontIndex = RSE_writerSetup();
 
 		fastVectorBallFX();
 
 		flat3DCubeFX();
+
+		displayBarbPictureFX();
 
 		stop_music();
 

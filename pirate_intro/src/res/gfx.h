@@ -13,5 +13,7 @@ extern const Image sim1_font;
 extern const Image circles;
 extern const SpriteDefinition cube_anim;
 extern const SpriteDefinition cube_shadow;
+extern const Image barb_pic_2_back;
+extern const Image barb_pic_2_front;
 
 #endif // _RES_GFX_H_

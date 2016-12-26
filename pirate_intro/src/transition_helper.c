@@ -40,12 +40,22 @@ void RSE_turn_screen_to_white(void)
 
 void RSE_turn_screen_to_black(void)
 {
-	/* Turn whole palette to white */
+	/* Turn whole palette to black */
 	u16 i;
 	for(i = 0; i < 63; i++)
 	{
 		VDP_setPaletteColor(i, 0x000);
 	}
+
+}
+
+void RSE_turn_screen_to_color(u16 col)
+{
+	/* Turn whole palette to the specified color */
+	u16 i;
+	
+	for(i = 0; i < 63; i++)
+		VDP_setPaletteColor(i, col);
 
 }
 

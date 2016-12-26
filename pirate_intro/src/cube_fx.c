@@ -18,19 +18,19 @@ void flat3DCubeFX(void)
 
 	cube_frame = 0;
 	sec_frame_step = 4;
-	cube_phase = 0;
+	cube_phase = 256;
 
 	SPR_init(0,0,0);
 	VDP_setHilightShadow(1);
 
-	sprites[0] = SPR_addSprite(&cube_anim, 0, 0, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 0));
+	VDP_setPalette(PAL2, palette_black);
+
+	sprites[0] = SPR_addSprite(&cube_anim, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 	sprites[1] = SPR_addSprite(&cube_shadow, 0, 0, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 0));
 	SPR_setFrame(sprites[0], 0);
 	SPR_setFrame(sprites[1], 0);
 
-	// VDP_fadePalTo(PAL2, ball_metal.palette->data, RSE_FRAMES(16), TRUE);
-
-	while(TRUE)
+	while(cube_phase < 1024)
 	{
 		VDP_waitVSync();
 		updateScrollText();
@@ -48,6 +48,30 @@ void flat3DCubeFX(void)
 
 		cube_frame++;
 		cube_phase += 2;
+
+		if (cube_phase == 256 + 32)
+			VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(4), TRUE);
+		if (cube_phase == 256 + 32 + 10)
+			VDP_fadePalTo(PAL2, sky.palette->data, RSE_FRAMES(16), TRUE);
+ 
+		if (cube_phase == 1024 - 32)
+			VDP_fadeOut(1, 63, 32, TRUE);
 	}
 
+	/* clean everything */
+
+	RSE_turn_screen_to_black();
+
+	RSE_resetScrolling();
+
+	SYS_disableInts();
+
+	VDP_clearPlan(PLAN_A, TRUE);
+	VDP_clearPlan(PLAN_B, TRUE);
+
+	SYS_enableInts();
+
+	SPR_end();
+
+	vramIndex = TILE_USERINDEX;
 }
