@@ -11,6 +11,7 @@ void displayBarbPictureFX(void)
 {
 	u16 fx_phase, j, scroll_A_y, scroll_B_y;
 	static 	Sprite *sprites[16];
+	static	u16 palsrc[64], paldst[64];
 
 	SYS_disableInts();
 
@@ -40,8 +41,21 @@ void displayBarbPictureFX(void)
 
 	DMA_waitCompletion();
 
-	VDP_fadePalTo(PAL0, barb_pic_2_front.palette->data, RSE_FRAMES(8), FALSE);
-	VDP_fadePalTo(PAL1, barb_pic_2_back.palette->data, RSE_FRAMES(8), TRUE);
+	for (j = 0; j < 64; j++)
+	{
+		palsrc[j] = barb_pic_2_front.palette->data[0];
+		paldst[j] = 0x000;
+	}
+
+	for (j = 0; j < 16; j++)
+	{
+		paldst[j] = barb_pic_2_front.palette->data[j];
+		paldst[j + 16] = barb_pic_2_back.palette->data[j];
+	}
+
+	// VDP_fadePalTo(PAL0, barb_pic_2_front.palette->data, RSE_FRAMES(8), FALSE);
+	// VDP_fadePalTo(PAL1, barb_pic_2_back.palette->data, RSE_FRAMES(8), TRUE);
+	VDP_fade(0, 31, palsrc, paldst, 32, TRUE);
 
 	fx_phase = 0;
 	while(fx_phase < 256)

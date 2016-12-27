@@ -11,6 +11,7 @@ void displayBarbTitleFX(void)
 {
 	u16 fx_phase, j, scroll_A_y, scroll_B_y;
 	static 	Sprite *sprites[16];
+	static	u16 palsrc[64], paldst[64];
 
 	SYS_disableInts();
 
@@ -90,26 +91,25 @@ void displayBarbTitleFX(void)
 		// BMP_showFPS(0);
 	}
 
-	// VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(8), TRUE);
-
-	// fx_phase = 0;
-	// j = 0;
-	// while(fx_phase < 64)
-	// {
-	// 	VDP_waitVSync();
-	// 	j = (easing_table[fx_phase << 4] >> 5) - 32;
-
-	// 	SPR_setPosition(sprites[0], (320 - 240) >> 1, ((224 - 48) >> 1) - j);
-	// 	SPR_update(sprites, 1);
-	// 	fx_phase++;
-
-	// 	if (fx_phase == 16)
-	// 		VDP_fadePalTo(PAL2, masiaka_title.palette->data, RSE_FRAMES(32), TRUE);
-	// }
-
 	RSE_pause(4 * 60);
 
-	VDP_fadeOut(1, 63, 64, TRUE);
+	for(j = 0; j < 64; j++)
+	{
+		palsrc[j] = 0x000;
+		paldst[j] = 0x000;
+	}
+
+	for(j = 0; j < 16; j++)
+	{
+		palsrc[j] = barb_pic_front.palette->data[j]; 
+		palsrc[j + (16 * PAL1)] = barb_pic_back.palette->data[j]; 
+		palsrc[j + (16 * PAL2)] = masiaka_title.palette->data[j]; 
+
+		paldst[j + (16 * PAL2)] = masiaka_title.palette->data[j]; 
+	}
+
+	// VDP_fadeOut(1, 63, 64, TRUE);
+	VDP_fade(0, 63, palsrc, paldst, 32, TRUE);
 
 	for(j = 0; j  < VDP_getPlanHeight(); j++)
 	{
