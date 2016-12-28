@@ -10,6 +10,7 @@ extern u8 framerate;
 void displayBarbTitleFX(void)
 {
 	u16 fx_phase, j, scroll_A_y, scroll_B_y;
+	static s16 scroll_A_x[256], scroll_B_x[256];
 	static 	Sprite *sprites[16];
 	static	u16 palsrc[64], paldst[64];
 
@@ -91,7 +92,7 @@ void displayBarbTitleFX(void)
 		// BMP_showFPS(0);
 	}
 
-	RSE_pause(4 * 60);
+	RSE_pause(60);
 
 	for(j = 0; j < 64; j++)
 	{
@@ -108,16 +109,43 @@ void displayBarbTitleFX(void)
 		paldst[j + (16 * PAL2)] = masiaka_title.palette->data[j]; 
 	}
 
-	// VDP_fadeOut(1, 63, 64, TRUE);
+	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
+
 	VDP_fade(0, 63, palsrc, paldst, 32, TRUE);
 
-	for(j = 0; j  < VDP_getPlanHeight(); j++)
+	for(fx_phase = 0; fx_phase < 64; fx_phase++)
 	{
-		VDP_waitVSync();
-		RSE_clearTileRowB(j);
-		VDP_waitVSync();
-		RSE_clearTileRowA(j);
+		for(j = 0; j < 256; j++)
+		{
+			if (j & 0x1)
+			{
+				scroll_A_x[j] += 3;
+				scroll_B_x[j] -= 1;
+			}
+			else
+			{
+				scroll_A_x[j] -= 3;
+				scroll_B_x[j] += 1;
+			}
+		}
+
+		VDP_setHorizontalScrollLine(PLAN_A, scroll_A_y, scroll_A_x, 224, TRUE);
+		VDP_setHorizontalScrollLine(PLAN_B, scroll_B_y, scroll_B_x, 224, TRUE);
+
+		if (fx_phase == 42)
+			VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(4), TRUE);
+		if (fx_phase == 48)
+			VDP_fadePalTo(PAL2, masiaka_title.palette->data, RSE_FRAMES(16), TRUE);
 	}
+
+	RSE_pause(16);
+
+	VDP_fadeOut(1, 63, 32, TRUE);
+	RSE_pause(32);
+
+	RSE_turn_screen_to_black();
+
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
 	SPR_end();
 	RSE_resetScrolling();

@@ -13,6 +13,9 @@ void displayBarbPictureFX(void)
 	static 	Sprite *sprites[16];
 	static	u16 palsrc[64], paldst[64];
 
+	RSE_turn_screen_to_color(barb_pic_2_front.palette->data[0]);
+	VDP_waitVSync();
+
 	SYS_disableInts();
 
 	VDP_clearPlan(PLAN_A, 0);
@@ -23,8 +26,6 @@ void displayBarbPictureFX(void)
 	VDP_setHilightShadow(0); 
 
 	vramIndex = 8;
-
-	RSE_turn_screen_to_color(barb_pic_2_front.palette->data[0]);
 
 	/* Draw the foreground */
 	VDP_drawImageEx(PLAN_B, &barb_pic_2_back, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);

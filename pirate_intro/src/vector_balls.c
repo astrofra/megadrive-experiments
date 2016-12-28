@@ -211,7 +211,7 @@ void fastVectorBallFX()
 	// 	RSE_clearTileRowA(j);
 	// }
 
-	VDP_drawImageEx(PLAN_B, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, TRUE, TRUE);
+	VDP_drawImageEx(PLAN_B, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, FALSE, TRUE);
 	vramIndex += checkboard.tileset->numTile;
 
 	VDP_drawImageEx(PLAN_B, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), FALSE, TRUE);
@@ -237,6 +237,8 @@ void fastVectorBallFX()
 
 	vball_phase = VBALL_PHASE_INTRO_SCROLL;
 	vball_timer = 0;
+
+	VDP_fadePalTo(PAL0, checkboard.palette->data, RSE_FRAMES(8), TRUE);
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{
