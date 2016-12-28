@@ -19,7 +19,7 @@ s16 twister_jump_table[TWISTER_TABLE_SIZE];
 void circleWavesFX(void)
 {
 	u16 vramIndex = TILE_USERINDEX;
-	s16 i, j, rot_y = 0, ang_speed_y = 4, twist_y = 0, twist_inc = 0;
+	s16 i, j, rot_y = 0, ang_speed_y = 4, twist_y = 0, twist_inc = 0, prev_i;
 	u16 vcount = 0;
 	u16 pal_raster[4 * 32];
 
@@ -35,11 +35,16 @@ void circleWavesFX(void)
 	    *pl = CST_WRITE_VSRAM_ADDR(0);
 	    *pw = twister_jump_table[(GET_VCOUNTER + vcount) & 1023];
 
-	    i = (GET_VCOUNTER + (vcount << 2)) >> 3;
-	    VDP_setPaletteColor(0, pal_raster[(i << 2) & 0x7F]);
-	    VDP_setPaletteColor(1, pal_raster[((i << 2) + 1) & 0x7F]);
-	    VDP_setPaletteColor(2, pal_raster[((i << 2) + 2) & 0x7F]);
-	    VDP_setPaletteColor(3, pal_raster[((i << 2) + 3) & 0x7F]);
+	    i = ((GET_VCOUNTER + vcount) & 1023) >> 2;
+	    i <<= 2;
+	    i &= 0x7F;
+	    // VDP_setPaletteColor(0, pal_raster[i & 0x7F]);
+	    // VDP_setPaletteColor(1, pal_raster[(i + 1) & 0x7F]);
+	    // VDP_setPaletteColor(2, pal_raster[(i + 2) & 0x7F]);
+	    // VDP_setPaletteColor(3, pal_raster[(i + 3) & 0x7F]);
+	    if (i != prev_i)
+	    	VDP_setPaletteColors(0, pal_raster + i, 4);
+	    prev_i = i;
 	}
 
 	SYS_disableInts();
@@ -53,7 +58,7 @@ void circleWavesFX(void)
 
 	/* Load the fond tiles */
 	VDP_drawImageEx(PLAN_A, &circles, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	VDP_drawImageEx(PLAN_A, &circles, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 8, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_A, &circles, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
 	vramIndex += circles.tileset->numTile;
 
 	VDP_setPalette(PAL0, circles.palette->data);
@@ -62,7 +67,7 @@ void circleWavesFX(void)
     VDP_setHilightShadow(0);
 
     for(i = 0; i < TWISTER_TABLE_SIZE; i++)
-    	twister_jump_table[i] = -((i + sinFix16(i << 2) + 64));
+    	twister_jump_table[i] = -((i + sinFix16(i << 2) + 64 + ((cosFix16((i + 256) << 3) + 64) >> 1) ));
 
 	SYS_enableInts();
 
@@ -107,10 +112,9 @@ void circleWavesFX(void)
         VDP_waitVSync();
         vcount += 1;
 
-        // SYS_disableInts();
-        // *pl = CST_WRITE_VSRAM_ADDR(0);
-        // *pw = twister_jump_table[(0 + rot_y + (twist_y >> 6)) & ((TWISTER_TABLE_SIZE >> 1) - 1)];
-        // twist_y += twist_inc;
-        // SYS_enableInts();
+        SYS_disableInts();
+	    *pl = CST_WRITE_VSRAM_ADDR(0);
+	    *pw = twister_jump_table[(GET_VCOUNTER + vcount) & 1023];
+        SYS_enableInts();
     }	
 }
