@@ -38,6 +38,7 @@ void circleWavesFX(void)
 	    i = ((GET_VCOUNTER + vcount) & 1023) >> 2;
 	    i <<= 2;
 	    i &= 0x7F;
+
 	    // VDP_setPaletteColor(0, pal_raster[i & 0x7F]);
 	    // VDP_setPaletteColor(1, pal_raster[(i + 1) & 0x7F]);
 	    // VDP_setPaletteColor(2, pal_raster[(i + 2) & 0x7F]);
@@ -54,7 +55,9 @@ void circleWavesFX(void)
 
 	VDP_clearPlan(PLAN_A, 0);
 	VDP_clearPlan(PLAN_B, 0);
-	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+
+	vramIndex = TILE_USERINDEX;
 
 	/* Load the fond tiles */
 	VDP_drawImageEx(PLAN_A, &circles, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
@@ -110,11 +113,12 @@ void circleWavesFX(void)
     while (TRUE)
     {
         VDP_waitVSync();
-        vcount += 1;
 
         SYS_disableInts();
 	    *pl = CST_WRITE_VSRAM_ADDR(0);
-	    *pw = twister_jump_table[(GET_VCOUNTER + vcount) & 1023];
+	    *pw = twister_jump_table[vcount & 1023];
         SYS_enableInts();
+
+        vcount += 1;
     }	
 }
