@@ -39,10 +39,6 @@ void circleWavesFX(void)
 	    i <<= 2;
 	    i &= 0x7F;
 
-	    // VDP_setPaletteColor(0, pal_raster[i & 0x7F]);
-	    // VDP_setPaletteColor(1, pal_raster[(i + 1) & 0x7F]);
-	    // VDP_setPaletteColor(2, pal_raster[(i + 2) & 0x7F]);
-	    // VDP_setPaletteColor(3, pal_raster[(i + 3) & 0x7F]);
 	    if (i != prev_i)
 	    	VDP_setPaletteColors(0, pal_raster + i, 4);
 	    prev_i = i;
@@ -63,8 +59,11 @@ void circleWavesFX(void)
 	VDP_drawImageEx(PLAN_A, &circles, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	VDP_drawImageEx(PLAN_A, &circles, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
 	vramIndex += circles.tileset->numTile;
+	VDP_drawImageEx(PLAN_B, &masiaka_title_pic, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), (320 - 240) >> 4, (224 - 48) >> 4, FALSE, TRUE);
+	vramIndex += masiaka_title_pic.tileset->numTile;	
 
 	VDP_setPalette(PAL0, circles.palette->data);
+	VDP_setPalette(PAL1, masiaka_title_pic.palette->data);
 	// VDP_setPaletteColor(0, 0x80A);
 
     VDP_setHilightShadow(0);

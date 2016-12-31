@@ -18,6 +18,7 @@ void displayRSILogoFX(void);
 void flat3DCubeFX(void);
 void displayBarbTitleFX(void);
 void displayBarbPictureFX(void);
+void circleWavesFX(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -38,6 +39,8 @@ int main()
 
 		RSE_turn_screen_to_black();
 
+		// circleWavesFX();
+
 		displayRSILogoFX();
 
 		displayBarbTitleFX();
@@ -49,6 +52,8 @@ int main()
 		flat3DCubeFX();
 
 		displayBarbPictureFX();
+
+		circleWavesFX();
 
 		stop_music();
 
