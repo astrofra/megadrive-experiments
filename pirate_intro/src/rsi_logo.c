@@ -24,8 +24,13 @@ void displayRSILogoFX(void)
 	vramIndex = TILE_USERINDEX;
 
 	/* Draw the foreground */
-	VDP_drawImageEx(PLAN_B, &rsi_logo, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, (224 - 120) >> 4, FALSE, TRUE);
-	vramIndex += rsi_logo.tileset->numTile;
+	VDP_drawImageEx(PLAN_B, &rsi_logo_0, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, (224 - 120) >> 4, FALSE, TRUE);
+	vramIndex += rsi_logo_0.tileset->numTile;
+
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
+
+	VDP_drawImageEx(PLAN_B, &rsi_logo_1, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, (64 >> 3) + ((224 - 120) >> 4), FALSE, TRUE);
+	vramIndex += rsi_logo_1.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
 
@@ -42,7 +47,7 @@ void displayRSILogoFX(void)
 	for (i = 0; i < (120 >> 3); i++)
 		scroll_tile_x[i] = 0;
 
-	VDP_fadePalTo(PAL1, rsi_logo.palette->data, RSE_FRAMES(16), TRUE);
+	VDP_fadePalTo(PAL1, rsi_logo_0.palette->data, RSE_FRAMES(16), TRUE);
 	RSE_pause(80);
 
 	VDP_fadePalTo(PAL1, palette_white, RSE_FRAMES(4), TRUE);
@@ -67,7 +72,7 @@ void displayRSILogoFX(void)
 		}
 
 		if (j == RSE_FRAMES(4) + 1)
-			VDP_fadePalTo(PAL1, rsi_logo.palette->data, RSE_FRAMES(8), TRUE);
+			VDP_fadePalTo(PAL1, rsi_logo_0.palette->data, RSE_FRAMES(8), TRUE);
 		if (j == 16)
 			VDP_fadeOut(1, 63, 32, TRUE);
 

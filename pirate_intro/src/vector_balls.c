@@ -202,27 +202,24 @@ void fastVectorBallFX()
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
 	}
 
- //    SPR_update(sprites, BALL_COUNT);
+	VDP_drawImageEx(PLAN_B, &checkboard_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, FALSE, TRUE);
+	vramIndex += checkboard_0.tileset->numTile;
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
 
-	// for(j = 0; j  < VDP_getPlanHeight(); j++)
-	// {
-	// 	VDP_waitVSync();
-	// 	RSE_clearTileRowB(j);
-	// 	RSE_clearTileRowA(j);
-	// }
+	VDP_drawImageEx(PLAN_B, &checkboard_1, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 80 >> 3, (224 - 96) >> 3, FALSE, TRUE);
+	vramIndex += checkboard_1.tileset->numTile;
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
 
-	VDP_drawImageEx(PLAN_B, &checkboard, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, FALSE, TRUE);
-	vramIndex += checkboard.tileset->numTile;
+	VDP_drawImageEx(PLAN_B, &checkboard_2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 160 >> 3, (224 - 96) >> 3, FALSE, TRUE);
+	vramIndex += checkboard_2.tileset->numTile;
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
+
+	VDP_drawImageEx(PLAN_B, &checkboard_3, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 240 >> 3, (224 - 96) >> 3, FALSE, TRUE);
+	vramIndex += checkboard_3.tileset->numTile;
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
 
 	VDP_drawImageEx(PLAN_B, &sky, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, ((224 - 96 - 72) >> 3), FALSE, TRUE);
 	vramIndex += sky.tileset->numTile;
-
-	// VDP_setWindowHPos(TRUE, 0);
-	// VDP_setWindowVPos(TRUE, 0);
-	// VDP_drawImageEx(PLAN_WINDOW, &rsi_logo, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 16, FALSE, TRUE);
-	// vramIndex += rsi_logo.tileset->numTile;
-
-// VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_2TILE);
 
 	SYS_enableInts();
 
@@ -238,7 +235,7 @@ void fastVectorBallFX()
 	vball_phase = VBALL_PHASE_INTRO_SCROLL;
 	vball_timer = 0;
 
-	VDP_fadePalTo(PAL0, checkboard.palette->data, RSE_FRAMES(8), TRUE);
+	VDP_fadePalTo(PAL0, checkboard_0.palette->data, RSE_FRAMES(8), TRUE);
 
 	while(vball_phase < VBALL_PHASE_QUIT)
 	{

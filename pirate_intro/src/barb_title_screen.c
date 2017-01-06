@@ -29,8 +29,26 @@ void displayBarbTitleFX(void)
 	sprites[0] = SPR_addSprite(&masiaka_title, (320 - 240) >> 1, 256, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 
 	/* Draw the foreground */
-	VDP_drawImageEx(PLAN_B, &barb_pic_back, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-	vramIndex += barb_pic_back.tileset->numTile;
+	VDP_drawImageEx(PLAN_B, &barb_pic_back_0, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += barb_pic_back_0.tileset->numTile;
+
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();	
+
+	VDP_drawImageEx(PLAN_B, &barb_pic_back_1, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 64 >> 3, FALSE, TRUE);
+	vramIndex += barb_pic_back_1.tileset->numTile;
+
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
+
+	VDP_drawImageEx(PLAN_B, &barb_pic_back_2, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 128 >> 3, FALSE, TRUE);
+	vramIndex += barb_pic_back_2.tileset->numTile;
+
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
+
+	VDP_drawImageEx(PLAN_B, &barb_pic_back_3, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 192 >> 3, FALSE, TRUE);
+	vramIndex += barb_pic_back_3.tileset->numTile;
+
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
+
 	VDP_drawImageEx(PLAN_A, &barb_pic_front, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += barb_pic_front.tileset->numTile;
 
@@ -45,13 +63,9 @@ void displayBarbTitleFX(void)
 
 	SPR_update(sprites, 1);
 
-	// VDP_fadePalTo(PAL1, barb_pic_back.palette->data, 16, TRUE);
-	// RSE_pause(16);
-	// VDP_fadePalTo(PAL2, masiaka_title.palette->data, 2, FALSE);
-
 	VDP_fadePalTo(PAL1, palette_white, RSE_FRAMES(8), TRUE);
 	RSE_pause(8);
-	VDP_fadePalTo(PAL1, barb_pic_back.palette->data, RSE_FRAMES(16), TRUE);
+	VDP_fadePalTo(PAL1, barb_pic_back_0.palette->data, RSE_FRAMES(16), TRUE);
 	RSE_pause(16);
 
 	VDP_fadePalTo(PAL0, barb_pic_front.palette->data, RSE_FRAMES(64), TRUE);
@@ -103,7 +117,7 @@ void displayBarbTitleFX(void)
 	for(j = 0; j < 16; j++)
 	{
 		palsrc[j] = barb_pic_front.palette->data[j]; 
-		palsrc[j + (16 * PAL1)] = barb_pic_back.palette->data[j]; 
+		palsrc[j + (16 * PAL1)] = barb_pic_back_0.palette->data[j]; 
 		palsrc[j + (16 * PAL2)] = masiaka_title.palette->data[j]; 
 
 		paldst[j + (16 * PAL2)] = masiaka_title.palette->data[j]; 
