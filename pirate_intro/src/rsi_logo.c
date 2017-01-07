@@ -38,12 +38,6 @@ void displayRSILogoFX(void)
 
 	DMA_waitCompletion();
 
-	// VDP_fadePalTo(PAL1, barb_pic_back.palette->data, 16, TRUE);
-	// RSE_pause(16);
-	// VDP_fadePalTo(PAL2, masiaka_title.palette->data, 2, FALSE);
-
-	// VDP_fadePalTo(PAL1, palette_white, RSE_FRAMES(8), FALSE);
-
 	for (i = 0; i < (120 >> 3); i++)
 		scroll_tile_x[i] = 0;
 

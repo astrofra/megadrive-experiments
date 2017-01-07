@@ -6,8 +6,8 @@
 #include "transition_helper.h"
 
 #define	MAX_VECTOR_BALL 256
-#define BALL_COUNT geosphere_VTX_COUNT
-#define VECTOR_BALL_ARRAY vb_geosphere_vertex_pos
+#define BALL_COUNT grid_cube_small_VTX_COUNT
+#define VECTOR_BALL_ARRAY vb_grid_cube_small_vertex_pos
 #define VBALL_DISTANCE 1100
 
 #define VBALL_PHASE_INTRO_SCROLL	0
@@ -338,27 +338,18 @@ void fastVectorBallFX()
 
 				switch(object_idx)
 				{
+
 					case 0:
-						ball_count = geosphere_VTX_COUNT;
-						vector_ball_array = vb_geosphere_vertex_pos;
-						break;
-
-					case 1:
-						ball_count = grid_cube_VTX_COUNT;
-						vector_ball_array = vb_grid_cube_vertex_pos;
-						break;
-
-					case 2:
 						ball_count = grid_cube_small_VTX_COUNT;
 						vector_ball_array = vb_grid_cube_small_vertex_pos;
 						break;
 
-					case 3:
+					case 1:
 						ball_count = sword_VTX_COUNT;
 						vector_ball_array = vb_sword_vertex_pos;
 						break;
 
-					case 4:
+					case 2:
 						ball_count = pyramid_VTX_COUNT;
 						vector_ball_array = vb_pyramid_vertex_pos;
 						break;						
