@@ -19,6 +19,7 @@ extern const Image sky;
 extern const Image sim1_font;
 extern const Image circles;
 extern const Image masiaka_title_pic;
+extern const Image fire_skull;
 extern const SpriteDefinition cube_anim;
 extern const SpriteDefinition cube_shadow;
 extern const Image barb_pic_2_back;

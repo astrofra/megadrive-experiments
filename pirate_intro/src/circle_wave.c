@@ -7,6 +7,7 @@
 #define CST_WRITE_VSRAM_ADDR(adr)   ((0x4000 + ((adr) & 0x3FFF)) << 16) + (((adr) >> 14) | 0x10)
 
 s16 twister_jump_table[TWISTER_TABLE_SIZE];
+s16 twister_hjump_table[TWISTER_TABLE_SIZE];
 // s16 scroll_jump_table_bg[TWISTER_TABLE_SIZE];
 // s16 hscroll_jump_table[TWISTER_TABLE_SIZE];
 // s16 hscroll_jump_table_bg[TWISTER_TABLE_SIZE];
@@ -14,6 +15,8 @@ s16 twister_jump_table[TWISTER_TABLE_SIZE];
 // s16 hblank_table_bg[TWISTER_TABLE_SIZE];
 // s16 hscroll_table[256];
 // s16 hscroll_table_bg[256];
+
+extern u16 hscrl_adr;
 
 
 void circleWavesFX(void)
@@ -32,6 +35,7 @@ void circleWavesFX(void)
 	static void hBlank(){
 		// VDP_setVerticalScroll(PLAN_A, scroll_jump_table[(GET_VCOUNTER + rot_y) & ((TWISTER_TABLE_SIZE >> 2) - 1)] + (64 + sinFix16(rot_y << 1)) << 1);
 
+		/* Vertical scroll */
 	    *pl = CST_WRITE_VSRAM_ADDR(0);
 	    *pw = twister_jump_table[(GET_VCOUNTER + vcount) & 1023];
 
@@ -42,6 +46,10 @@ void circleWavesFX(void)
 	    if (i != prev_i)
 	    	VDP_setPaletteColors(0, pal_raster + i, 4);
 	    prev_i = i;
+
+		/* Horizontal scroll */
+	    *pl = GFX_WRITE_VRAM_ADDR(hscrl_adr);
+	    *pw = twister_hjump_table[(GET_VCOUNTER + vcount) & 1023];	    
 	}
 
 	SYS_disableInts();
@@ -60,7 +68,7 @@ void circleWavesFX(void)
 	VDP_drawImageEx(PLAN_A, &circles, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 256 >> 3, FALSE, FALSE);
 	vramIndex += circles.tileset->numTile;
 	VDP_drawImageEx(PLAN_B, &masiaka_title_pic, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), (320 - 240) >> 4, (224 - 48) >> 4, FALSE, TRUE);
-	vramIndex += masiaka_title_pic.tileset->numTile;	
+	vramIndex += masiaka_title_pic.tileset->numTile;		
 
 	VDP_setPalette(PAL0, circles.palette->data);
 	VDP_setPalette(PAL1, masiaka_title_pic.palette->data);
@@ -69,7 +77,10 @@ void circleWavesFX(void)
     VDP_setHilightShadow(0);
 
     for(i = 0; i < TWISTER_TABLE_SIZE; i++)
+    {
     	twister_jump_table[i] = -((i + sinFix16(i << 2) + 64 + ((cosFix16((i + 256) << 3) + 64) >> 1) ));
+    	twister_hjump_table[i] = (sinFix16(i >> 1) - 64 + cosFix16((i + 256) << 3)) >> 4;
+    }
 
 	SYS_enableInts();
 
@@ -86,15 +97,15 @@ void circleWavesFX(void)
 
 			if (i < 16)
 			{
-				r -= (i >> 2);
+				r -= i;
 				g -= (i >> 1);
-				b -= i;
+				b -= (i >> 2);
 			}
 			else
 			{
-				r = r - ((32 - i) >> 2);
+				r = r - (32 - i);				
 				g = g - ((32 - i) >> 1);
-				b = b - (32 - i);				
+				b = b - ((32 - i) >> 2);
 			}
 
 			if (r < 0) r = 0;
@@ -116,6 +127,9 @@ void circleWavesFX(void)
         SYS_disableInts();
 	    *pl = CST_WRITE_VSRAM_ADDR(0);
 	    *pw = twister_jump_table[vcount & 1023];
+
+	    *pl = GFX_WRITE_VRAM_ADDR(hscrl_adr);
+	    *pw = twister_hjump_table[vcount & 1023];	 	    
         SYS_enableInts();
 
         vcount += 1;

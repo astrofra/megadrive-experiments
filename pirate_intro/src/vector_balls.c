@@ -96,7 +96,7 @@ void fastVectorBallFX()
 		    x >>= 3;
 		    y >>= 3;
 
-			z = t_vtx[j].z;
+			z = t_vtx[j].z + FIX16(1.5);
 			if (z < FIX16(0.0))
 				z = FIX16(0.0);
 

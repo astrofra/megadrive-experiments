@@ -23,6 +23,7 @@ IMAGE sim1_font "sim1_font.png" 0
 IMAGE circles "flames.png" 0
 
 IMAGE masiaka_title_pic "masiaka_title.png" 0
+IMAGE fire_skull "fire_skull.png" 0
 
 SPRITE cube_anim "cube_anim.png" 14 14 0
 SPRITE cube_shadow "cube_anim_shadow.png" 16 2 0
