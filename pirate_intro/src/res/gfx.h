@@ -24,5 +24,6 @@ extern const SpriteDefinition cube_anim;
 extern const SpriteDefinition cube_shadow;
 extern const Image barb_pic_2_back;
 extern const Image barb_pic_2_front;
+extern const SpriteDefinition goblin_head;
 
 #endif // _RES_GFX_H_

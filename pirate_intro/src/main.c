@@ -39,8 +39,6 @@ int main()
 
 		RSE_turn_screen_to_black();
 
-		// circleWavesFX();
-
 		displayRSILogoFX();
 
 		displayBarbTitleFX();

@@ -23,15 +23,18 @@ void displayBarbPictureFX(void)
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 64);
-	VDP_setHilightShadow(0); 
+	VDP_setHilightShadow(0);
+	// SPR_init(8,8,90);
+	SPR_initNoFont(1,barb_pic_2_back.tileset->numTile + barb_pic_2_front.tileset->numTile,1);
 
-	vramIndex = 8;
+	vramIndex = 0;
 
 	/* Draw the foreground */
 	VDP_drawImageEx(PLAN_B, &barb_pic_2_back, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += barb_pic_2_back.tileset->numTile;
 	VDP_drawImageEx(PLAN_A, &barb_pic_2_front, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += barb_pic_2_front.tileset->numTile;
+	sprites[0] = SPR_addSprite(&goblin_head, 28, 110, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
 
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
@@ -41,6 +44,8 @@ void displayBarbPictureFX(void)
 	SYS_enableInts();
 
 	DMA_waitCompletion();
+
+	SPR_update(sprites, 1);
 
 	for (j = 0; j < 64; j++)
 	{
@@ -52,11 +57,12 @@ void displayBarbPictureFX(void)
 	{
 		paldst[j] = barb_pic_2_front.palette->data[j];
 		paldst[j + 16] = barb_pic_2_back.palette->data[j];
+		paldst[j + 32] = goblin_head.palette->data[j];
 	}
 
 	// VDP_fadePalTo(PAL0, barb_pic_2_front.palette->data, RSE_FRAMES(8), FALSE);
 	// VDP_fadePalTo(PAL1, barb_pic_2_back.palette->data, RSE_FRAMES(8), TRUE);
-	VDP_fade(0, 31, palsrc, paldst, 32, TRUE);
+	VDP_fade(0, 47, palsrc, paldst, 32, TRUE);
 
 	fx_phase = 0;
 	while(fx_phase < 256)
@@ -65,10 +71,12 @@ void displayBarbPictureFX(void)
 		j = easing_table[fx_phase << 2];
 
 		scroll_A_y = (336 - 224) - ((j * (336 - 224)) >> 10);
-		scroll_B_y = (336 - 224) - ((j * (336 - 224)) >> 10);
+		// scroll_B_y = (336 - 224) - ((j * (336 - 224)) >> 10);
 
 		VDP_setVerticalScroll(PLAN_A, scroll_A_y);
-		VDP_setVerticalScroll(PLAN_B, scroll_B_y);
+		VDP_setVerticalScroll(PLAN_B, scroll_A_y);
+		SPR_setPosition(sprites[0], 28, 100 - (scroll_A_y >> 1));
+		SPR_update(sprites, 1);
 
 		fx_phase++;
 	}
@@ -80,10 +88,12 @@ void displayBarbPictureFX(void)
 		j = easing_table[fx_phase << 2];
 
 		scroll_A_y = (j * 80) >> 10;
-		scroll_B_y = (j * 80) >> 10;
+		// scroll_B_y = (j * 80) >> 10;
 
 		VDP_setVerticalScroll(PLAN_A, scroll_A_y);
-		VDP_setVerticalScroll(PLAN_B, scroll_B_y);
+		VDP_setVerticalScroll(PLAN_B, scroll_A_y);
+		SPR_setPosition(sprites[0], 28, 100 - (scroll_A_y >> 1));
+		SPR_update(sprites, 1);
 
 		fx_phase++;
 	}
@@ -95,10 +105,12 @@ void displayBarbPictureFX(void)
 		j = easing_table[fx_phase << 2];
 
 		scroll_A_y = 80 - ((j * 40) >> 10);
-		scroll_B_y = 80 - ((j * 40) >> 10);
+		// scroll_B_y = 80 - ((j * 40) >> 10);
 
 		VDP_setVerticalScroll(PLAN_A, scroll_A_y);
-		VDP_setVerticalScroll(PLAN_B, scroll_B_y);
+		VDP_setVerticalScroll(PLAN_B, scroll_A_y);
+		SPR_setPosition(sprites[0], 28, 100 - (scroll_A_y >> 1));
+		SPR_update(sprites, 1);
 
 		fx_phase++;
 	}	
@@ -113,6 +125,7 @@ void displayBarbPictureFX(void)
 
 	SYS_disableInts();
 
+	SPR_end();
 	VDP_clearPlan(PLAN_A, TRUE);
 	VDP_clearPlan(PLAN_B, TRUE);
 

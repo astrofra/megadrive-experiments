@@ -30,3 +30,4 @@ SPRITE cube_shadow "cube_anim_shadow.png" 16 2 0
 
 IMAGE barb_pic_2_back "barb_pic_2_back.png" 0
 IMAGE barb_pic_2_front "barb_pic_2_front.png" 0
+SPRITE goblin_head "barb_pic_2_goblin_head.png" 10 12 0
