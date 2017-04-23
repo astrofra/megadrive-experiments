@@ -110,7 +110,7 @@ u16 RSE_writerSetup(void)
 
 	return vramIndex;
 }
-
+// s16 scroll_tile_x[16];
 void updateScrollText(void)
 {
 	scroll_x_offset -= scroll_speed;
@@ -144,11 +144,15 @@ void updateScrollText(void)
 	}
 
 	SYS_disableInts();
-	/* H scroll */
-	VDP_setHorizontalScroll(current_plan, scroll_x_offset);
 
 	/* V scroll */
-	VDP_setVerticalScrollTile(current_plan, 0, &(scroll_tile_y[scroll_y_offset & 0x1ff]), screen_w_tile >> 1, TRUE);
+	VDP_setVerticalScrollTile(current_plan, 0, &(scroll_tile_y[scroll_y_offset & 0x1ff]), (screen_w_tile >> 1) - 4, TRUE);
+
+	/* H scroll */
+	VDP_setHorizontalScroll(current_plan, scroll_x_offset);
+	// scroll_tile_x[0] = scroll_x_offset;
+	// VDP_setHorizontalScrollTile(current_plan, 0, scroll_tile_x, 8, TRUE);
+
 	SYS_enableInts();
 }
 

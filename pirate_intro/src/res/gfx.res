@@ -1,3 +1,4 @@
+IMAGE logo_rse_3d "logo_rse_3d.png" 0
 IMAGE rsi_logo_0 "rsi_logo-0.png" 0
 IMAGE rsi_logo_1 "rsi_logo-1.png" 0
 

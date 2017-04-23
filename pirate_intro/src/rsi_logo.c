@@ -16,6 +16,7 @@ void displayRSILogoFX(void)
 
 	VDP_clearPlan(PLAN_A, 0);
 	VDP_clearPlan(PLAN_B, 0);
+	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);

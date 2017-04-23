@@ -14,6 +14,7 @@ Framework : SGDK
 */
 
 void fastVectorBallFX(void);
+void main_logo(void);
 void displayRSILogoFX(void);
 void flat3DCubeFX(void);
 void displayBarbTitleFX(void);
@@ -35,11 +36,13 @@ int main()
 	{
 		vramIndex = TILE_USERINDEX;
 
-		play_music();
-
 		RSE_turn_screen_to_black();
 
-		displayRSILogoFX();
+		main_logo();
+
+		RSE_pause(RSE_FRAMES(8));
+
+		play_music();
 
 		displayBarbTitleFX();
 
@@ -52,6 +55,8 @@ int main()
 		displayBarbPictureFX();
 
 		circleWavesFX();
+
+		displayRSILogoFX();
 
 		stop_music();
 

@@ -1,6 +1,7 @@
 #ifndef _RES_GFX_H_
 #define _RES_GFX_H_
 
+extern const Image logo_rse_3d;
 extern const Image rsi_logo_0;
 extern const Image rsi_logo_1;
 extern const Image barb_pic_back_0;

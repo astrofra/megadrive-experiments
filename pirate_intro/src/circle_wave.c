@@ -22,7 +22,9 @@ extern u16 hscrl_adr;
 void circleWavesFX(void)
 {
 	u16 vramIndex = TILE_USERINDEX;
-	s16 i, j, rot_y = 0, ang_speed_y = 4, twist_y = 0, twist_inc = 0, prev_i;
+	s16 i, j, k, rot_y = 0, ang_speed_y = 4, twist_y = 0, twist_inc = 0, prev_i;
+	s16 r, g, b;
+	u16 col;
 	u16 vcount = 0;
 	u16 pal_raster[4 * 32];
 
@@ -60,6 +62,8 @@ void circleWavesFX(void)
 	VDP_clearPlan(PLAN_A, 0);
 	VDP_clearPlan(PLAN_B, 0);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
+	VDP_setHInterrupt(TRUE);
+	VDP_setHIntCounter(1);
 
 	vramIndex = TILE_USERINDEX;
 
@@ -88,8 +92,6 @@ void circleWavesFX(void)
 	for(i = 0; i < 32; i++)
 		for(j = 0; j < 4; j++)
 		{
-			u16 col;
-			s16 r, g, b;
 			col = circles.palette->data[j];
 			r = (col & (0xF << 8)) >> 8;
 			g = (col & (0xF << 4)) >> 4;
@@ -120,7 +122,8 @@ void circleWavesFX(void)
 	VDP_setHInterrupt(1);
 	SYS_setHIntCallback(&hBlank);
 
-    while (TRUE)
+	j = 0;
+    while (vcount < 60 * 10)
     {
         VDP_waitVSync();
 
@@ -132,6 +135,57 @@ void circleWavesFX(void)
 	    *pw = twister_hjump_table[vcount & 1023];	 	    
         SYS_enableInts();
 
+        if (vcount > 60 * 8)
+        {
+	        for (k = 0; k < 16; k++)
+	    	{
+	    		if (vcount & 0x1)
+	    			col = pal_raster[(k << 2) + j];
+	    		else 
+	    			col = pal_raster[((k + 16) << 2) + j];
+
+				r = (col & (0xF << 8)) >> 8;
+				g = (col & (0xF << 4)) >> 4;
+				b = col & 0xF;
+
+				if (r > 0) r--;
+				if (g > 0) g--;
+				if (b > 0) b--;
+
+				col = (r << 8) | (g << 4) | b;
+
+				if (vcount & 0x1)
+					pal_raster[(k << 2) + j] = col;
+				else
+					pal_raster[((k + 16) << 2) + j] = col;
+	        }
+
+			if (vcount & 0x1)
+	        	j++;
+
+		    if (j >= 4)
+		    	j = 0;
+		}
+
         vcount += 1;
-    }	
+    }
+
+	// SPR_end();
+
+	SYS_disableInts();
+
+	RSE_resetScrolling();
+	// VDP_clearPlan(PLAN_A, TRUE);
+	// VDP_clearPlan(PLAN_B, TRUE);
+
+	VDP_setHInterrupt(0);
+
+	SYS_setHIntCallback(NULL);
+	SYS_setVIntCallback(NULL);
+
+	SYS_enableInts();
+
+    RSE_turn_screen_to_black();	
+
+	// vramIndex = TILE_USERINDEX;    
 }
