@@ -20,6 +20,7 @@ void flat3DCubeFX(void);
 void displayBarbTitleFX(void);
 void displayBarbPictureFX(void);
 void circleWavesFX(void);
+void ankouScreenFX(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -57,6 +58,8 @@ int main()
 		circleWavesFX();
 
 		displayRSILogoFX();
+
+		ankouScreenFX();
 
 		stop_music();
 

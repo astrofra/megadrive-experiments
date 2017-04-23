@@ -26,5 +26,14 @@ extern const SpriteDefinition cube_shadow;
 extern const Image barb_pic_2_back;
 extern const Image barb_pic_2_front;
 extern const SpriteDefinition goblin_head;
+extern const Image exocet_ankou_darken;
+extern const Image exocet_ankou_back_0;
+extern const Image exocet_ankou_back_1;
+extern const Image exocet_ankou_back_2;
+extern const Image exocet_ankou_back_3;
+extern const Image exocet_ankou_front_0;
+extern const Image exocet_ankou_front_1;
+extern const Image exocet_ankou_front_2;
+extern const Image exocet_ankou_front_3;
 
 #endif // _RES_GFX_H_

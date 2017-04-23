@@ -32,3 +32,15 @@ SPRITE cube_shadow "cube_anim_shadow.png" 16 2 0
 IMAGE barb_pic_2_back "barb_pic_2_back.png" 0
 IMAGE barb_pic_2_front "barb_pic_2_front.png" 0
 SPRITE goblin_head "barb_pic_2_goblin_head.png" 10 12 0
+
+IMAGE exocet_ankou_darken "exocet-ankou-front-darken.png" 0
+
+IMAGE exocet_ankou_back_0 "exocet-ankou-back-0.png" 0
+IMAGE exocet_ankou_back_1 "exocet-ankou-back-1.png" 0
+IMAGE exocet_ankou_back_2 "exocet-ankou-back-2.png" 0
+IMAGE exocet_ankou_back_3 "exocet-ankou-back-3.png" 0
+
+IMAGE exocet_ankou_front_0 "exocet-ankou-front-0.png" 0
+IMAGE exocet_ankou_front_1 "exocet-ankou-front-1.png" 0
+IMAGE exocet_ankou_front_2 "exocet-ankou-front-2.png" 0
+IMAGE exocet_ankou_front_3 "exocet-ankou-front-3.png" 0

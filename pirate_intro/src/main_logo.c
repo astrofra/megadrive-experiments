@@ -572,13 +572,13 @@ void main_logo(void)
 	}
 
 	u16 vblCount = 0;
-	while (vblCount < RSE_FRAMES(60))
+	while (vblCount < RSE_FRAMES(60 * 2))
 	{
 		VDP_waitVSync();
 		vblCount++;
 	}
 
-	VDP_fadeOut(1, 63, RSE_FRAMES(16), FALSE);
+	VDP_fadeOut(1, 63, RSE_FRAMES(32), FALSE);
 
 	RSE_turn_screen_to_black();
 	BMP_end();
