@@ -15,6 +15,8 @@
 #include "transition_helper.h"
 #include "music.h"
 
+extern u16 vramIndex;
+extern u16 fontIndex;
 extern u8 framerate;
 
 /*	2D poly caches */
@@ -554,7 +556,8 @@ void main_logo(void)
 	VDP_setPlanSize(64, 32);
 	VDP_clearPlan(PLAN_A, 0);
 	VDP_clearPlan(PLAN_B, 0);	
-	VDP_drawImageEx(PLAN_A, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, 50), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
+	VDP_drawImageEx(PLAN_A, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
+	vramIndex += logo_rse_3d.tileset->numTile;
 	SYS_enableInts();
 
 	/* Fade to the logo's palette */
@@ -571,12 +574,11 @@ void main_logo(void)
 		}
 	}
 
-	u16 vblCount = 0;
-	while (vblCount < RSE_FRAMES(60 * 2))
-	{
-		VDP_waitVSync();
-		vblCount++;
-	}
+	RSE_pause(RSE_FRAMES(60));
+
+	VDP_drawImageEx(PLAN_B, &medieval_girl, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, ((240 - 64) >> 4), TRUE, TRUE);
+	
+	RSE_pause(RSE_FRAMES(60));
 
 	VDP_fadeOut(1, 63, RSE_FRAMES(32), FALSE);
 

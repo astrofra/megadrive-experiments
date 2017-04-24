@@ -4,6 +4,7 @@
 extern const Image logo_rse_3d;
 extern const Image rsi_logo_0;
 extern const Image rsi_logo_1;
+extern const Image medieval_girl;
 extern const Image barb_pic_back_0;
 extern const Image barb_pic_back_1;
 extern const Image barb_pic_back_2;

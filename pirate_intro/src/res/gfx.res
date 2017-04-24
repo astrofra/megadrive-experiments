@@ -1,6 +1,7 @@
 IMAGE logo_rse_3d "logo_rse_3d.png" 0
 IMAGE rsi_logo_0 "rsi_logo-0.png" 0
 IMAGE rsi_logo_1 "rsi_logo-1.png" 0
+IMAGE medieval_girl "medieval_girl.png" 0
 
 IMAGE barb_pic_back_0 "barb_pic_back-0.png" 0
 IMAGE barb_pic_back_1 "barb_pic_back-1.png" 0
