@@ -41,7 +41,7 @@ int main()
 
 		main_logo();
 
-		RSE_pause(RSE_FRAMES(8));
+		RSE_pause(RSE_FRAMES(16));
 
 		play_music();
 

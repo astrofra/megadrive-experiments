@@ -574,11 +574,17 @@ void main_logo(void)
 		}
 	}
 
-	RSE_pause(RSE_FRAMES(60));
+	RSE_pause(RSE_FRAMES(30));
 
-	VDP_drawImageEx(PLAN_B, &medieval_girl, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, ((240 - 64) >> 4), TRUE, TRUE);
+	{
+		u16 i;
+		for(i = 1; i < 16; i++)
+			VDP_setPaletteColor(i, 0xFFF);
+	}
+	VDP_drawImageEx(PLAN_B, &medieval_girl, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, ((240 - 64) >> 4), FALSE, TRUE);
+	VDP_fadePalTo(PAL0, medieval_girl.palette->data, 16, TRUE);
 	
-	RSE_pause(RSE_FRAMES(60));
+	RSE_pause(RSE_FRAMES(120));
 
 	VDP_fadeOut(1, 63, RSE_FRAMES(32), FALSE);
 
