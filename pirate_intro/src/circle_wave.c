@@ -26,7 +26,7 @@ void circleWavesFX(void)
 	s16 r, g, b;
 	u16 col;
 	u16 vcount = 0;
-	u16 pal_raster[4 * 32];
+	u16 pal_raster[4 * 32 * 14];
 
     vu16 *pw;
     vu32 *pl;
@@ -46,12 +46,58 @@ void circleWavesFX(void)
 	    i &= 0x7F;
 
 	    if (i != prev_i)
-	    	VDP_setPaletteColors(0, pal_raster + i, 4);
+	    	VDP_setPaletteColors(0, pal_raster + i + k, 4);
 	    prev_i = i;
 
 		/* Horizontal scroll */
 	    *pl = GFX_WRITE_VRAM_ADDR(hscrl_adr);
 	    *pw = twister_hjump_table[(GET_VCOUNTER + vcount) & 1023];	    
+	}
+
+    /* Prepare wave table */
+    for(i = 0; i < TWISTER_TABLE_SIZE; i++)
+    {
+    	twister_jump_table[i] = -((i + sinFix16(i << 2) + 64 + ((cosFix16((i + 256) << 3) + 64) >> 1) ));
+    	twister_hjump_table[i] = (sinFix16(i >> 1) - 64 + cosFix16((i + 256) << 3)) >> 4;
+    }
+
+	/* prepare raster palettes */
+	for(k = 0; k < 14; k++)
+	{
+		VDP_waitVSync();
+		for(i = 0; i < 32; i++)
+			for(j = 0; j < 4; j++)
+			{
+				col = circles.palette->data[j];
+				r = (col & (0xF << 8)) >> 8;
+				g = (col & (0xF << 4)) >> 4;
+				b = col & 0xF;
+
+				if (i < 16)
+				{
+					r -= i;
+					g -= (i >> 1);
+					b -= (i >> 2);
+				}
+				else
+				{
+					r = r - (32 - i);				
+					g = g - ((32 - i) >> 1);
+					b = b - ((32 - i) >> 2);
+				}
+
+				r -= (k + 1);
+				g -= (k + 1);
+				b -= (k + 1);
+
+				if (r < 0) r = 0;
+				if (g < 0) g = 0;
+				if (b < 0) b = 0;
+
+				col = (r << 8) | (g << 4) | b;
+
+				pal_raster[(i * 4) + j + (k * 4 * 32)] = col;
+			}	
 	}
 
 	SYS_disableInts();
@@ -80,49 +126,14 @@ void circleWavesFX(void)
 
     VDP_setHilightShadow(0);
 
-    for(i = 0; i < TWISTER_TABLE_SIZE; i++)
-    {
-    	twister_jump_table[i] = -((i + sinFix16(i << 2) + 64 + ((cosFix16((i + 256) << 3) + 64) >> 1) ));
-    	twister_hjump_table[i] = (sinFix16(i >> 1) - 64 + cosFix16((i + 256) << 3)) >> 4;
-    }
-
 	SYS_enableInts();
-
-	/* prepare raster palettes */
-	for(i = 0; i < 32; i++)
-		for(j = 0; j < 4; j++)
-		{
-			col = circles.palette->data[j];
-			r = (col & (0xF << 8)) >> 8;
-			g = (col & (0xF << 4)) >> 4;
-			b = col & 0xF;
-
-			if (i < 16)
-			{
-				r -= i;
-				g -= (i >> 1);
-				b -= (i >> 2);
-			}
-			else
-			{
-				r = r - (32 - i);				
-				g = g - ((32 - i) >> 1);
-				b = b - ((32 - i) >> 2);
-			}
-
-			if (r < 0) r = 0;
-			if (g < 0) g = 0;
-			if (b < 0) b = 0;
-
-			col = (r << 8) | (g << 4) | b;
-
-			pal_raster[(i * 4) + j] = col;
-		}
 
 	VDP_setHInterrupt(1);
 	SYS_setHIntCallback(&hBlank);
 
 	j = 0;
+	k = 0;
+
     while (vcount < 60 * 10)
     {
         VDP_waitVSync();
@@ -135,37 +146,8 @@ void circleWavesFX(void)
 	    *pw = twister_hjump_table[vcount & 1023];	 	    
         SYS_enableInts();
 
-        if (vcount > 60 * 8)
-        {
-	        for (k = 0; k < 16; k++)
-	    	{
-	    		if (vcount & 0x1)
-	    			col = pal_raster[(k << 2) + j];
-	    		else 
-	    			col = pal_raster[((k + 16) << 2) + j];
-
-				r = (col & (0xF << 8)) >> 8;
-				g = (col & (0xF << 4)) >> 4;
-				b = col & 0xF;
-
-				if (r > 0) r--;
-				if (g > 0) g--;
-				if (b > 0) b--;
-
-				col = (r << 8) | (g << 4) | b;
-
-				if (vcount & 0x1)
-					pal_raster[(k << 2) + j] = col;
-				else
-					pal_raster[((k + 16) << 2) + j] = col;
-	        }
-
-			if (vcount & 0x1)
-	        	j++;
-
-		    if (j >= 4)
-		    	j = 0;
-		}
+        if (vcount > 60 * 8 && k < (4 * 13 * 32))
+        	k += 32;
 
         vcount += 1;
     }
