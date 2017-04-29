@@ -1,6 +1,7 @@
 #include <genesis.h>
 #include <gfx.h>
 #include <resources.h>
+#include "writer.h"
 
 #define	TABLE_LEN 220
 #define MAX_DONUT 16
@@ -37,6 +38,10 @@ static void fastStarFieldFX()
 	VDP_clearPlan(PLAN_A, 0);
 	VDP_clearPlan(PLAN_B, 0);
 	VDP_setPlanSize(64, 32);
+
+	/* Load the fond tiles */
+	VDP_drawImageEx(PLAN_B, &amiga_font, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	vramIndex += amiga_font.tileset->numTile;		
 
 	/* Draw the foreground */
 	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
@@ -91,6 +96,15 @@ static void fastStarFieldFX()
 	VDP_setPalette(PAL0, vip_logo.palette->data);
 
 	SYS_enableInts();
+
+	/* writer setup */
+	current_string_idx = 0;
+	current_char_idx = 0;
+	current_char_x = 0;
+	writer_timer = 0;
+	writer_switch = FALSE;
+
+	writer_state = WRT_CENTER_CUR_LINE;		
 
 	SND_startPlay_XGM(maak_music_2);
 	SND_setMusicTempo_XGM(50);	
@@ -150,5 +164,10 @@ static void fastStarFieldFX()
 
 			figure_counter = 0;
 		}
+
+		if (writer_switch || writer_state == WRT_CLEAR_LINE)
+			RSE_updateLineWriter();
+
+		writer_switch = !writer_switch;			
 	}
 }
