@@ -106,7 +106,7 @@ u16 RSE_drawString(char *str)
 		{
 			i = charToTileIndex(c);
 			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(PLAN_A, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), current_char_x + fade, 25);
+				VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade)), current_char_x + fade, 25);
 		}
 	}
 

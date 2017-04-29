@@ -100,6 +100,7 @@ static void fastStarFieldFX()
 	// VDP_setPalette(PAL0, vip_logo.palette->data);
 	// VDP_setPalette(PAL1, starfield.palette->data);
 	// VDP_setPalette(PAL2, donut.palette->data);
+	VDP_setPalette(PAL3, amiga_font.palette->data);
 
 	SYS_enableInts();
 
