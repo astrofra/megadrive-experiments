@@ -4,6 +4,15 @@
 #define	TABLE_LEN 220
 #define MAX_DONUT 16
 
+typedef struct
+{
+    Vect2D_f16 pos;
+    Vect2D_f16 mov;
+    u16 timer;
+} Object;
+
+static u16 tileIndexes[64];
+
 static void fastStarFieldFX();
 
 s16 scroll_PLAN_B[TABLE_LEN];
@@ -17,17 +26,18 @@ int main(){
 static void fastStarFieldFX()
 {
 	u16 vramIndex = TILE_USERINDEX;
-	s16 i, ns, s;
-	Sprite sprites[256];
+	s16 i, ns, s, ind;
+	static Object objects[256];
+	Sprite *sprites[256];
 
 	SYS_disableInts();
 
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);
+	VDP_clearPlan(PLAN_A, 0);
+	VDP_clearPlan(PLAN_B, 0);
 	VDP_setPlanSize(32, 32);
 
 	/* Draw the foreground */
-	VDP_drawImageEx(BPLAN, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
+	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
 	vramIndex += starfield.tileset->numTile; 	
 
 	/*	Set the proper scrolling mode (line by line) */
@@ -48,13 +58,29 @@ static void fastStarFieldFX()
 	}
 
 	/* Setup the sprites */
-	SPR_init(256);
+	SPR_init(0,0,0);
+
+    ind = vramIndex;
+    for(i = 0; i < donut.animations[0]->numFrame; i++)
+    {
+        TileSet* tileset = donut.animations[0]->frames[i]->tileset;
+
+        VDP_loadTileSet(tileset, ind, TRUE);
+        tileIndexes[i] = ind;
+        ind += tileset->numTile;
+    }
+
 	for(i = 0; i < MAX_DONUT; i++)
-	    SPR_initSprite(&sprites[i], &donut, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	{
+	    sprites[i] = SPR_addSprite(&donut, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+		SPR_setAutoTileUpload(sprites[i], FALSE);
+		SPR_setVRAMTileIndex(sprites[i], TILE_USERINDEX);
+		sprites[i]->data = (u32) &objects[i];    
+	}
 
-	SPR_update(sprites, MAX_DONUT);
+	// SPR_update(sprites, MAX_DONUT);
 
-	VDP_setPalette(PAL2, donut.palette->data);	    	
+	VDP_setPalette(PAL2, donut.palette->data);   	
 
 	SYS_enableInts();
 
@@ -73,10 +99,11 @@ static void fastStarFieldFX()
 		/*	Animate the donuts */
 		for(i = 0; i < MAX_DONUT; i++)
 		{
-	        // SPR_setPosition(&sprites[i], (cosFix16(s + (i << 5)) << 1) + 160 - 16, sinFix16(s + (i << 5)) + 112 - 16);
-	        sprites[i].x = (cosFix16(s + (i << 5)) << 1) + 160 - 16 + 0x80;
-	        sprites[i].y = sinFix16(s + (i << 5)) + 112 - 16 + 0x80;
-			SPR_setFrame(&sprites[i], ((s >> 4) + i) & 0x7);
+			// sprites[i]->x = (cosFix16(s + (i << 5)) << 1) + 160 - 16 + 0x80;
+			// sprites[i]->y = sinFix16(s + (i << 5)) + 112 - 16 + 0x80;
+			SPR_setPosition(sprites[i], (cosFix16(s + (i << 5)) << 1) + 160 - 16, sinFix16(s + (i << 5)) + 112 - 16);
+			SPR_setVRAMTileIndex(sprites[i], tileIndexes[((s >> 4) + i) & 0x7]);
+			// SPR_setFrame(sprites[i], ((s >> 4) + i) & 0x7);
 		}
 
 		s += 4;	
