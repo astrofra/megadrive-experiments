@@ -145,7 +145,7 @@ void inline RSE_updateLineWriter(void)
 		case WRT_CLEAR_LINE:
 			VDP_setTileMapXY(PLAN_A, 0, current_char_x, 25);
 			current_char_x++;
-			if (current_char_x > 320 / 8)
+			if (current_char_x > 320 >> 3)
 			{
 				current_char_x = 0;
 				current_char_idx = 0;

@@ -2,6 +2,7 @@
 #include <gfx.h>
 #include <resources.h>
 #include "writer.h"
+#include "transition_helper.h"
 
 #define	TABLE_LEN 220
 #define MAX_DONUT 16
@@ -29,6 +30,8 @@ u8 figure_mode = 0;
 s16 i, ns, s, ind, figure_counter = 0;
 static Object objects[256];
 Sprite *sprites[256];
+u8 demo_phase = 0;
+u16 phase_counter = 0;
 
 static void fastStarFieldFX()
 {
@@ -39,17 +42,19 @@ static void fastStarFieldFX()
 	VDP_clearPlan(PLAN_B, 0);
 	VDP_setPlanSize(64, 32);
 
+	RSE_turn_screen_to_black();
+
 	/* Load the fond tiles */
 	VDP_drawImageEx(PLAN_B, &amiga_font, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	vramIndex += amiga_font.tileset->numTile;		
 
 	/* Draw the foreground */
-	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
-	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, TRUE, FALSE);	
+	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, FALSE, FALSE);	
 	vramIndex += starfield.tileset->numTile; 	
 
 	/* Draw the logo */
-	VDP_drawImageEx(PLAN_A, &vip_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 256) >> 4, (224 - 144) >> 4, TRUE, FALSE);
+	VDP_drawImageEx(PLAN_A, &vip_logo, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), (320 - 256) >> 4, (224 - 144) >> 4, FALSE, FALSE);
 	vramIndex += vip_logo.tileset->numTile; 	
 
 	/*	Set the proper scrolling mode (line by line) */
@@ -92,10 +97,15 @@ static void fastStarFieldFX()
 
 	// SPR_update(sprites, MAX_DONUT);
 
-	VDP_setPalette(PAL2, donut.palette->data);
-	VDP_setPalette(PAL0, vip_logo.palette->data);
+	// VDP_setPalette(PAL0, vip_logo.palette->data);
+	// VDP_setPalette(PAL1, starfield.palette->data);
+	// VDP_setPalette(PAL2, donut.palette->data);
 
 	SYS_enableInts();
+
+	// VDP_fadePalTo(PAL1, starfield.palette->data, 16, FALSE);
+	// VDP_fadePalTo(PAL0, vip_logo.palette->data, 16, FALSE);
+	// VDP_fadePalTo(PAL2, donut.palette->data, 16, FALSE);
 
 	/* writer setup */
 	current_string_idx = 0;
@@ -110,10 +120,51 @@ static void fastStarFieldFX()
 	SND_setMusicTempo_XGM(50);	
 
 	/*	Start !!!! */
+
 	s = 0;
 	while (TRUE)
 	{
 		VDP_waitVSync();
+
+		switch(demo_phase)
+		{
+			case 0:
+				VDP_fadePalTo(PAL1, starfield.palette->data, 32, TRUE);
+				phase_counter = 0;
+				demo_phase++;
+				break;
+
+			case 1:
+				phase_counter++;
+				if (phase_counter > 32 + 16)
+				{
+					phase_counter = 0;
+					demo_phase++;
+					VDP_fadePalTo(PAL2, donut.palette->data, 32, TRUE);
+				}
+				break;
+
+			case 2:
+				phase_counter++;
+				if (phase_counter > 32 + 16)
+				{
+					phase_counter = 0;
+					demo_phase++;
+					VDP_fadePalTo(PAL0, vip_logo.palette->data, 32, TRUE);					
+				}
+				break;
+
+			case 3:		
+				break;
+		}
+
+		if (demo_phase > 2)
+		{
+			if (writer_switch || writer_state == WRT_CLEAR_LINE)
+				RSE_updateLineWriter();
+
+			writer_switch = !writer_switch;					
+		}
 		// BMP_showFPS(1);
 
 		/* 	Scroll the starfield */
@@ -163,11 +214,6 @@ static void fastStarFieldFX()
 			if (figure_mode > 4) figure_mode = 0;
 
 			figure_counter = 0;
-		}
-
-		if (writer_switch || writer_state == WRT_CLEAR_LINE)
-			RSE_updateLineWriter();
-
-		writer_switch = !writer_switch;			
+		}		
 	}
 }
