@@ -1,5 +1,6 @@
 #include <genesis.h>
 #include <gfx.h>
+#include <resources.h>
 
 #define	TABLE_LEN 220
 #define MAX_DONUT 16
@@ -23,22 +24,28 @@ int main(){
 	return 0;
 }
 
+u8 figure_mode = 0;
+s16 i, ns, s, ind, figure_counter = 0;
+static Object objects[256];
+Sprite *sprites[256];
+
 static void fastStarFieldFX()
 {
 	u16 vramIndex = TILE_USERINDEX;
-	s16 i, ns, s, ind;
-	static Object objects[256];
-	Sprite *sprites[256];
-
 	SYS_disableInts();
 
 	VDP_clearPlan(PLAN_A, 0);
 	VDP_clearPlan(PLAN_B, 0);
-	VDP_setPlanSize(32, 32);
+	VDP_setPlanSize(64, 32);
 
 	/* Draw the foreground */
 	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
+	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 256 >> 3, 0, TRUE, FALSE);	
 	vramIndex += starfield.tileset->numTile; 	
+
+	/* Draw the logo */
+	VDP_drawImageEx(PLAN_A, &vip_logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 256) >> 4, (224 - 144) >> 4, TRUE, FALSE);
+	vramIndex += vip_logo.tileset->numTile; 	
 
 	/*	Set the proper scrolling mode (line by line) */
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
@@ -80,16 +87,20 @@ static void fastStarFieldFX()
 
 	// SPR_update(sprites, MAX_DONUT);
 
-	VDP_setPalette(PAL2, donut.palette->data);   	
+	VDP_setPalette(PAL2, donut.palette->data);
+	VDP_setPalette(PAL0, vip_logo.palette->data);
 
 	SYS_enableInts();
+
+	SND_startPlay_XGM(maak_music_2);
+	SND_setMusicTempo_XGM(50);	
 
 	/*	Start !!!! */
 	s = 0;
 	while (TRUE)
 	{
 		VDP_waitVSync();
-		BMP_showFPS(1);
+		// BMP_showFPS(1);
 
 		/* 	Scroll the starfield */
 		VDP_setHorizontalScrollLine(PLAN_B, 2, scroll_PLAN_B, TABLE_LEN, TRUE);
@@ -101,12 +112,43 @@ static void fastStarFieldFX()
 		{
 			// sprites[i]->x = (cosFix16(s + (i << 5)) << 1) + 160 - 16 + 0x80;
 			// sprites[i]->y = sinFix16(s + (i << 5)) + 112 - 16 + 0x80;
-			SPR_setPosition(sprites[i], (cosFix16(s + (i << 5)) << 1) + 160 - 16, sinFix16(s + (i << 5)) + 112 - 16);
+			
+			switch(figure_mode)
+			{
+				case 0:
+					SPR_setPosition(sprites[i], (cosFix16(s + (i << 5)) << 1) + 160 - 16, sinFix16(s + (i << 5)) + 112 - 16);
+					break;
+
+				case 1:
+					SPR_setPosition(sprites[i], (cosFix16(s + (i << 6)) << 1) + 160 - 16, (sinFix16(s + (i << 5))) + 112 - 16);
+					break;
+
+				case 2:
+					SPR_setPosition(sprites[i], ((sinFix16((s << 1) + (i << 6))) << 1) + 160 - 16, (cosFix16(s + (i << 5)) << 1) + 112 - 16);
+					break;
+
+				case 3:
+					SPR_setPosition(sprites[i], (sinFix16(s + (i << 7))) + 160 - 16, (cosFix16((s >> 1) + (i << 4)) << 1) + 112 - 16);
+					break;
+
+				case 4:
+					SPR_setPosition(sprites[i], (cosFix16((s << 1) + (i << 5)) << 1) + 160 - 16, (sinFix16((s >> 1) + (i << 5)) << 1) + 112 - 16);
+					break;
+			}
 			SPR_setVRAMTileIndex(sprites[i], tileIndexes[((s >> 4) + i) & 0x7]);
 			// SPR_setFrame(sprites[i], ((s >> 4) + i) & 0x7);
 		}
 
-		s += 4;	
 		SPR_update(sprites, MAX_DONUT);
+
+		s += 4;
+		figure_counter++;
+		if (figure_counter > 512)
+		{
+			figure_mode++;
+			if (figure_mode > 4) figure_mode = 0;
+
+			figure_counter = 0;
+		}
 	}
 }
