@@ -8,7 +8,7 @@
 #define WRT_WAIT 2
 #define WRT_CLEAR_LINE 3
 
-#define FONT_PUNCT_OFFSET 35
+#define FONT_PUNCT_OFFSET 36
 #define FONT_LINE_OFFSET ((504 >> 3) - 1)
 
 #define PLAN_B_TILE_H 20

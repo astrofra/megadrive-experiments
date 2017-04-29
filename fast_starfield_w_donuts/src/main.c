@@ -46,7 +46,10 @@ static void fastStarFieldFX()
 
 	/* Load the fond tiles */
 	VDP_drawImageEx(PLAN_B, &amiga_font, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
-	vramIndex += amiga_font.tileset->numTile;		
+	vramIndex += amiga_font.tileset->numTile;
+
+	// for (i = 0; i < 224 >> 3; i++)
+	// 	RSE_clearTileRowAPrioTrue(i);
 
 	/* Draw the foreground */
 	VDP_drawImageEx(PLAN_B, &starfield, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
@@ -101,6 +104,8 @@ static void fastStarFieldFX()
 	// VDP_setPalette(PAL1, starfield.palette->data);
 	// VDP_setPalette(PAL2, donut.palette->data);
 	VDP_setPalette(PAL3, amiga_font.palette->data);
+
+	VDP_setHilightShadow(0); 
 
 	SYS_enableInts();
 

@@ -27,13 +27,13 @@ u16 inline charToTileIndex(char c)
 		return (u16)(c - 'A'); 
 
 	if (c >= '0' && c <= '9')
-		return (u16)(c - '0') + 25;
+		return (u16)(c - '0') + 26;
 
 	switch(c)
 	{
 		case '!':
 			return FONT_PUNCT_OFFSET;
-		case '"':
+		case '\"':
 			return FONT_PUNCT_OFFSET + 1;
 		case '#':
 			return FONT_PUNCT_OFFSET + 2;
@@ -54,15 +54,15 @@ u16 inline charToTileIndex(char c)
 		case '+':
 			return FONT_PUNCT_OFFSET + 10;
 		case ',':
-			return FONT_PUNCT_OFFSET + 11;
+			return FONT_PUNCT_OFFSET + 10;
 		case '-':
-			return FONT_PUNCT_OFFSET + 12;
+			return FONT_PUNCT_OFFSET + 11;
 		case '.':
-			return FONT_PUNCT_OFFSET + 13;
+			return FONT_PUNCT_OFFSET + 12;
 		case '/':
-			return FONT_PUNCT_OFFSET + 14;
+			return FONT_PUNCT_OFFSET + 13;
 		case ':':
-			return FONT_PUNCT_OFFSET + 15;
+			return FONT_PUNCT_OFFSET + 14;
 		case ';':
 			return FONT_PUNCT_OFFSET + 16;
 		case '<':
@@ -106,7 +106,7 @@ u16 RSE_drawString(char *str)
 		{
 			i = charToTileIndex(c);
 			if (faded_idx < current_string_len && i != 0xFF)
-				VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade)), current_char_x + fade, 25);
+				VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade)), current_char_x + fade, 25);
 		}
 	}
 
@@ -143,7 +143,7 @@ void inline RSE_updateLineWriter(void)
 			break;
 
 		case WRT_CLEAR_LINE:
-			VDP_setTileMapXY(PLAN_A, 0, current_char_x, 25);
+			VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 0), current_char_x, 25);
 			current_char_x++;
 			if (current_char_x > 320 >> 3)
 			{
