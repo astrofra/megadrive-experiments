@@ -36,5 +36,7 @@ extern const Image exocet_ankou_front_0;
 extern const Image exocet_ankou_front_1;
 extern const Image exocet_ankou_front_2;
 extern const Image exocet_ankou_front_3;
+extern const Image shield_anim;
+extern const SpriteDefinition rse_logo_shadow;
 
 #endif // _RES_GFX_H_

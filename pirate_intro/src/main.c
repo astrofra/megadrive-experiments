@@ -57,7 +57,7 @@ int main()
 
 		circleWavesFX();
 
-		displayRSILogoFX();
+		displayRSELogoFX();
 
 		ankouScreenFX();
 

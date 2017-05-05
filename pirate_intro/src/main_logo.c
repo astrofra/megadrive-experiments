@@ -551,11 +551,23 @@ void main_logo(void)
 
 	/* Reset the whole screen and draw the pixel logo */
 	BMP_end();
+
 	SYS_disableInts();
 	VDP_setScreenWidth320();
 	VDP_setPlanSize(64, 32);
 	VDP_clearPlan(PLAN_A, 0);
-	VDP_clearPlan(PLAN_B, 0);	
+	VDP_clearPlan(PLAN_B, 0);
+
+	{
+		u16 i;
+		for(i = 0; i  < 224 >> 3; i++)
+		{
+			if (i & 0x1) VDP_waitVSync();
+			// RSE_clearTileRowB(i);
+			RSE_clearTileRowA(i);
+		}
+	}
+
 	VDP_drawImageEx(PLAN_A, &logo_rse_3d, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, ((240 - 64) >> 4) - 1, FALSE, TRUE);
 	vramIndex += logo_rse_3d.tileset->numTile;
 	SYS_enableInts();
@@ -581,7 +593,12 @@ void main_logo(void)
 		for(i = 1; i < 16; i++)
 			VDP_setPaletteColor(i, 0xFFF);
 	}
-	VDP_drawImageEx(PLAN_B, &medieval_girl, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, ((240 - 64) >> 4), FALSE, TRUE);
+
+	SYS_disableInts();
+	VDP_drawImageEx(PLAN_B, &medieval_girl, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, ((240 - 64) >> 4), FALSE, FALSE);
+	SYS_enableInts();
+	VDP_waitVSync();
+
 	VDP_fadePalTo(PAL0, medieval_girl.palette->data, 16, TRUE);
 	
 	RSE_pause(RSE_FRAMES(120));
@@ -590,5 +607,15 @@ void main_logo(void)
 
 	RSE_turn_screen_to_black();
 	BMP_end();
+
+	{
+		u16 i;
+		for(i = 0; i  < 224 >> 3; i++)
+		{
+			if (i & 0x1) VDP_waitVSync();
+			RSE_clearTileRowB(i);
+			RSE_clearTileRowA(i);
+		}
+	}	
 
 }

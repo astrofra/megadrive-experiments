@@ -16,7 +16,7 @@ s16 twister_hjump_table[TWISTER_TABLE_SIZE];
 // s16 hscroll_table[256];
 // s16 hscroll_table_bg[256];
 
-extern u16 hscrl_adr;
+// extern u16 hscrl_adr;
 
 
 void circleWavesFX(void)
@@ -50,7 +50,7 @@ void circleWavesFX(void)
 	    prev_i = i;
 
 		/* Horizontal scroll */
-	    *pl = GFX_WRITE_VRAM_ADDR(hscrl_adr);
+	    *pl = GFX_WRITE_VRAM_ADDR(0xB800);
 	    *pw = twister_hjump_table[(GET_VCOUNTER + vcount) & 1023];	    
 	}
 
@@ -142,12 +142,12 @@ void circleWavesFX(void)
 	    *pl = CST_WRITE_VSRAM_ADDR(0);
 	    *pw = twister_jump_table[vcount & 1023];
 
-	    *pl = GFX_WRITE_VRAM_ADDR(hscrl_adr);
+	    *pl = GFX_WRITE_VRAM_ADDR(0xB800);
 	    *pw = twister_hjump_table[vcount & 1023];	 	    
         SYS_enableInts();
 
-        if (vcount > 60 * 8 && k < (4 * 13 * 32))
-        	k += 32;
+        if (vcount & 0x1 && vcount > 60 * 4 && k < (4 * 13 * 32))
+        	k += 8;
 
         vcount += 1;
     }
@@ -157,8 +157,6 @@ void circleWavesFX(void)
 	SYS_disableInts();
 
 	RSE_resetScrolling();
-	// VDP_clearPlan(PLAN_A, TRUE);
-	// VDP_clearPlan(PLAN_B, TRUE);
 
 	VDP_setHInterrupt(0);
 
@@ -169,5 +167,7 @@ void circleWavesFX(void)
 
     RSE_turn_screen_to_black();	
 
+	VDP_clearPlan(PLAN_A, TRUE);
+	VDP_clearPlan(PLAN_B, TRUE);
 	// vramIndex = TILE_USERINDEX;    
 }

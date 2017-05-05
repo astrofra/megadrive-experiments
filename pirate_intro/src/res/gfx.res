@@ -45,3 +45,6 @@ IMAGE exocet_ankou_front_0 "exocet-ankou-front-0.png" 0
 IMAGE exocet_ankou_front_1 "exocet-ankou-front-1.png" 0
 IMAGE exocet_ankou_front_2 "exocet-ankou-front-2.png" 0
 IMAGE exocet_ankou_front_3 "exocet-ankou-front-3.png" 0
+
+IMAGE shield_anim "shield_anim.png" 0
+SPRITE rse_logo_shadow "rse_logo_shadow.png" 32 4 0
