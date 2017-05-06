@@ -20,7 +20,7 @@ IMAGE checkboard_2 "checkboard-2.png" 0
 IMAGE checkboard_3 "checkboard-3.png" 0
 IMAGE sky "sky.png" 0
 
-IMAGE sim1_font "sim1_font.png" 0
+IMAGE sim1_font "btiger_font.png" 0
 
 IMAGE circles "flames.png" 0
 
