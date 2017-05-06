@@ -8,10 +8,11 @@
 extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
+static u16 barb_blue_pal[64];
 
 void flat3DCubeFX(void)
 {
-	u16 cube_phase;
+	u16 i, cube_phase;
 	s16 x_cube, y_cube;
 	u16 cube_frame, sec_frame_step;
 	Sprite *sprites[2];
@@ -22,6 +23,9 @@ void flat3DCubeFX(void)
 
 	SPR_init(0,0,0);
 	VDP_setHilightShadow(1);
+
+	for(i = 0; i < 64; i++)
+		barb_blue_pal[i] = barb_pic_2_front.palette->data[0];
 
 	VDP_setPalette(PAL2, palette_black);
 
@@ -54,13 +58,13 @@ void flat3DCubeFX(void)
 		if (cube_phase == 256 + 32 + 10)
 			VDP_fadePalTo(PAL2, sky.palette->data, RSE_FRAMES(16), TRUE);
  
-		if (cube_phase == 1024 - 32)
-			VDP_fadeOut(1, 63, 32, TRUE);
+		if (cube_phase == 1024 - 20)
+			VDP_fadeAllTo(barb_blue_pal, 16, TRUE); // VDP_fadeOut(1, 63, 32, TRUE);
 	}
 
 	/* clean everything */
 
-	RSE_turn_screen_to_black();
+	RSE_turn_screen_to_color(0xF0F);
 
 	RSE_resetScrolling();
 

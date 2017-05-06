@@ -9,11 +9,20 @@ extern u8 framerate;
 
 void displayBarbPictureFX(void)
 {
-	u16 fx_phase, j, scroll_A_y, scroll_B_y;
+	u16 fx_phase, i, j, scroll_A_y, scroll_B_y;
 	static 	Sprite *sprites[16];
 	static	u16 palsrc[64], paldst[64];
 
 	RSE_turn_screen_to_color(barb_pic_2_front.palette->data[0]);
+	// RSE_turn_screen_to_black();
+
+	for(i = 0; i < 224 >> 3; i++)
+		RSE_clearTileRowB(i);
+
+	for(i = 0; i < 224 >> 3; i++)
+		RSE_clearTileRowA(i);		
+
+	VDP_waitVSync();
 	VDP_waitVSync();
 
 	SYS_disableInts();
@@ -29,9 +38,13 @@ void displayBarbPictureFX(void)
 
 	vramIndex = 0;
 
-	/* Draw the foreground */
+	/* Draw the background */
 	VDP_drawImageEx(PLAN_B, &barb_pic_2_back, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	// VDP_loadTileData(tileset->tiles, index, tileset->numTile, use_dma);
+	// VDP_setMap(plan, image->map, basetile, x, y);
 	vramIndex += barb_pic_2_back.tileset->numTile;
+
+	/* Draw the foreground */
 	VDP_drawImageEx(PLAN_A, &barb_pic_2_front, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += barb_pic_2_front.tileset->numTile;
 	sprites[0] = SPR_addSprite(&goblin_head, 28, 110, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
