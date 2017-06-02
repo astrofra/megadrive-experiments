@@ -22,17 +22,15 @@ IMAGE sky "sky.png" 0
 
 IMAGE sim1_font "btiger_font.png" 0
 
-IMAGE circles "flames.png" 0
+IMAGE flames_0 "flames-0.png" 0
+IMAGE flames_1 "flames-1.png" 0
+IMAGE flames_2 "flames-2.png" 0
+IMAGE flames_3 "flames-3.png" 0
 
 IMAGE masiaka_title_pic "masiaka_title.png" 0
-IMAGE fire_skull "fire_skull.png" 0
 
 SPRITE cube_anim "cube_anim.png" 14 14 0
 SPRITE cube_shadow "cube_anim_shadow.png" 16 2 0
-
-IMAGE barb_pic_2_back "barb_pic_2_back.png" 0
-IMAGE barb_pic_2_front "barb_pic_2_front.png" 0
-SPRITE goblin_head "barb_pic_2_goblin_head.png" 10 12 0
 
 IMAGE exocet_ankou_darken "exocet-ankou-front-darken.png" 0
 
@@ -48,3 +46,4 @@ IMAGE exocet_ankou_front_3 "exocet-ankou-front-3.png" 0
 
 IMAGE shield_anim "shield_anim.png" 0
 SPRITE rse_logo_shadow "rse_logo_shadow.png" 32 4 0
+SPRITE sword "sword.png" 6 16 0

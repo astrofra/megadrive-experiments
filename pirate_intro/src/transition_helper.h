@@ -6,7 +6,8 @@
 
 #define RSE_FRAMES(A) ((A*60)/framerate)
 
-const u16 palette_white[16];
+const u16 palette_white[64];
+const u16 palette_white_bg[64];
 
 void RSE_turn_screen_to_white(void);
 void RSE_turn_screen_to_black(void);

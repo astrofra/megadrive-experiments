@@ -8,7 +8,7 @@
 extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
-static u16 barb_blue_pal[64];
+// static u16 barb_blue_pal[64];
 
 void flat3DCubeFX(void)
 {
@@ -24,8 +24,8 @@ void flat3DCubeFX(void)
 	SPR_init(0,0,0);
 	VDP_setHilightShadow(1);
 
-	for(i = 0; i < 64; i++)
-		barb_blue_pal[i] = barb_pic_2_front.palette->data[0];
+	// for(i = 0; i < 64; i++)
+	// 	barb_blue_pal[i] = barb_pic_2_front_0.palette->data[0];
 
 	VDP_setPalette(PAL2, palette_black);
 
@@ -59,7 +59,8 @@ void flat3DCubeFX(void)
 			VDP_fadePalTo(PAL2, sky.palette->data, RSE_FRAMES(16), TRUE);
  
 		if (cube_phase == 1024 - 20)
-			VDP_fadeAllTo(barb_blue_pal, 16, TRUE); // VDP_fadeOut(1, 63, 32, TRUE);
+			VDP_fadeOut(1, 63, 32, TRUE);
+			// VDP_fadeAllTo(barb_blue_pal, 16, TRUE);
 	}
 
 	/* clean everything */

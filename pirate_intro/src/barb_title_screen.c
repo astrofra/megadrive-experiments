@@ -7,12 +7,13 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
+static s16 scroll_A_x[256], scroll_B_x[256];
+static	u16 palsrc[64], paldst[64];
+
 void displayBarbTitleFX(void)
 {
 	u16 fx_phase, j, scroll_A_y, scroll_B_y;
-	static s16 scroll_A_x[256], scroll_B_x[256];
 	static 	Sprite *sprites[16];
-	static	u16 palsrc[64], paldst[64];
 
 	SYS_disableInts();
 
@@ -22,9 +23,10 @@ void displayBarbTitleFX(void)
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 64);
 	VDP_setHilightShadow(0); 
-	SPR_init(16,180,128);
+	SPR_initNoFont(16,TILE_USERINDEX + barb_pic_back_0.tileset->numTile + barb_pic_back_1.tileset->numTile + barb_pic_back_2.tileset->numTile
+									+ barb_pic_back_3.tileset->numTile + barb_pic_front.tileset->numTile /*180*/,128);
 
-	vramIndex = 8;
+	vramIndex = TILE_USERINDEX;
 
 	sprites[0] = SPR_addSprite(&masiaka_title, (320 - 240) >> 1, 256, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 
@@ -63,7 +65,7 @@ void displayBarbTitleFX(void)
 
 	SPR_update(sprites, 1);
 
-	VDP_fadePalTo(PAL1, palette_white, RSE_FRAMES(8), TRUE);
+	VDP_fadePalTo(PAL1, palette_white_bg, RSE_FRAMES(8), TRUE);
 	RSE_pause(8);
 	VDP_fadePalTo(PAL1, barb_pic_back_0.palette->data, RSE_FRAMES(16), TRUE);
 	RSE_pause(16);
@@ -84,14 +86,14 @@ void displayBarbTitleFX(void)
 		VDP_setVerticalScroll(PLAN_B, scroll_B_y);
 
 		if (fx_phase == 256 - 64 - 16)
-			VDP_fadePalTo(PAL0, palette_white, RSE_FRAMES(8), TRUE);
+			VDP_fadePalTo(PAL0, palette_white_bg, RSE_FRAMES(8), TRUE);
 		if (fx_phase == 256 - 56 - 16)
 			VDP_fadePalTo(PAL0, barb_pic_front.palette->data, RSE_FRAMES(8), TRUE);
 
 		if (fx_phase >= 256 - 64)
 		{
 			if (fx_phase == 256 - 64)
-				VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(8), TRUE);
+				VDP_fadePalTo(PAL2, palette_white_bg, RSE_FRAMES(8), TRUE);
 
 			if (fx_phase == 256 - (64 - 12))
 				VDP_fadePalTo(PAL2, masiaka_title.palette->data, RSE_FRAMES(32), TRUE);
@@ -129,25 +131,25 @@ void displayBarbTitleFX(void)
 
 	for(fx_phase = 0; fx_phase < 64; fx_phase++)
 	{
-		for(j = 0; j < 256; j++)
-		{
-			if (j & 0x1)
-			{
-				scroll_A_x[j] += 3;
-				scroll_B_x[j] -= 1;
-			}
-			else
-			{
-				scroll_A_x[j] -= 3;
-				scroll_B_x[j] += 1;
-			}
-		}
+		// for(j = 0; j < 256; j++)
+		// {
+		// 	if (j & 0x1)
+		// 	{
+		// 		scroll_A_x[j] += 3;
+		// 		scroll_B_x[j] -= 1;
+		// 	}
+		// 	else
+		// 	{
+		// 		scroll_A_x[j] -= 3;
+		// 		scroll_B_x[j] += 1;
+		// 	}
+		// }
 
-		VDP_setHorizontalScrollLine(PLAN_A, scroll_A_y, scroll_A_x, 224, TRUE);
-		VDP_setHorizontalScrollLine(PLAN_B, scroll_B_y, scroll_B_x, 224, TRUE);
+		// VDP_setHorizontalScrollLine(PLAN_A, scroll_A_y, scroll_A_x, 224, TRUE);
+		// VDP_setHorizontalScrollLine(PLAN_B, scroll_B_y, scroll_B_x, 224, TRUE);
 
 		if (fx_phase == 42)
-			VDP_fadePalTo(PAL2, palette_white, RSE_FRAMES(4), TRUE);
+			VDP_fadePalTo(PAL2, palette_white_bg, RSE_FRAMES(4), TRUE);
 		if (fx_phase == 48)
 			VDP_fadePalTo(PAL2, masiaka_title.palette->data, RSE_FRAMES(16), TRUE);
 	}

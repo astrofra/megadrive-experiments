@@ -15,11 +15,11 @@ Framework : SGDK
 
 void fastVectorBallFX(void);
 void main_logo(void);
-void displayRSILogoFX(void);
+void displayRSELogoFX(void);
 void flat3DCubeFX(void);
 void displayBarbTitleFX(void);
 void displayBarbPictureFX(void);
-void circleWavesFX(void);
+void flamesWavesFX(void);
 void ankouScreenFX(void);
 
 u16 vramIndex;
@@ -53,13 +53,12 @@ int main()
 
 		flat3DCubeFX();
 
-		displayBarbPictureFX();
+		ankouScreenFX();
 
-		circleWavesFX();
+		flamesWavesFX();
 
 		displayRSELogoFX();
 
-		ankouScreenFX();
 
 		stop_music();
 
