@@ -50,7 +50,7 @@ void ankouScreenFX(void){
 	vramIndex += exocet_ankou_back_3.tileset->numTile;
 	VDP_waitVSync();
 
-	VDP_drawImageEx(PLAN_B, &exocet_ankou_front_0, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, TRUE, FALSE);
+	VDP_drawImageEx(PLAN_B, &exocet_ankou_front_0, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0,  FALSE, TRUE);
 	vramIndex += exocet_ankou_front_0.tileset->numTile;
 	VDP_waitVSync();
 
@@ -66,12 +66,12 @@ void ankouScreenFX(void){
 	vramIndex += exocet_ankou_front_3.tileset->numTile;
 	VDP_waitVSync();
 
-	VDP_fadePalTo(PAL1, exocet_ankou_darken.palette->data, 16, TRUE);
-	RSE_pause(16);
-	VDP_fadePalTo(PAL1, exocet_ankou_front_0.palette->data, 16, TRUE);
-	RSE_pause(16);
-	VDP_fadePalTo(PAL0, exocet_ankou_back_0.palette->data, 16, TRUE);
-	RSE_pause(16);	
+	VDP_fadePalTo(PAL1, exocet_ankou_darken.palette->data, RSE_FRAMES(32), TRUE);
+	RSE_pause(RSE_FRAMES(32));
+	VDP_fadePalTo(PAL1, exocet_ankou_front_0.palette->data, RSE_FRAMES(24), TRUE);
+	RSE_pause(RSE_FRAMES(24));
+	VDP_fadePalTo(PAL0, exocet_ankou_back_0.palette->data, RSE_FRAMES(16), TRUE);
+	RSE_pause(RSE_FRAMES(16));	
 
 	vcount = 0;
 	while(vcount < 60 * 5)

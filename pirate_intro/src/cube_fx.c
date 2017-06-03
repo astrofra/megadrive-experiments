@@ -59,13 +59,13 @@ void flat3DCubeFX(void)
 			VDP_fadePalTo(PAL2, sky.palette->data, RSE_FRAMES(16), TRUE);
  
 		if (cube_phase == 1024 - 20)
-			VDP_fadeOut(1, 63, 32, TRUE);
+			VDP_fadeOut(1, 63, 16, TRUE);
 			// VDP_fadeAllTo(barb_blue_pal, 16, TRUE);
 	}
 
 	/* clean everything */
 
-	RSE_turn_screen_to_color(0xF0F);
+	// RSE_turn_screen_to_color(0xF0F);
 
 	RSE_resetScrolling();
 

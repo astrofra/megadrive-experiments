@@ -59,7 +59,6 @@ int main()
 
 		displayRSELogoFX();
 
-
 		stop_music();
 
 		RSE_pause(RSE_FRAMES(20));
