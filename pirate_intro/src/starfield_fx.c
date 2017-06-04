@@ -14,15 +14,25 @@ typedef struct
 	s16 x,y,z;
 } _star;
 
+typedef struct
+{
+    Vect2D_f16 pos;
+    Vect2D_f16 mov;
+    u16 timer;
+} Object;
+
 extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
+static u16 tileIndexes[64];
+
 static u16 loop;
 static _star stars[MAX_STAR];
-static s16 numstars;
+static s16 numstars, ind;
 
 static Sprite *sprites[MAX_STAR];
+static Object objects[256];
 static short x_screen, y_screen;
 
 void RSE_Starfield_3D_Spr(void)
@@ -105,13 +115,27 @@ void RSE_Starfield_3D_Spr(void)
 	vramIndex = TILE_USERINDEX;
 
 	VDP_setPalette(PAL2, sprite_stars.palette->data);
-	SPR_init(MAX_STAR, 0, 0);	
+	SPR_init(0,0,0);
+
+    ind = vramIndex;
+    for(loop = 0; loop < sprite_stars.animations[0]->numFrame; loop++)
+    {
+        TileSet* tileset = sprite_stars.animations[0]->frames[loop]->tileset;
+
+        VDP_loadTileSet(tileset, ind, TRUE);
+        tileIndexes[loop] = ind;
+        ind += tileset->numTile;
+    }		
 
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < MAX_STAR; loop++)
 	{
 		sprites[loop] = SPR_addSprite(&sprite_stars, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-		SPR_setFrame(sprites[loop], loop % 7);
+		SPR_setAutoTileUpload(sprites[loop], FALSE);
+		SPR_setVRAMTileIndex(sprites[loop], TILE_USERINDEX);
+		sprites[loop]->data = (u32) &objects[loop];
+		SPR_setVRAMTileIndex(sprites[loop], tileIndexes[loop & 0x7]);		
+		// SPR_setFrame(sprites[loop], loop % 7);
 	}
 
 	SPR_update(sprites, MAX_STAR);
@@ -121,7 +145,7 @@ void RSE_Starfield_3D_Spr(void)
 	/* Initialise stars */
 	initStar(MAX_STAR);
 
-	VDP_fadePalTo(PAL0, checkboard_green.palette->data, RSE_FRAMES(8), TRUE);
+	// VDP_fadePalTo(PAL0, checkboard_green.palette->data, RSE_FRAMES(8), TRUE);
 
 	/* Main loop */
 	while(TRUE)

@@ -15,7 +15,7 @@ Framework : SGDK
 
 void fastVectorBallFX(void);
 void main_logo(void);
-void displayRSELogoFX(void);
+void shieldAnimFX(void);
 void flat3DCubeFX(void);
 void displayBarbTitleFX(void);
 void displayBarbPictureFX(void);
@@ -57,7 +57,7 @@ int main()
 
 		flamesWavesFX();
 
-		displayRSELogoFX();
+		shieldAnimFX();
 
 		RSE_Starfield_3D_Spr();
 

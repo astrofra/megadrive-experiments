@@ -39,6 +39,5 @@ extern const Image shield_anim;
 extern const SpriteDefinition rse_logo_shadow;
 extern const SpriteDefinition sword;
 extern const SpriteDefinition sprite_stars;
-extern const Image checkboard_green;
 
 #endif // _RES_GFX_H_

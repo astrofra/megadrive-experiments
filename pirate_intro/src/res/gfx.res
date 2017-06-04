@@ -49,4 +49,3 @@ SPRITE rse_logo_shadow "rse_logo_shadow.png" 32 4 0
 SPRITE sword "sword.png" 6 16 0
 
 SPRITE sprite_stars "sprite_stars.png" 1 1 -1
-IMAGE checkboard_green "checkboard_green.png" 0

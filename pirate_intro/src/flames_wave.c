@@ -269,7 +269,7 @@ void flamesWavesFX(void)
         vcount += 1;
     }
 
-	// SPR_end();
+	SPR_end();
 
 	SYS_disableInts();
 
