@@ -21,6 +21,7 @@ void displayBarbTitleFX(void);
 void displayBarbPictureFX(void);
 void flamesWavesFX(void);
 void ankouScreenFX(void);
+void RSE_Starfield_3D_Spr(void);
 
 u16 vramIndex;
 u16 fontIndex;

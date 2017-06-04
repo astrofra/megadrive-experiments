@@ -31,12 +31,12 @@ static u16 loop;
 static _star stars[MAX_STAR];
 static s16 numstars, ind;
 
-static Sprite *sprites[MAX_STAR];
-static Object objects[256];
-static short x_screen, y_screen;
-
 void RSE_Starfield_3D_Spr(void)
 {
+	Sprite *sprites[MAX_STAR];
+	Object sp_objects[MAX_STAR];
+	short x_screen, y_screen;
+
 	/*	Initialize the list of stars */
 	static void initStar(s16 num)
 	{
@@ -133,7 +133,7 @@ void RSE_Starfield_3D_Spr(void)
 		sprites[loop] = SPR_addSprite(&sprite_stars, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 		SPR_setAutoTileUpload(sprites[loop], FALSE);
 		SPR_setVRAMTileIndex(sprites[loop], TILE_USERINDEX);
-		sprites[loop]->data = (u32) &objects[loop];
+		sprites[loop]->data = (u32) &sp_objects[loop];
 		SPR_setVRAMTileIndex(sprites[loop], tileIndexes[loop & 0x7]);		
 		// SPR_setFrame(sprites[loop], loop % 7);
 	}
