@@ -104,9 +104,9 @@ void flamesWavesFX(void)
 					b = b - ((32 - i) >> 2);
 				}
 
-				r -= (k + 1);
-				g -= (k + 1);
-				b -= (k + 1);
+				r -= (k + 1) << 1;
+				g -= (k + 1) << 1;
+				b -= (k + 1) << 1;
 
 				if (r < 0) r = 0;
 				if (g < 0) g = 0;
@@ -212,7 +212,7 @@ void flamesWavesFX(void)
     while (vcount < 32)	
 	{
 		VDP_waitVSync();
-    	SPR_setPosition(sprites[0], (320 - 48) >> 1, (((224 - 128) >> 1) - 64 )+ (easing_table[vcount << 5] >> 4));
+    	SPR_setPosition(sprites[0], (320 - 48) >> 1, (((224 - 128) >> 1) - 76 )+ (easing_table[vcount << 5] >> 4));
     	SPR_update(sprites, 1);
     	vcount++;
 	}
@@ -263,7 +263,7 @@ void flamesWavesFX(void)
 	    *pw = twister_hjump_table[vcount & 1023];	 	    
         SYS_enableInts();
 
-        if (vcount & 0x1 && vcount > 60 * 4 && k < (4 * 13 * 32))
+        if (vcount & 0x1 && vcount > 60 * 5 && k < (4 * 13 * 32))
         	k += 8;
 
         vcount += 1;

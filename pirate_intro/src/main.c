@@ -59,6 +59,8 @@ int main()
 
 		displayRSELogoFX();
 
+		RSE_Starfield_3D_Spr();
+
 		stop_music();
 
 		RSE_pause(RSE_FRAMES(20));
