@@ -20,6 +20,11 @@
 #define VBALL_NEXT_OBJECT			7
 #define VBALL_PHASE_QUIT			8
 
+#define VBALL_X_SCREEN (((320 - 32) >> 1) + 0x80)
+#define VBALL_Y_SCREEN (((224 - 32) >> 1) + 0x80)
+#define VBALL_X_SCREEN_SHADOW (VBALL_X_SCREEN + 0x30)
+#define VBALL_Y_SCREEN_SHADOW (VBALL_Y_SCREEN + 0x60)
+
 extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
@@ -30,30 +35,24 @@ static 	Sprite *sprites[MAX_VECTOR_BALL];
 static 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
 static 	short xc, yc;
 static	short rx, ry;
-static 	u16 angle;
-static 	u16 sec_angle, sec_angle_step;
 static 	u8 vball_phase;
 static 	u16 vball_timer;
 static 	const Animation *animation;
 static 	u16 frameInd;
 static	u8 ball_count;
 static	Vect3D_f16 *vector_ball_array;
-static	u8 object_idx;
 
 static short x, y, z;
 static Vect3D_f16 _vtx, t_vtx[MAX_VTX_COUNT];
 static fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
-// static u16 distance = 1100;
-static short x_screen, y_screen, x_screen_shadow, y_screen_shadow;
 
 void fastVectorBallFX()
 {
+	u16 angle, sec_angle, sec_angle_step;
+	u8 object_idx;
+
 	inline static void drawVectorBalls(u16 constant_angle, u16 accel_angle)
 	{
-		/* Get the center of the screen (minus the half width of a vector balls) */
-		x_screen_shadow = x_screen + 0x30;
-		y_screen_shadow = y_screen + 0x60;
-
 		rx = constant_angle;
 		ry = constant_angle >> 1;
 
@@ -106,13 +105,13 @@ void fastVectorBallFX()
 				z = 8;
 
 			/* Vector ball */
-	        sprites[loop]->x = x_screen + x;
-	        sprites[loop]->y = y_screen + y;
+	        sprites[loop]->x = VBALL_X_SCREEN + x;
+	        sprites[loop]->y = VBALL_Y_SCREEN + y;
 	        sprites[loop]->status = sprites[loop]->status | 0x0002;
 
 		    /* shadow */
-	        sprites[shadow_idx]->x = x_screen_shadow + x;
-	        sprites[shadow_idx]->y = y_screen_shadow + (y >> 2);
+	        sprites[shadow_idx]->x = VBALL_X_SCREEN_SHADOW + x;
+	        sprites[shadow_idx]->y = VBALL_Y_SCREEN_SHADOW + (y >> 2);
 	        sprites[shadow_idx]->status = sprites[loop]->status | 0x0002;
 
 		    if (zsort_switch & 0x1)
@@ -226,11 +225,6 @@ void fastVectorBallFX()
 	angle = 0;
 	sec_angle = 0;
 	sec_angle_step = 0;
-
-	x_screen = (VDP_getScreenWidth() - 32) >> 1;
-	x_screen += 0x80;
- 	y_screen = (VDP_getScreenHeight() - 32) >> 1;
-	y_screen += 0x80;
 
 	vball_phase = VBALL_PHASE_INTRO_SCROLL;
 	vball_timer = 0;
