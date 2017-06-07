@@ -150,8 +150,6 @@ void updateScrollText(void)
 
 	/* H scroll */
 	VDP_setHorizontalScroll(current_plan, scroll_x_offset);
-	// scroll_tile_x[0] = scroll_x_offset;
-	// VDP_setHorizontalScrollTile(current_plan, 0, scroll_tile_x, 8, TRUE);
 
 	SYS_enableInts();
 }

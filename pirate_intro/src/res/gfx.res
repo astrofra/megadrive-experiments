@@ -47,5 +47,6 @@ IMAGE exocet_ankou_front_3 "exocet-ankou-front-3.png" 0
 IMAGE shield_anim "shield_anim.png" 0
 SPRITE rse_logo_shadow "rse_logo_shadow.png" 32 4 0
 SPRITE sword "sword.png" 6 16 0
+IMAGE transition_pattern "transition_pattern.png" 0
 
 SPRITE sprite_stars "sprite_stars.png" 1 1 -1

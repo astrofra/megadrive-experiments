@@ -46,10 +46,14 @@ static short x, y, z;
 static Vect3D_f16 _vtx, t_vtx[MAX_VTX_COUNT];
 static fix16 _cosx, _sinx, _cosy, _siny, cs, cc, ss, sc;
 
+static u16 tileIndexes[64];
+
 void fastVectorBallFX()
 {
 	u16 angle, sec_angle, sec_angle_step;
 	u8 object_idx;
+	Object vb_objects[BALL_COUNT];
+	u16 ind;
 
 	inline static void drawVectorBalls(u16 constant_angle, u16 accel_angle)
 	{
@@ -114,40 +118,18 @@ void fastVectorBallFX()
 	        sprites[shadow_idx]->y = VBALL_Y_SCREEN_SHADOW + (y >> 2);
 	        sprites[shadow_idx]->status = sprites[loop]->status | 0x0002;
 
-		    if (zsort_switch & 0x1)
+		    if (!(zsort_switch & 0x1))
 		    {
-			    if (sprites[loop]->seqInd != z)
-			    {
-			        animation = sprites[loop]->animation;
-			        frameInd = animation->sequence[z];
-
-			        sprites[loop]->seqInd = z;
-
-			        if (sprites[loop]->frameInd != frameInd)
-			        {
-			            sprites[loop]->frameInd = frameInd;
-			            sprites[loop]->frame = animation->frames[frameInd];
-			            sprites[loop]->status |= 0x0040;
-			        }
-				}
+				SPR_setVRAMTileIndex(sprites[loop], tileIndexes[z]);
+				sprites[loop]->status |= 0x0040;
 			}
 			else
 			{
-			    if (sprites[shadow_idx]->seqInd != z)
-			    {
-			        /* shadow */
-			        animation = sprites[shadow_idx]->animation;
-			        frameInd = animation->sequence[z];
-
-			        sprites[shadow_idx]->seqInd = z;
-
-			        if (sprites[shadow_idx]->frameInd != frameInd)
-			        {
-			            sprites[shadow_idx]->frameInd = frameInd;
-			            sprites[shadow_idx]->frame = animation->frames[frameInd];
-			            sprites[shadow_idx]->status |= 0x0040;
-			        }		        
-			    }
+				if (!(zsort_switch & 0x5))
+				{
+					SPR_setVRAMTileIndex(sprites[shadow_idx], tileIndexes[z + 9]);
+					sprites[shadow_idx]->status |= 0x0040;
+				}
 		    }
 		}
 
@@ -180,26 +162,58 @@ void fastVectorBallFX()
 	VDP_setPlanSize(64, 64);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setVerticalScroll(PLAN_A, -64);
+	VDP_setVerticalScroll(PLAN_B, 0);
+	VDP_setVerticalScrollTile(PLAN_A, 0, palette_black, 64, TRUE);
+	VDP_setVerticalScrollTile(PLAN_B, 0, palette_black, 64, TRUE);
 	VDP_setHilightShadow(1);
 	SPR_init(0,0,0);
 	vramIndex = fontIndex;
 
 	object_idx = 0;
 	ball_count = BALL_COUNT;
-	vector_ball_array = VECTOR_BALL_ARRAY;	
+	vector_ball_array = VECTOR_BALL_ARRAY;		
+
+	ind = vramIndex;
+    for(loop = 0; loop < ball_metal.animations[0]->numFrame; loop++)
+    {
+        TileSet* tileset = ball_metal.animations[0]->frames[loop]->tileset;
+
+        VDP_loadTileSet(tileset, ind, TRUE);
+        tileIndexes[loop] = ind;
+        ind += tileset->numTile;
+    }   
 
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < ball_count; loop++)
 	{
 	    sprites[loop] = SPR_addSprite(&ball_metal, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
+		SPR_setAutoTileUpload(sprites[loop], FALSE);
+		sprites[loop]->data = (u32) &vb_objects[loop];
+		SPR_setVRAMTileIndex(sprites[loop], tileIndexes[loop & 0x7]);			
 	}
+
+	vramIndex += ind;
+
+    for(loop = 0; loop < ball_shadow.animations[0]->numFrame; loop++)
+    {
+        TileSet* tileset = ball_shadow.animations[0]->frames[loop]->tileset;
+
+        VDP_loadTileSet(tileset, ind, TRUE);
+        tileIndexes[loop + ball_metal.animations[0]->numFrame] = ind;
+        ind += tileset->numTile;
+    } 	
 
 	for(loop = ball_count; loop < ball_count << 1; loop++)
 	{
-	    sprites[loop] = SPR_addSprite(&ball_shadow, 0, 0, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, 0));
+	    sprites[loop] = SPR_addSprite(&ball_shadow, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 		SPR_setAlwaysVisible(sprites[loop], TRUE);
+		SPR_setAutoTileUpload(sprites[loop], FALSE);
+		sprites[loop]->data = (u32) &vb_objects[loop];
+		SPR_setVRAMTileIndex(sprites[loop], TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, tileIndexes[8 + (loop & 0x7)]));
 	}
+
+	vramIndex += ind;
 
 	VDP_drawImageEx(PLAN_B, &checkboard_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 96) >> 3, FALSE, TRUE);
 	vramIndex += checkboard_0.tileset->numTile;
@@ -254,9 +268,11 @@ void fastVectorBallFX()
 
 				if (vball_timer > 63)
 				{
-					VDP_fadePalTo(PAL1, sky.palette->data, RSE_FRAMES(32), TRUE);
+					SYS_disableInts();
 					VDP_setVerticalScroll(PLAN_B, 0);
 					VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_2TILE);
+					SYS_enableInts();
+					VDP_fadePalTo(PAL1, sky.palette->data, RSE_FRAMES(32), TRUE);
 					vball_timer = 0;
 					vball_phase++;					
 				}			

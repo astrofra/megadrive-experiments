@@ -1,6 +1,6 @@
 #include "types.h"
 
-
+__attribute__((used))
 const struct
 {
     char console[16];               /* Console Name (16) */
@@ -23,9 +23,9 @@ const struct
     char region[16];                /* Country Support (16) */
 } rom_header = {
     "SEGA MEGA DRIVE ",
-    "(C)RESISTANCE 17",
-    "MASIAKA SEGA MD                                 ",
-    "MASIAKA SEGA MD                                 ",
+    "(C)FLEMTEAM 2013",
+    "SAMPLE PROGRAM                                  ",
+    "SAMPLE PROGRAM                                  ",
     "GM 00000000-00",
     0x0000,
     "JD              ",
@@ -38,6 +38,6 @@ const struct
     0x00200000,
     0x002001FF,
     "            ",
-    "MASIAKA - AGE OF BARBARIAN BY RESISTANCE",
+    "DEMONSTRATION PROGRAM                   ",
     "JUE             "
 };

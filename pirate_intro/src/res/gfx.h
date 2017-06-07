@@ -38,6 +38,7 @@ extern const Image exocet_ankou_front_3;
 extern const Image shield_anim;
 extern const SpriteDefinition rse_logo_shadow;
 extern const SpriteDefinition sword;
+extern const Image transition_pattern;
 extern const SpriteDefinition sprite_stars;
 
 #endif // _RES_GFX_H_

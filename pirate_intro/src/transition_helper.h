@@ -4,6 +4,13 @@
 #ifndef TRANSITION_HELPER
 #define TRANSITION_HELPER
 
+typedef struct
+{
+    Vect2D_f16 pos;
+    Vect2D_f16 mov;
+    u16 timer;
+} Object;
+
 #define RSE_FRAMES(A) ((A*60)/framerate)
 
 const u16 palette_white[64];
