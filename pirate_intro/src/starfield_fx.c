@@ -145,10 +145,10 @@ void RSE_Starfield_3D_Spr(void)
 	/* Main loop */
 	while(TRUE)
 	{
-		VDP_waitVSync();
+		// VDP_waitVSync();
 
 		// can now draw text
-		// BMP_showFPS(0);
+		BMP_showFPS(0);
 
 		// calculates stars position
 		// draw stars

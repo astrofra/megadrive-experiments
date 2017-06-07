@@ -38,7 +38,7 @@ int main()
 	{
 		vramIndex = TILE_USERINDEX;
 
-		RSE_turn_screen_to_black();
+		// RSE_turn_screen_to_black();
 
 		// main_logo();
 
