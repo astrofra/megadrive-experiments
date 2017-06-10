@@ -50,3 +50,5 @@ SPRITE sword "sword.png" 6 16 0
 IMAGE transition_pattern "transition_pattern.png" 0
 
 SPRITE sprite_stars "sprite_stars.png" 1 1 -1
+IMAGE bg_sky "bg_sky.png" 0
+IMAGE rse_retrowave_logo "rse_retrowave_logo.png" 0

@@ -10,8 +10,9 @@ extern u8 framerate;
 void shieldAnimFX(void)
 {
 	u16 fx_phase, i, j, k, vcount;
+	s16 si, sj;
 	s16 shield_hscroll[256];
-	s16 scroll_tile_x[32], scroll_dir[32];
+	s16 scroll_tile_x[32], scroll_dir[32], wipe_tile_x[32];
 
 	SYS_disableInts();
 
@@ -75,6 +76,9 @@ void shieldAnimFX(void)
 	for (i = 0; i < 32; i++)
 		scroll_tile_x[i] = 0;
 
+	for (i = 0; i < 32; i++)
+		wipe_tile_x[i] = 0;
+
 	VDP_waitVSync();
 
 	for (i = 0; i < 4; i++)
@@ -102,6 +106,19 @@ void shieldAnimFX(void)
 
 		if (vcount == RSE_FRAMES(16) + 2)
 				VDP_fadePalTo(PAL0, shield_anim.palette->data, RSE_FRAMES(16), TRUE);
+		else
+		if (vcount > RSE_FRAMES(40) && vcount < RSE_FRAMES(80))
+		{
+			si = vcount - RSE_FRAMES(40);
+			sj = (si * 700) / RSE_FRAMES(80 - 40);
+			for (i = 0; i < 32; i++)
+			{
+				si = sj + i;
+				if (si < -700) si = -700;
+				wipe_tile_x[i] = si;
+			}
+			VDP_setHorizontalScrollTile(PLAN_A, 0, wipe_tile_x, 8 << 2, TRUE);
+		}
 
 		vcount++;
 		k++;
@@ -109,7 +126,7 @@ void shieldAnimFX(void)
 		{
 			k = 0;
 			VDP_setHorizontalScrollTile(PLAN_B, 0, scroll_tile_x, 8 << 2, TRUE);
-			VDP_setHorizontalScrollTile(PLAN_A, 0, scroll_tile_x, 8 << 2, TRUE);
+			// VDP_setHorizontalScrollTile(PLAN_A, 0, scroll_tile_x, 8 << 2, TRUE);
 			for (i = 0; i < 4; i++)
 				for(j = 0; j < 8; j++)
 					shield_hscroll[(i << 3) + j] += scroll_dir[(i << 3) + j];

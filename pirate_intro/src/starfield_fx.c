@@ -99,8 +99,8 @@ void RSE_Starfield_3D_Spr(void)
 			p++;
 		}
 
-		// SPR_updateQ(sprites, MAX_STAR);
-		SPR_update(sprites, MAX_STAR);
+		SPR_updateQ(sprites, MAX_STAR);
+		// SPR_update(sprites, MAX_STAR);
 	};
 
 	SYS_disableInts();
@@ -109,8 +109,30 @@ void RSE_Starfield_3D_Spr(void)
 
 	vramIndex = TILE_USERINDEX;
 
+	for(loop = 0; loop < 4; loop++)
+	{
+		VDP_drawImageEx(PLAN_B, &bg_sky, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), loop * 10, (224 - 160) >> 4, FALSE, TRUE);
+
+		SYS_enableInts();
+		VDP_waitVSync();
+		SYS_disableInts();		
+	}
+	vramIndex += bg_sky.tileset->numTile;
+
+	VDP_setPalette(PAL0, bg_sky.palette->data);
+
+	VDP_drawImageEx(PLAN_A, &rse_retrowave_logo, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), (320 - 140) >> 4, 4, FALSE, TRUE);
+	vramIndex += rse_retrowave_logo.tileset->numTile;
+
+	SYS_enableInts();
+	VDP_waitVSync();
+	SYS_disableInts();
+		
+	VDP_setPalette(PAL1, rse_retrowave_logo.palette->data);
+
+
 	VDP_setPalette(PAL2, sprite_stars.palette->data);
-	SPR_init(0,0,0);
+	SPR_init(MAX_STAR,0,0);
 
     ind = vramIndex;
     for(loop = 0; loop < sprite_stars.animations[0]->numFrame; loop++)
@@ -125,7 +147,7 @@ void RSE_Starfield_3D_Spr(void)
 	/*	Initialize the needed amount of sprites */
 	for(loop = 0; loop < MAX_STAR; loop++)
 	{
-		sprites[loop] = SPR_addSprite(&sprite_stars, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+		sprites[loop] = SPR_addSprite(&sprite_stars, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
 		SPR_setAutoTileUpload(sprites[loop], FALSE);
 		// SPR_setVRAMTileIndex(sprites[loop], vramIndex);
 		sprites[loop]->data = (u32) &sp_objects[loop];
@@ -145,10 +167,10 @@ void RSE_Starfield_3D_Spr(void)
 	/* Main loop */
 	while(TRUE)
 	{
-		// VDP_waitVSync();
+		VDP_waitVSync();
 
 		// can now draw text
-		BMP_showFPS(0);
+		// BMP_showFPS(0);
 
 		// calculates stars position
 		// draw stars

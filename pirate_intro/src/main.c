@@ -38,27 +38,27 @@ int main()
 	{
 		vramIndex = TILE_USERINDEX;
 
-		// RSE_turn_screen_to_black();
+		RSE_turn_screen_to_black();
 
-		// main_logo();
+		main_logo();
 
-		// RSE_pause(RSE_FRAMES(16));
+		RSE_pause(RSE_FRAMES(16));
 
-		// play_music();
+		play_music();
 
-		// displayBarbTitleFX();
+		displayBarbTitleFX();
 
-		// fontIndex = RSE_writerSetup();
+		fontIndex = RSE_writerSetup();
 
-		// fastVectorBallFX();
+		fastVectorBallFX();
 
-		// flat3DCubeFX();
+		flat3DCubeFX();
 
-		// ankouScreenFX();
+		ankouScreenFX();
 
-		// flamesWavesFX();
+		flamesWavesFX();
 
-		// shieldAnimFX();
+		shieldAnimFX();
 
 		RSE_Starfield_3D_Spr();
 

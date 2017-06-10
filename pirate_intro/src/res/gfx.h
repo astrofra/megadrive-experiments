@@ -40,5 +40,7 @@ extern const SpriteDefinition rse_logo_shadow;
 extern const SpriteDefinition sword;
 extern const Image transition_pattern;
 extern const SpriteDefinition sprite_stars;
+extern const Image bg_sky;
+extern const Image rse_retrowave_logo;
 
 #endif // _RES_GFX_H_
