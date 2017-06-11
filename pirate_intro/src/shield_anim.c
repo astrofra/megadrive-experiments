@@ -7,6 +7,8 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
+u16 palette_bg[16];
+
 void shieldAnimFX(void)
 {
 	u16 fx_phase, i, j, k, vcount;
@@ -25,47 +27,39 @@ void shieldAnimFX(void)
 	vramIndex = 0;
 
 	/* Draw the background */
-	VDP_drawImageEx(PLAN_B, &shield_anim, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-
-	SYS_enableInts();
-	VDP_waitVSync();
-	SYS_disableInts();
-
-	VDP_drawImageEx(PLAN_B, &shield_anim, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 8, FALSE, TRUE);
-
-	SYS_enableInts();
-	VDP_waitVSync();
-	SYS_disableInts();
-
-	VDP_drawImageEx(PLAN_B, &shield_anim, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 16, FALSE, TRUE);
-
-	SYS_enableInts();
-	VDP_waitVSync();
-	SYS_disableInts();
-
-	VDP_drawImageEx(PLAN_B, &shield_anim, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, 24, FALSE, TRUE);
-	vramIndex += shield_anim.tileset->numTile;
-
-	SYS_enableInts();
-	VDP_waitVSync();
-	SYS_disableInts();
-
-	VDP_drawImageEx(PLAN_A, &transition_pattern, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-	vramIndex += transition_pattern.tileset->numTile;
-
-	for(i = 1; i < 15; i++)
+	for(i = 0; i < 4; i++)
 	{
-		VDP_drawImageEx(PLAN_A, &transition_pattern, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, i << 1, FALSE, TRUE);
+		VDP_drawImageEx(PLAN_B, &shield_anim_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, i << 3 , FALSE, TRUE);
+
+		SYS_enableInts();
 		VDP_waitVSync();
+		SYS_disableInts();
 	}
 
-	// // /* Draw the foreground */
-	// for(i = 0; i < (224 - 120) >> 4; i++)
-	// 	RSE_clearTileRowBWithPrio(i);
+	vramIndex += shield_anim_0.tileset->numTile;
 
-	SYS_enableInts();
-	VDP_waitVSync();
-	SYS_disableInts();
+	for(i = 0; i < 4; i++)
+	{
+		VDP_drawImageEx(PLAN_B, &shield_anim_1, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 512 >> 3, i << 3 , FALSE, TRUE);
+
+		SYS_enableInts();
+		VDP_waitVSync();
+		SYS_disableInts();
+	}
+
+	vramIndex += shield_anim_1.tileset->numTile;
+
+	VDP_setPaletteColor(17, 0x000);
+
+	for(i = 0; i < 15; i++)
+	{
+		VDP_drawImageEx(PLAN_A, &transition_pattern, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, i << 1, FALSE, TRUE);
+		SYS_enableInts();
+		VDP_waitVSync();
+		SYS_disableInts();
+	}
+
+	vramIndex += transition_pattern.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
 
@@ -96,8 +90,11 @@ void shieldAnimFX(void)
 		}
 	}
 
-	// VDP_setVerticalScroll(PLAN_B, 16);
-	VDP_fadePalTo(PAL1, rsi_logo_0.palette->data, RSE_FRAMES(16), TRUE);
+	for(i = 0; i < 16; i++)
+		palette_bg[i] = shield_anim_0.palette->data[i];
+
+	palette_bg[0] = flames_0.palette->data[2];
+
 	vcount = 0;
 	k = 0;
 	while(vcount < RSE_FRAMES(60 * 10))
@@ -105,28 +102,45 @@ void shieldAnimFX(void)
 		VDP_waitVSync();
 
 		if (vcount == RSE_FRAMES(16) + 2)
-				VDP_fadePalTo(PAL0, shield_anim.palette->data, RSE_FRAMES(16), TRUE);
+				VDP_fadePalTo(PAL0, shield_anim_0.palette->data, RSE_FRAMES(16), TRUE);
 		else
+		/* wipe fx */
 		if (vcount > RSE_FRAMES(40) && vcount < RSE_FRAMES(80))
 		{
 			si = vcount - RSE_FRAMES(40);
 			sj = (si * 700) / RSE_FRAMES(80 - 40);
 			for (i = 0; i < 32; i++)
 			{
-				si = sj + i;
+				si = sj + i - 32;
 				if (si < -700) si = -700;
 				wipe_tile_x[i] = si;
 			}
 			VDP_setHorizontalScrollTile(PLAN_A, 0, wipe_tile_x, 8 << 2, TRUE);
 		}
+		else
+		/* clear the wipe fx layer */
+		if (vcount >= RSE_FRAMES(80) && vcount < RSE_FRAMES(80) + 32)
+			RSE_clearTileRowA(vcount - RSE_FRAMES(80));
+		else
+		/* reset the scroll offset */
+		if (vcount == RSE_FRAMES(80) + 40)
+		{
+			for (i = 0; i < 32; i++)
+				wipe_tile_x[i] = 0;
+			VDP_setHorizontalScrollTile(PLAN_A, 0, wipe_tile_x, 8 << 2, TRUE);
+		}
 
+
+		if (vcount == RSE_FRAMES(70))
+				VDP_fadePalTo(PAL0, palette_bg, RSE_FRAMES(16), TRUE);
+
+		/* Animate the shields in the background */
 		vcount++;
 		k++;
 		if (k > 2)
 		{
 			k = 0;
 			VDP_setHorizontalScrollTile(PLAN_B, 0, scroll_tile_x, 8 << 2, TRUE);
-			// VDP_setHorizontalScrollTile(PLAN_A, 0, scroll_tile_x, 8 << 2, TRUE);
 			for (i = 0; i < 4; i++)
 				for(j = 0; j < 8; j++)
 					shield_hscroll[(i << 3) + j] += scroll_dir[(i << 3) + j];
