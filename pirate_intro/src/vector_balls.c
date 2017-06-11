@@ -118,14 +118,14 @@ void fastVectorBallFX()
 	        sprites[shadow_idx]->y = VBALL_Y_SCREEN_SHADOW + (y >> 2);
 	        sprites[shadow_idx]->status = sprites[loop]->status | 0x0002;
 
-		    if (!(zsort_switch & 0x1))
+		    if (zsort_switch & 0x1)
 		    {
 				SPR_setVRAMTileIndex(sprites[loop], tileIndexes[z]);
 				sprites[loop]->status |= 0x0040;
 			}
 			else
 			{
-				if (!(zsort_switch & 0x5))
+				if (!(zsort_switch & 0x3))
 				{
 					SPR_setVRAMTileIndex(sprites[shadow_idx], tileIndexes[z + 9]);
 					sprites[shadow_idx]->status |= 0x0040;
