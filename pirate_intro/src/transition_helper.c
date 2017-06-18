@@ -80,6 +80,14 @@ void RSE_clearTileRowA(u16 row)
 		VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL0, 0, 0, 0, TILE_SYSTEMINDEX), col, row);
 }
 
+void RSE_clearTileRowAWithPrio(u16 row)
+{
+	u16 col, max_col;
+	max_col = VDP_getPlanWidth(); 
+	for(col = 0; col < max_col; col++)
+		VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL0, TRUE, 0, 0, TILE_SYSTEMINDEX), col, row);
+}
+
 void RSE_resetScrolling(void)
 {
 	SYS_disableInts();

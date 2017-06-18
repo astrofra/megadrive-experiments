@@ -23,6 +23,7 @@ void RSE_pause(u16 frames);
 void RSE_clearTileRowB(u16 row);
 void RSE_clearTileRowBWithPrio(u16 row);
 void RSE_clearTileRowA(u16 row);
+void RSE_clearTileRowAWithPrio(u16 row);
 void RSE_resetScrolling(void);
 
 #endif

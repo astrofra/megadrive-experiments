@@ -16,29 +16,31 @@ const char *demo_strings =
 const char *strings_greets[] = 
 {
 	/*
-	"<----------- MAX HEADROOM ------------->\0"
+	"<----------- MAX HEADROOM ------->\0"
 	*/
-	// "---------------------------------\0",
+	// "-------------------------------\0",
 	// " \0",
 
-	"$$$ GREETINGS FLY OUT TO $$$\0",
+	"ccc GREETINGS FLY OUT TO ccc\0",
 	" \0",	
-	"DARKLITE, DEFENCE FORCE, DEKADENCE\0",
+	"BLAST!, CONDENSE, DARKLITE\0",
 	" \0",	
-	"DESIRE, FOCUS DESIGN, INSANE, LEMON\0",
+	"DEFENCE FORCE, DEKADENCE, DESIRE\0",
 	" \0",	
-	"LIVE!, LOONIES, MANKIND, CONDENSE,\0",
+	"FLC, FLUSH, FOCUS DESIGN,\0",
 	" \0",	
-	"MOODS PLATEAU, PACIFIC, RSI, SCARAB\0",
+	"FUNKENSTORT, INSANE, LEMON\0",
 	" \0",	
-	"SCOOPEX, TRBL, WANTED TEAM, Y-CREW\0",
+	"LIVE!, LOONIES, MANDARINE\0",
 	" \0",	
-	"FUNKENSTORT, MANDARINE, FLUSH, FLC\0",
+	"MANKIND, MOODS PLATEAU, PACIFIC\0",
 	" \0",
-	"AND ALL RESISTANCE MEMBERS!\0",
+	"RSI, SCOOPEX, TRBL\0",
 	" \0",
-	"ccc\0",	
-	// "---------------------------------\0",
+	"WANTED TEAM, Y-CREW\0",
+	" \0",
+	"AND ALL THE RESISTANCE MEMBERS!\0",
+	// "-------------------------------\0",
 	/*	Do not remove the next line */
 	"\0"
 };

@@ -17,6 +17,8 @@ void shieldAnimFX(void)
 	s16 si, sj;
 	s16 shield_hscroll[256];
 	s16 scroll_tile_x[32], scroll_dir[32], wipe_tile_x[32];
+	u16 bx, by;
+	bx = 2; by = 2;
 
 	SYS_disableInts();
 
@@ -31,7 +33,7 @@ void shieldAnimFX(void)
 	/* Draw the background */
 	for(i = 0; i < 4; i++)
 	{
-		VDP_drawImageEx(PLAN_B, &shield_anim_0, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 0, i << 3 , FALSE, TRUE);
+		VDP_drawImageEx(PLAN_B, &shield_anim_0, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, i << 3 , FALSE, TRUE);
 
 		SYS_enableInts();
 		VDP_waitVSync();
@@ -42,7 +44,7 @@ void shieldAnimFX(void)
 
 	for(i = 0; i < 4; i++)
 	{
-		VDP_drawImageEx(PLAN_B, &shield_anim_1, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, vramIndex), 512 >> 3, i << 3 , FALSE, TRUE);
+		VDP_drawImageEx(PLAN_B, &shield_anim_1, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 512 >> 3, i << 3 , FALSE, TRUE);
 
 		SYS_enableInts();
 		VDP_waitVSync();
@@ -98,19 +100,20 @@ void shieldAnimFX(void)
 	palette_bg[0] = flames_0.palette->data[2];
 
 	/* init writer */
-	pg_current_char_y = 2;
+	pg_current_char_y = 4;
 	pgwriter_display_duration = 20;
 	demo_strings = (char **)strings_greets;
 
 	vcount = 0;
 	k = 0;
+
 	while(!RSE_pgwriterIsDone()) // vcount < RSE_FRAMES(60 * 10))
 	{
 		VDP_waitVSync();
 
-		// if (vcount == RSE_FRAMES(16) + 2)
-		// 		VDP_fadePalTo(PAL0, shield_anim_0.palette->data, RSE_FRAMES(16), TRUE);
-		// else
+		if (vcount == RSE_FRAMES(16) + 2)
+				VDP_fadePalTo(PAL0, shield_anim_0.palette->data, RSE_FRAMES(16), TRUE);
+		else
 		/* wipe fx */
 		if (vcount > RSE_FRAMES(40) && vcount < RSE_FRAMES(80))
 		{
@@ -127,7 +130,7 @@ void shieldAnimFX(void)
 		else
 		/* clear the wipe fx layer */
 		if (vcount >= RSE_FRAMES(80) && vcount < RSE_FRAMES(80) + 32)
-			RSE_clearTileRowA(vcount - RSE_FRAMES(80));
+			RSE_clearTileRowAWithPrio(vcount - RSE_FRAMES(80));
 		else
 		/* reset the scroll offset */
 		if (vcount == RSE_FRAMES(80) + 40)
@@ -140,11 +143,25 @@ void shieldAnimFX(void)
 		if (vcount == RSE_FRAMES(70))
 				VDP_fadePalTo(PAL0, palette_bg, RSE_FRAMES(16), TRUE);
 
-		if (vcount == RSE_FRAMES(100))
+		if (vcount == RSE_FRAMES(200))
 			VDP_fadePalTo(PAL2, sim1_font.palette->data, RSE_FRAMES(16), TRUE);
 		else
-		if (vcount > RSE_FRAMES(100))
+		if (vcount > RSE_FRAMES(200))
 			RSE_pgwriterUpdateMultiLine();
+
+		if (by < (224 >> 3) - 2 && vcount > RSE_FRAMES(100))
+		{
+			VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL2, FALSE, 0, 0, TILE_SYSTEMINDEX), bx, by);
+			VDP_setTileMapXY(PLAN_A, TILE_ATTR_FULL(PAL2, FALSE, 0, 0, TILE_SYSTEMINDEX), bx+1, by);
+
+			bx += 2;
+			if (bx >= (320 >> 3) - 2)
+			{
+				bx = 2;
+				by++;
+			}
+
+		}
 
 		/* Animate the shields in the background */
 		vcount++;

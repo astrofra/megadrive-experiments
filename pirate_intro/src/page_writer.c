@@ -98,8 +98,8 @@ u16 RSE_pgwriterDrawString(char *str)
 			VDP_setTileMapXY(pg_current_plan, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, TILE_USERINDEX + i), pg_current_char_x + pg_x_offset, pg_current_char_y);
 			// VDP_setTileMapXY(pg_current_plan, TILE_USERINDEX + i + (FONT_LINE_OFFSET * fade), pg_current_char_x + fade + pg_x_offset, TILE_ATTR_FULL(pg_current_pal, FALSE, FALSE, FALSE, pg_current_char_y));
 	}
-	else
-		VDP_setTileMapXY(pg_current_plan, 0, pg_current_char_x, pg_current_char_y);	
+	// else
+	// 	VDP_setTileMapXY(pg_current_plan, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, TILE_SYSTEMINDEX), pg_current_char_x, pg_current_char_y);	
 
 	pg_current_char_x++;
 	pg_current_char_idx++;
