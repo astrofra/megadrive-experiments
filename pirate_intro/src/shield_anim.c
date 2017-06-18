@@ -2,6 +2,8 @@
 #include <gfx.h>
 #include "writer.h"
 #include "transition_helper.h"
+#include "demo_strings.h"
+#include "page_writer.h"
 
 extern u16 vramIndex;
 extern u16 fontIndex;
@@ -24,7 +26,7 @@ void shieldAnimFX(void)
 	VDP_setPlanSize(128, 32);
 	VDP_setHilightShadow(1); 
 
-	vramIndex = 0;
+	vramIndex = fontIndex;
 
 	/* Draw the background */
 	for(i = 0; i < 4; i++)
@@ -95,15 +97,20 @@ void shieldAnimFX(void)
 
 	palette_bg[0] = flames_0.palette->data[2];
 
+	/* init writer */
+	pg_current_char_y = 2;
+	pgwriter_display_duration = 20;
+	demo_strings = (char **)strings_greets;
+
 	vcount = 0;
 	k = 0;
-	while(vcount < RSE_FRAMES(60 * 10))
+	while(!RSE_pgwriterIsDone()) // vcount < RSE_FRAMES(60 * 10))
 	{
 		VDP_waitVSync();
 
-		if (vcount == RSE_FRAMES(16) + 2)
-				VDP_fadePalTo(PAL0, shield_anim_0.palette->data, RSE_FRAMES(16), TRUE);
-		else
+		// if (vcount == RSE_FRAMES(16) + 2)
+		// 		VDP_fadePalTo(PAL0, shield_anim_0.palette->data, RSE_FRAMES(16), TRUE);
+		// else
 		/* wipe fx */
 		if (vcount > RSE_FRAMES(40) && vcount < RSE_FRAMES(80))
 		{
@@ -130,9 +137,14 @@ void shieldAnimFX(void)
 			VDP_setHorizontalScrollTile(PLAN_A, 0, wipe_tile_x, 8 << 2, TRUE);
 		}
 
-
 		if (vcount == RSE_FRAMES(70))
 				VDP_fadePalTo(PAL0, palette_bg, RSE_FRAMES(16), TRUE);
+
+		if (vcount == RSE_FRAMES(100))
+			VDP_fadePalTo(PAL2, sim1_font.palette->data, RSE_FRAMES(16), TRUE);
+		else
+		if (vcount > RSE_FRAMES(100))
+			RSE_pgwriterUpdateMultiLine();
 
 		/* Animate the shields in the background */
 		vcount++;

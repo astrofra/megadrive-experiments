@@ -11,9 +11,6 @@ extern u8 scroll_local_offset;
 #ifndef RSE_WRITER
 #define RSE_WRITER
 
-#define FONT_PUNCT_OFFSET 36
-#define FONT_LINE_OFFSET ((432 >> 3))
-
 u16 RSE_writerSetup(void);
 void RSE_writerSetY(u16 initial_y);
 void updateScrollText(void);

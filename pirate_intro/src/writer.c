@@ -2,6 +2,7 @@
 #include <gfx.h>
 #include "writer.h"
 #include "transition_helper.h"
+#include "string_parser.h"
 
 extern u16 vramIndex;
 extern u8 framerate;
@@ -24,64 +25,64 @@ u8 scroll_local_offset;
 u8 screen_w_tile;
 s16 scroll_tile_y[1204];
 
-u16 inline computeStringLen(char *str)
-{
-	u16 l = 0;
-	while(str[l])
-		l++;
+// u16 inline computeStringLen(char *str)
+// {
+// 	u16 l = 0;
+// 	while(str[l])
+// 		l++;
 
-	return l;
-}
+// 	return l;
+// }
 
-u16 inline charToTileIndex(char c)
-{
-	if (c >= 'A' && c <= 'Z')
-		return (u16)(c - 'A'); 
+// u16 inline charToTileIndex(char c)
+// {
+// 	if (c >= 'A' && c <= 'Z')
+// 		return (u16)(c - 'A'); 
 
-	if (c >= '0' && c <= '9')
-		return (u16)((c  + 26) - '0');
+// 	if (c >= '0' && c <= '9')
+// 		return (u16)((c  + 26) - '0');
 
-	switch(c)
-	{
-		case '!':
-			return FONT_PUNCT_OFFSET;
-		case '.':
-			return FONT_PUNCT_OFFSET + 1;
-		case '\'':
-			return FONT_PUNCT_OFFSET + 2;
-		case '$':
-			return FONT_PUNCT_OFFSET + 3;
-		case ',':
-			return FONT_PUNCT_OFFSET + 4;
-		case '(':
-			return FONT_PUNCT_OFFSET + 5;
-		case ')':
-			return FONT_PUNCT_OFFSET + 6;
-		case '?':
-			return FONT_PUNCT_OFFSET + 7;
-		case '-':
-			return FONT_PUNCT_OFFSET + 8;
-		case '@':
-			return FONT_PUNCT_OFFSET + 9;
-		case ':':
-			return FONT_PUNCT_OFFSET + 10;
-		case '=':
-			return FONT_PUNCT_OFFSET + 11;
-		case '+':
-			return FONT_PUNCT_OFFSET + 12;
-		case 'c':
-			return FONT_PUNCT_OFFSET + 13;
-		case '[':
-			return FONT_PUNCT_OFFSET + 14;
-		case ']':
-			return FONT_PUNCT_OFFSET + 15;		
+// 	switch(c)
+// 	{
+// 		case '!':
+// 			return FONT_PUNCT_OFFSET;
+// 		case '.':
+// 			return FONT_PUNCT_OFFSET + 1;
+// 		case '\'':
+// 			return FONT_PUNCT_OFFSET + 2;
+// 		case '$':
+// 			return FONT_PUNCT_OFFSET + 3;
+// 		case ',':
+// 			return FONT_PUNCT_OFFSET + 4;
+// 		case '(':
+// 			return FONT_PUNCT_OFFSET + 5;
+// 		case ')':
+// 			return FONT_PUNCT_OFFSET + 6;
+// 		case '?':
+// 			return FONT_PUNCT_OFFSET + 7;
+// 		case '-':
+// 			return FONT_PUNCT_OFFSET + 8;
+// 		case '@':
+// 			return FONT_PUNCT_OFFSET + 9;
+// 		case ':':
+// 			return FONT_PUNCT_OFFSET + 10;
+// 		case '=':
+// 			return FONT_PUNCT_OFFSET + 11;
+// 		case '+':
+// 			return FONT_PUNCT_OFFSET + 12;
+// 		case 'c':
+// 			return FONT_PUNCT_OFFSET + 13;
+// 		case '[':
+// 			return FONT_PUNCT_OFFSET + 14;
+// 		case ']':
+// 			return FONT_PUNCT_OFFSET + 15;		
 
-	};
+// 	};
 
-	/* if no character was found,
-		we return a special code */
-	return 0xFF;
-}
+// 	/* if no character was found,
+// 		we return a special code */
+// 	return 0xFF;
+// }
 
 u16 RSE_writerSetup(void)
 {
@@ -147,6 +148,7 @@ void updateScrollText(void)
 
 	/* V scroll */
 	VDP_setVerticalScrollTile(current_plan, 0, &(scroll_tile_y[scroll_y_offset & 0x1ff]), (screen_w_tile >> 1) - 4, TRUE);
+	DMA_waitCompletion();
 
 	/* H scroll */
 	VDP_setHorizontalScroll(current_plan, scroll_x_offset);

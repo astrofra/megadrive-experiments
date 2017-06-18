@@ -58,6 +58,8 @@ int main()
 
 		flamesWavesFX();
 
+		vramIndex = TILE_USERINDEX;
+		fontIndex = RSE_writerSetup();
 		shieldAnimFX();
 
 		RSE_Starfield_3D_Spr();
