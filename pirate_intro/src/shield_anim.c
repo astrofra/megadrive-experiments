@@ -13,7 +13,7 @@ u16 palette_bg[16];
 
 void shieldAnimFX(void)
 {
-	u16 fx_phase, i, j, k, vcount;
+	u16 fx_phase, i, j, k, vcount, vcount2;
 	s16 si, sj;
 	s16 shield_hscroll[256];
 	s16 scroll_tile_x[32], scroll_dir[32], wipe_tile_x[32];
@@ -105,11 +105,15 @@ void shieldAnimFX(void)
 	demo_strings = (char **)strings_greets;
 
 	vcount = 0;
+	vcount2 = 0;
 	k = 0;
 
-	while(!RSE_pgwriterIsDone()) // vcount < RSE_FRAMES(60 * 10))
+	while(vcount2 < RSE_FRAMES(60 * 2))
 	{
 		VDP_waitVSync();
+
+		if (vcount2 > 0 || RSE_pgwriterIsDone())
+			vcount2++;
 
 		if (vcount == RSE_FRAMES(16) + 2)
 				VDP_fadePalTo(PAL0, shield_anim_0.palette->data, RSE_FRAMES(16), TRUE);
@@ -179,6 +183,21 @@ void shieldAnimFX(void)
 				j = i >> 3;
 				scroll_tile_x[i] = shield_hscroll[i] + sinFix16((vcount + (j << 4)) << 3);
 			}
+		}
+
+		/* exit transition */
+		if (vcount2 > RSE_FRAMES(30))
+		{
+			if (vcount2 == RSE_FRAMES(30) + 5)
+ 				VDP_fadeOut(0, 63, 16, TRUE);
+
+			for (i = 0; i < 32; i++)
+				if (i & 0x1)
+					wipe_tile_x[i] += (i >> 1) + 1;
+				else
+					wipe_tile_x[i] -= ((i >> 1) + 1);
+
+			VDP_setHorizontalScrollTile(PLAN_A, 0, wipe_tile_x, 8 << 2, TRUE);			
 		}
 
 	}
