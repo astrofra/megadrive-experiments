@@ -30,7 +30,7 @@ static u16 tmp_vcount;
 void flamesWavesFX(void)
 {
 	u16 vramIndex = TILE_USERINDEX;
-	s16 i, j, k, rot_y = 0, ang_speed_y = 4, twist_y = 0, twist_inc = 0, prev_i;
+	s16 i, j, k, prev_i;
 	s16 r, g, b;
 	u16 col;
 	u16 vcount = 0;
@@ -42,8 +42,7 @@ void flamesWavesFX(void)
     pw = (u16 *) GFX_DATA_PORT;
     pl = (u32 *) GFX_CTRL_PORT;
 
-	static void hBlank(){
-		// VDP_setVerticalScroll(PLAN_A, scroll_jump_table[(GET_VCOUNTER + rot_y) & ((TWISTER_TABLE_SIZE >> 2) - 1)] + (64 + sinFix16(rot_y << 1)) << 1);
+	auto void hBlank(){
 
 		tmp_vcount = (GET_VCOUNTER + vcount) & 1023;
 		/* Vertical scroll */
@@ -244,12 +243,6 @@ void flamesWavesFX(void)
 
         if (vcount < 64)
         {
-        	// if (vcount < 32)
-        	// {
-	        // 	SPR_setPosition(sprites[0], (320 - 48) >> 1, (((224 - 128) >> 1) - 64 )+ (easing_table[vcount << 5] >> 4));
-	        // 	SPR_update(sprites, 1);
-        	// }
-        	// VDP_setVerticalScroll(PLAN_B, logo_yscroll_table[vcount]); // (easing_table[vcount << 4] >> 4) - 64);
 		    *pl = GFX_WRITE_VSRAM_ADDR(2);
 		    *pw = logo_yscroll_table[vcount];        	
         }

@@ -28,11 +28,10 @@ void RSE_Starfield_3D_Spr(void)
 {
 	Sprite *sprites[MAX_STAR];
 	Object sp_objects[MAX_STAR];
-	short x_screen, y_screen;
 	u16 ind;
 
 	/*	Initialize the list of stars */
-	static void initStar(s16 num)
+	auto void initStar(s16 num)
 	{
 		_star *p;
 		s16 i;
@@ -51,7 +50,7 @@ void RSE_Starfield_3D_Spr(void)
 	};
 
 	/*	Draw the stars */
-	static void inline updateAndDrawStar(_star *part, s16 num)
+	auto void inline updateAndDrawStar(_star *part, s16 num)
 	{
 		_star *p;
 		s16 i;
@@ -94,13 +93,14 @@ void RSE_Starfield_3D_Spr(void)
 				sprites[i]->x = X_SCREEN_CENTER + x;
 				sprites[i]->y = Y_SCREEN_CENTER + y;
 				sprites[i]->status |= 0x0002;
-				// SPR_setPosition(sprites[i], x_screen + x, y_screen + y);
 			}
 			p++;
 		}
-
-		SPR_updateQ(sprites, MAX_STAR);
-		// SPR_update(sprites, MAX_STAR);
+// #ifdef RSE_PERFORMANCE_PATCH
+// 		SPR_updateQ(sprites, MAX_STAR);
+// #else
+		SPR_update(sprites, MAX_STAR);
+// #endif
 	};
 
 	SYS_disableInts();

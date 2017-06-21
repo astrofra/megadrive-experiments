@@ -1,7 +1,4 @@
-#ifndef RSE_DEMO_STRINGS
-#define RSE_DEMO_STRINGS
+#pragma once
 
 extern const char *demo_strings;
 extern const char *strings_greets[];
-
-#endif

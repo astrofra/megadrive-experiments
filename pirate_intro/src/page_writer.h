@@ -1,3 +1,5 @@
+#pragma once
+
 #include "genesis.h"
 
 extern u16 pgwriter_state;
@@ -12,6 +14,7 @@ extern u16 pgwriter_timer;
 extern u16 pgwriter_options;
 extern u16 pgwriter_display_duration;
 extern u16 pg_x_offset;
+extern char **current_strings;
 
 #ifndef RSE_PGWRITER
 #define RSE_PGWRITER

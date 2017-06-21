@@ -12,20 +12,16 @@ extern u8 framerate;
 
 void flat3DCubeFX(void)
 {
-	u16 i, cube_phase;
+	u16 cube_phase;
 	s16 x_cube, y_cube;
-	u16 cube_frame, sec_frame_step;
+	u16 cube_frame;
 	Sprite *sprites[2];
 
 	cube_frame = 0;
-	sec_frame_step = 4;
 	cube_phase = 256;
 
 	SPR_init(0,0,0);
 	VDP_setHilightShadow(1);
-
-	// for(i = 0; i < 64; i++)
-	// 	barb_blue_pal[i] = barb_pic_2_front_0.palette->data[0];
 
 	VDP_setPalette(PAL2, palette_black);
 

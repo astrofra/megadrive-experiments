@@ -34,26 +34,4 @@ inline void    QuickSort (u16 n, struct QSORT_ENTRY *a)
     }
     QuickSort(i, a);
     QuickSort(n - i, a + i);
-}
-
-s16 inline divideQ(s16 n, s16 d)
-{
-    s16 k = d;
-    s16 i, c, index=1;
-    c = 0;
-    while(n > d){
-        d <<= 1;
-        index <<= 1;
-    }
-    while(1){
-        if(k > n)
-            return c;
-        if(n >= d){
-            c |= index;
-            n -= d;                
-        }
-        index >>= 1;
-        d >>= 1;
-    }
-    return c;
-}   
+}  

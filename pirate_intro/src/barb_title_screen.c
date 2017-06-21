@@ -7,12 +7,11 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
-static s16 scroll_A_x[256], scroll_B_x[256];
 static	u16 palsrc[64], paldst[64];
 
 void displayBarbTitleFX(void)
 {
-	u16 fx_phase, j, scroll_A_y, scroll_B_y;
+	u16 fx_phase, j, scroll_A_y, scroll_B_y, tmp_vramIndex;
 	static 	Sprite *sprites[16];
 
 	SYS_disableInts();
@@ -22,15 +21,17 @@ void displayBarbTitleFX(void)
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 64);
-	VDP_setHilightShadow(0); 
-	SPR_initNoFont(16,TILE_USERINDEX + barb_pic_back_0.tileset->numTile + barb_pic_back_1.tileset->numTile + barb_pic_back_2.tileset->numTile
-									+ barb_pic_back_3.tileset->numTile + barb_pic_front.tileset->numTile /*180*/,128);
+	VDP_setHilightShadow(0);
 
 	vramIndex = TILE_USERINDEX;
 
-	sprites[0] = SPR_addSprite(&masiaka_title, (320 - 240) >> 1, 256, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-
 	/* Draw the foreground */
+	VDP_drawImageEx(PLAN_A, &barb_pic_front, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
+	vramIndex += barb_pic_front.tileset->numTile;
+
+	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
+
+	/* Draw the background */
 	VDP_drawImageEx(PLAN_B, &barb_pic_back_0, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
 	vramIndex += barb_pic_back_0.tileset->numTile;
 
@@ -46,13 +47,8 @@ void displayBarbTitleFX(void)
 
 	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
 
-	VDP_drawImageEx(PLAN_B, &barb_pic_back_3, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, 192 >> 3, FALSE, TRUE);
+	VDP_drawImageEx(PLAN_B, &barb_pic_back_3, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 0, (128 + 80) >> 3, FALSE, TRUE);
 	vramIndex += barb_pic_back_3.tileset->numTile;
-
-	SYS_enableInts(); VDP_waitVSync(); SYS_disableInts();
-
-	VDP_drawImageEx(PLAN_A, &barb_pic_front, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, TRUE);
-	vramIndex += barb_pic_front.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 
@@ -63,6 +59,19 @@ void displayBarbTitleFX(void)
 
 	DMA_waitCompletion();
 
+	/* Title sprite */
+	Object title_object;
+	u16 tileIndexes;
+	SPR_init(1, 0, 0);
+
+    TileSet* tileset = masiaka_title.animations[0]->frames[0]->tileset;
+    VDP_loadTileSet(tileset, vramIndex, TRUE);
+    tileIndexes = vramIndex;	
+
+	sprites[0] = SPR_addSprite(&masiaka_title, (320 - 240) >> 1, 256, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setAutoTileUpload(sprites[0], FALSE);
+	sprites[0]->data = (u32) &title_object;
+	SPR_setVRAMTileIndex(sprites[0], tileIndexes);
 	SPR_update(sprites, 1);
 
 	VDP_fadePalTo(PAL1, palette_white_bg, RSE_FRAMES(8), TRUE);
@@ -90,6 +99,11 @@ void displayBarbTitleFX(void)
 		if (fx_phase == 256 - 56 - 16)
 			VDP_fadePalTo(PAL0, barb_pic_front.palette->data, RSE_FRAMES(8), TRUE);
 
+		if (fx_phase == 256 - 64)
+		{
+
+		}
+		else
 		if (fx_phase >= 256 - 64)
 		{
 			if (fx_phase == 256 - 64)
@@ -131,23 +145,6 @@ void displayBarbTitleFX(void)
 
 	for(fx_phase = 0; fx_phase < 64; fx_phase++)
 	{
-		// for(j = 0; j < 256; j++)
-		// {
-		// 	if (j & 0x1)
-		// 	{
-		// 		scroll_A_x[j] += 3;
-		// 		scroll_B_x[j] -= 1;
-		// 	}
-		// 	else
-		// 	{
-		// 		scroll_A_x[j] -= 3;
-		// 		scroll_B_x[j] += 1;
-		// 	}
-		// }
-
-		// VDP_setHorizontalScrollLine(PLAN_A, scroll_A_y, scroll_A_x, 224, TRUE);
-		// VDP_setHorizontalScrollLine(PLAN_B, scroll_B_y, scroll_B_x, 224, TRUE);
-
 		if (fx_phase == 42)
 			VDP_fadePalTo(PAL2, palette_white_bg, RSE_FRAMES(4), TRUE);
 		if (fx_phase == 48)

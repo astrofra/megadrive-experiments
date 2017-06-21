@@ -6,7 +6,7 @@
 
 extern u16 vramIndex;
 extern u8 framerate;
-extern char **demo_strings;
+char **current_strings;
 
 /* 
 	Global pgwriter data 
@@ -129,13 +129,13 @@ void inline RSE_pgwriterUpdateLine(void)
 	switch(pgwriter_state)
 	{
 		case WRT_CENTER_CUR_LINE:
-			pg_current_string_len = computeStringLen((char *)demo_strings[pg_current_string_idx]);
+			pg_current_string_len = computeStringLen((char *)current_strings[pg_current_string_idx]);
 			pg_current_char_x = ((320 / 8) - pg_current_string_len) >> 1;
 			pgwriter_state = WRT_WRITE_CUR_LINE;
 			break;
 
 		case WRT_WRITE_CUR_LINE:
-			if (!RSE_pgwriterDrawString((char *)demo_strings[pg_current_string_idx]))
+			if (!RSE_pgwriterDrawString((char *)current_strings[pg_current_string_idx]))
 			{
 				pgwriter_timer = 0;
 				pgwriter_state = WRT_WAIT;
@@ -158,7 +158,7 @@ void inline RSE_pgwriterUpdateLine(void)
 				pg_current_char_x = 0;
 				pg_current_char_idx = 0;
 				pg_current_string_idx++;
-				if (demo_strings[pg_current_string_idx][0] == '\0')
+				if (current_strings[pg_current_string_idx][0] == '\0')
 				{
 					pgwriter_is_done = TRUE;
 					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))
@@ -170,7 +170,7 @@ void inline RSE_pgwriterUpdateLine(void)
 					}
 				}
 				else
-				if (demo_strings[pg_current_string_idx][0] == '\1')
+				if (current_strings[pg_current_string_idx][0] == '\1')
 					pg_current_char_y = pg_initial_char_y;
 
 
@@ -208,13 +208,13 @@ void inline RSE_pgwriterUpdateMultiLine(void)
 	switch(pgwriter_state)
 	{
 		case WRT_CENTER_CUR_LINE:
-			pg_current_string_len = computeStringLen((char *)demo_strings[pg_current_string_idx]);
+			pg_current_string_len = computeStringLen((char *)current_strings[pg_current_string_idx]);
 			pg_current_char_x = ((320 / 8) - pg_current_string_len) >> 1;
 			pgwriter_state = WRT_WRITE_CUR_LINE;
 			break;
 
 		case WRT_WRITE_CUR_LINE:
-			if (!RSE_pgwriterDrawString((char *)demo_strings[pg_current_string_idx]))
+			if (!RSE_pgwriterDrawString((char *)current_strings[pg_current_string_idx]))
 			{
 				pgwriter_timer = 0;
 				pgwriter_state = WRT_WAIT;
@@ -228,7 +228,7 @@ void inline RSE_pgwriterUpdateMultiLine(void)
 				pg_current_char_y++;
 				pg_current_char_idx = 0;
 				pg_current_string_idx++;
-				if (demo_strings[pg_current_string_idx][0] == '\0')
+				if (current_strings[pg_current_string_idx][0] == '\0')
 				{
 					pgwriter_is_done = TRUE;
 					if (WRT_HAS_OPTION(WRT_OPT_AUTO_RESTART))

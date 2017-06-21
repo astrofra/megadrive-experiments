@@ -29,7 +29,7 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
-static u16 loop, shadow_idx, i, j;
+static u16 loop, shadow_idx, j;
 static 	u16 zsort_switch = 0;
 static 	Sprite *sprites[MAX_VECTOR_BALL];
 static 	struct  QSORT_ENTRY vball_zsort[MAX_VECTOR_BALL];
@@ -37,8 +37,6 @@ static 	short xc, yc;
 static	short rx, ry;
 static 	u8 vball_phase;
 static 	u16 vball_timer;
-static 	const Animation *animation;
-static 	u16 frameInd;
 static	u8 ball_count;
 static	Vect3D_f16 *vector_ball_array;
 
@@ -55,7 +53,7 @@ void fastVectorBallFX()
 	Object vb_objects[BALL_COUNT];
 	u16 ind;
 
-	inline static void drawVectorBalls(u16 constant_angle, u16 accel_angle)
+	inline auto void drawVectorBalls(u16 constant_angle, u16 accel_angle)
 	{
 		rx = constant_angle;
 		ry = constant_angle >> 1;
@@ -163,15 +161,15 @@ void fastVectorBallFX()
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	VDP_setVerticalScroll(PLAN_A, -64);
 	VDP_setVerticalScroll(PLAN_B, 0);
-	VDP_setVerticalScrollTile(PLAN_A, 0, palette_black, 64, TRUE);
-	VDP_setVerticalScrollTile(PLAN_B, 0, palette_black, 64, TRUE);
+	VDP_setVerticalScrollTile(PLAN_A, 0, (s16*)palette_black, 64, TRUE);
+	VDP_setVerticalScrollTile(PLAN_B, 0, (s16*)palette_black, 64, TRUE);
 	VDP_setHilightShadow(1);
 	SPR_init(0,0,0);
 	vramIndex = fontIndex;
 
 	object_idx = 0;
 	ball_count = BALL_COUNT;
-	vector_ball_array = VECTOR_BALL_ARRAY;		
+	vector_ball_array = (Vect3D_f16 *)VECTOR_BALL_ARRAY;		
 
 	ind = vramIndex;
     for(loop = 0; loop < ball_metal.animations[0]->numFrame; loop++)
@@ -351,17 +349,17 @@ void fastVectorBallFX()
 
 					case 0:
 						ball_count = grid_cube_small_VTX_COUNT;
-						vector_ball_array = vb_grid_cube_small_vertex_pos;
+						vector_ball_array = (Vect3D_f16 *)vb_grid_cube_small_vertex_pos;
 						break;
 
 					case 1:
 						ball_count = sword_VTX_COUNT;
-						vector_ball_array = vb_sword_vertex_pos;
+						vector_ball_array = (Vect3D_f16 *)vb_sword_vertex_pos;
 						break;
 
 					case 2:
 						ball_count = pyramid_VTX_COUNT;
-						vector_ball_array = vb_pyramid_vertex_pos;
+						vector_ball_array = (Vect3D_f16 *)vb_pyramid_vertex_pos;
 						break;						
 				}
 		}

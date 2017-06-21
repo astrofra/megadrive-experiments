@@ -13,7 +13,7 @@ u16 palette_bg[16];
 
 void shieldAnimFX(void)
 {
-	u16 fx_phase, i, j, k, vcount, vcount2;
+	u16 i, j, k, vcount, vcount2;
 	s16 si, sj;
 	s16 shield_hscroll[256];
 	s16 scroll_tile_x[32], scroll_dir[32], wipe_tile_x[32];
@@ -102,7 +102,7 @@ void shieldAnimFX(void)
 	/* init writer */
 	pg_current_char_y = 4;
 	pgwriter_display_duration = 20;
-	demo_strings = (char **)strings_greets;
+	current_strings = (char **)strings_greets;
 
 	vcount = 0;
 	vcount2 = 0;

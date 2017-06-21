@@ -7,7 +7,6 @@ extern u16 fontIndex;
 extern u8 framerate;
 
 void ankouScreenFX(void){
-	u16 tmp_tile_index;
 	u16 vcount;
 
 	RSE_turn_screen_to_black();

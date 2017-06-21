@@ -19,14 +19,6 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
-/*	2D poly caches */
-/* 	The result of the 3D transformation
-	and 2D projection will be stored in an array
-	of 2D polygons, along with the color of each
-	polygon. Hence, we can display still letters
-	without harming the framerate that much. */
-u16 poly_cache_size[3];
-
 Vect2D_s16 poly_cache_pt_r[logo_r_FACE_COUNT << 2];
 u16 poly_cache_is_quad_r[logo_r_FACE_COUNT];
 u16 poly_cache_col_r[logo_r_FACE_COUNT];
@@ -39,9 +31,6 @@ Vect2D_s16 poly_cache_pt_e[logo_e_FACE_COUNT << 2];
 u16 poly_cache_is_quad_e[logo_e_FACE_COUNT];
 u16 poly_cache_col_e[logo_e_FACE_COUNT];
 
-/* Rotation easing */
-u16 easing_index;
-
 /* Polygon zsort array */
 struct  QSORT_ENTRY poly_zsort[RSE_LOGO_3D_MAX_POINTS];
 
@@ -49,33 +38,34 @@ Rotation3D rotation;
 Translation3D translation;
 Transformation3D transformation;
 
-fix16 camdist;
-
 Vect3D_f16 pts_3D[RSE_LOGO_3D_MAX_POINTS];
 Vect2D_s16 pts_2D[RSE_LOGO_3D_MAX_POINTS];
 
 void main_logo(void)
 {
-	VDP_setScreenWidth256();
-	VDP_setHInterrupt(0);
-	VDP_setHilightShadow(0);
-
-	BMP_init(TRUE, PLAN_A, PAL0, FALSE);
-
 	u16 zsort_switch;
+
+	/* Rotation easing */
+	u16 easing_index;	
+
+	/*	2D poly caches */
+	/* 	The result of the 3D transformation
+		and 2D projection will be stored in an array
+		of 2D polygons, along with the color of each
+		polygon. Hence, we can display still letters
+		without harming the framerate that much. */
+	u16 poly_cache_size[3];
 
 	const Vect3D_f16 *mesh_coord;
 	const short *mesh_poly_ind;
-	const u16 *mesh_line_ind;
 	const Vect3D_f16 *mesh_face_norm;
 	u16 vtx_count;
 	u16 poly_count;
+	fix16 camdist;
 
 	u16 logo_state;
 
 	u16 palette_gold[64];
-
-	char str[16];
 
 	/* 3D Transformation */
 	void inline updatePointsPos()
@@ -297,7 +287,14 @@ void main_logo(void)
 			palette_gold[i] = i << 1 | (i << 0x4);
 		palette_gold[8] = 0xF | (0xA << 0x4);
 	}
-	VDP_fadePalTo(PAL0, palette_gold, 8, FALSE);
+
+	SYS_disableInts();
+	VDP_setScreenWidth256();
+	VDP_setHInterrupt(0);
+	VDP_setHilightShadow(0);
+	SYS_enableInts();
+
+	BMP_init(TRUE, PLAN_A, PAL0, FALSE);
 
 	/* 3D render misc inits */
 	camdist = FIX16(11);
@@ -349,6 +346,7 @@ void main_logo(void)
 
 	/* Play the boot screen sfx */
 	play_intro_sound();
+	VDP_fadePalTo(PAL0, palette_gold, 8, FALSE);
 
 	while (logo_state < 14)
 	{

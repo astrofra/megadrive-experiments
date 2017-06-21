@@ -25,5 +25,6 @@ void RSE_clearTileRowBWithPrio(u16 row);
 void RSE_clearTileRowA(u16 row);
 void RSE_clearTileRowAWithPrio(u16 row);
 void RSE_resetScrolling(void);
+void RSE_clearAll(void);
 
 #endif
