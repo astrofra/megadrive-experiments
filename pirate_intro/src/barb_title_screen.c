@@ -64,9 +64,9 @@ void displayBarbTitleFX(void)
 	u16 tileIndexes;
 	SPR_init(1, 0, 0);
 
-    TileSet* tileset = masiaka_title.animations[0]->frames[0]->tileset;
-    VDP_loadTileSet(tileset, vramIndex, TRUE);
-    tileIndexes = vramIndex;	
+	TileSet* tileset = masiaka_title.animations[0]->frames[0]->tileset;
+	VDP_loadTileSet(tileset, vramIndex, TRUE);
+	tileIndexes = vramIndex;	
 
 	sprites[0] = SPR_addSprite(&masiaka_title, (320 - 240) >> 1, 256, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 	SPR_setAutoTileUpload(sprites[0], FALSE);
@@ -99,11 +99,6 @@ void displayBarbTitleFX(void)
 		if (fx_phase == 256 - 56 - 16)
 			VDP_fadePalTo(PAL0, barb_pic_front.palette->data, RSE_FRAMES(8), TRUE);
 
-		if (fx_phase == 256 - 64)
-		{
-
-		}
-		else
 		if (fx_phase >= 256 - 64)
 		{
 			if (fx_phase == 256 - 64)
