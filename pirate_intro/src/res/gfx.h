@@ -43,5 +43,6 @@ extern const SpriteDefinition ball_transition;
 extern const SpriteDefinition sprite_stars;
 extern const Image bg_sky;
 extern const Image rse_retrowave_logo;
+extern const Image conan_on_fire;
 
 #endif // _RES_GFX_H_
