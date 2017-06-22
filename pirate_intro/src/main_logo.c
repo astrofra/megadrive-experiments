@@ -19,6 +19,13 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
+void main_logo(void)
+{
+	u16 zsort_switch;
+
+	/* Rotation easing */
+	u16 easing_index;	
+
 Vect2D_s16 poly_cache_pt_r[logo_r_FACE_COUNT << 2];
 u16 poly_cache_is_quad_r[logo_r_FACE_COUNT];
 u16 poly_cache_col_r[logo_r_FACE_COUNT];
@@ -40,13 +47,6 @@ Transformation3D transformation;
 
 Vect3D_f16 pts_3D[RSE_LOGO_3D_MAX_POINTS];
 Vect2D_s16 pts_2D[RSE_LOGO_3D_MAX_POINTS];
-
-void main_logo(void)
-{
-	u16 zsort_switch;
-
-	/* Rotation easing */
-	u16 easing_index;	
 
 	/*	2D poly caches */
 	/* 	The result of the 3D transformation

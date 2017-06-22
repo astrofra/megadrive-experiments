@@ -1,5 +1,7 @@
 #include "genesis.h"
 
+__attribute__((aligned(4)))
+
 /* logo_e.obj */
 /* List of vertices */
 const Vect3D_f16 logo_e_coord[78] =
