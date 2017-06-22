@@ -19,34 +19,34 @@ extern u16 vramIndex;
 extern u16 fontIndex;
 extern u8 framerate;
 
+__attribute__((aligned(32))) Vect2D_s16 poly_cache_pt_r[logo_r_FACE_COUNT << 2];
+__attribute__((aligned(32))) u16 poly_cache_is_quad_r[logo_r_FACE_COUNT];
+__attribute__((aligned(32))) u16 poly_cache_col_r[logo_r_FACE_COUNT];
+
+__attribute__((aligned(32))) Vect2D_s16 poly_cache_pt_s[logo_s_FACE_COUNT << 2];
+__attribute__((aligned(32))) u16 poly_cache_is_quad_s[logo_s_FACE_COUNT];
+__attribute__((aligned(32))) u16 poly_cache_col_s[logo_s_FACE_COUNT];
+
+__attribute__((aligned(32))) Vect2D_s16 poly_cache_pt_e[logo_e_FACE_COUNT << 2];
+__attribute__((aligned(32))) u16 poly_cache_is_quad_e[logo_e_FACE_COUNT];
+__attribute__((aligned(32))) u16 poly_cache_col_e[logo_e_FACE_COUNT];
+
+/* Polygon zsort array */
+__attribute__((aligned(32))) struct  QSORT_ENTRY poly_zsort[RSE_LOGO_3D_MAX_POINTS];
+
+__attribute__((aligned(32))) Rotation3D rotation;
+__attribute__((aligned(32))) Translation3D translation;
+__attribute__((aligned(32))) Transformation3D transformation;
+
+__attribute__((aligned(32))) Vect3D_f16 pts_3D[RSE_LOGO_3D_MAX_POINTS];
+__attribute__((aligned(32))) Vect2D_s16 pts_2D[RSE_LOGO_3D_MAX_POINTS];
+
 void main_logo(void)
 {
 	u16 zsort_switch;
 
 	/* Rotation easing */
 	u16 easing_index;	
-
-Vect2D_s16 poly_cache_pt_r[logo_r_FACE_COUNT << 2];
-u16 poly_cache_is_quad_r[logo_r_FACE_COUNT];
-u16 poly_cache_col_r[logo_r_FACE_COUNT];
-
-Vect2D_s16 poly_cache_pt_s[logo_s_FACE_COUNT << 2];
-u16 poly_cache_is_quad_s[logo_s_FACE_COUNT];
-u16 poly_cache_col_s[logo_s_FACE_COUNT];
-
-Vect2D_s16 poly_cache_pt_e[logo_e_FACE_COUNT << 2];
-u16 poly_cache_is_quad_e[logo_e_FACE_COUNT];
-u16 poly_cache_col_e[logo_e_FACE_COUNT];
-
-/* Polygon zsort array */
-struct  QSORT_ENTRY poly_zsort[RSE_LOGO_3D_MAX_POINTS];
-
-Rotation3D rotation;
-Translation3D translation;
-Transformation3D transformation;
-
-Vect3D_f16 pts_3D[RSE_LOGO_3D_MAX_POINTS];
-Vect2D_s16 pts_2D[RSE_LOGO_3D_MAX_POINTS];
 
 	/*	2D poly caches */
 	/* 	The result of the 3D transformation
