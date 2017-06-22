@@ -22,6 +22,7 @@ void displayBarbPictureFX(void);
 void flamesWavesFX(void);
 void ankouScreenFX(void);
 void RSE_Starfield_3D_Spr(void);
+void fireFX(void);
 
 u16 vramIndex;
 u16 fontIndex;
@@ -39,6 +40,8 @@ int main()
 		vramIndex = TILE_USERINDEX;
 
 		RSE_turn_screen_to_black();
+
+		fireFX();
 
 		main_logo();
 
